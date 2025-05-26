@@ -258,7 +258,7 @@ module swarm_logistics::economic_dao_example {
         // If proposal passed, execute it
         if (dao_governance::proposal_status(proposal) == 1) { // STATUS_PASSED
             dao_governance::execute_proposal(dao, proposal, clock, ctx);
-        };
+        }
     }
 
     // ==================== INTEGRATED EXAMPLES ====================
@@ -275,13 +275,16 @@ module swarm_logistics::economic_dao_example {
         let (mut dao, founder_membership) = example_create_dao(initial_treasury, clock, ctx);
 
         // Join as member
-        let _member_membership = dao_governance::join_dao(
+        let member_membership = dao_governance::join_dao(
             &mut dao,
             membership_payment,
             3000, // 3000 tokens
             clock,
             ctx
         );
+        
+        // Transfer membership to sender since it can't be dropped
+        transfer::public_transfer(member_membership, tx_context::sender(ctx));
 
         // Create pricing proposal
         let _pricing_proposal = dao_governance::create_proposal(
