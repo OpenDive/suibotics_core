@@ -77,6 +77,10 @@ module swarm_logistics::drone {
         current_time: u64,
         ctx: &mut sui::tx_context::TxContext
     ): Drone {
+        // Validate inputs
+        assert!(is_valid_operation_mode(operation_mode), 1);
+        assert!(is_valid_autonomy_level(autonomy_level), 2);
+        
         let drone_uid = sui::object::new(ctx);
         Drone {
             id: drone_uid,

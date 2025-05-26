@@ -131,7 +131,7 @@ module swarm_logistics::order_management {
 
     // ==================== PACKAGE LIMITS ====================
     const MAX_PACKAGE_WEIGHT: u64 = 5000; // 5kg in grams
-    const MIN_PAYMENT_AMOUNT: u64 = 100; // Minimum payment in SUI
+    const MIN_PAYMENT_AMOUNT: u64 = 100000000; // Minimum payment: 0.1 SUI
 
     /// Initialize the order management system
     public fun create_order_manager(ctx: &mut TxContext): OrderManager {

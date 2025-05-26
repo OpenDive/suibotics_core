@@ -190,7 +190,7 @@ module swarm_logistics::order_management_tests {
 
     #[test]
     fun test_order_cancellation() {
-        let scenario_val = test_scenario::begin(CUSTOMER);
+        let mut scenario_val = test_scenario::begin(CUSTOMER);
         let scenario = &mut scenario_val;
         let clock = clock::create_for_testing(test_scenario::ctx(scenario));
 
@@ -236,7 +236,7 @@ module swarm_logistics::order_management_tests {
     #[test]
     #[expected_failure]
     fun test_invalid_package_weight() {
-        let scenario_val = test_scenario::begin(CUSTOMER);
+        let mut scenario_val = test_scenario::begin(CUSTOMER);
         let scenario = &mut scenario_val;
         let clock = clock::create_for_testing(test_scenario::ctx(scenario));
 
@@ -260,6 +260,10 @@ module swarm_logistics::order_management_tests {
                 &clock,
                 test_scenario::ctx(scenario)
             );
+            
+            // These transfers won't be reached due to expected failure above
+            transfer::public_transfer(_order, CUSTOMER);
+            transfer::public_transfer(order_manager, CUSTOMER);
         };
 
         clock::destroy_for_testing(clock);
@@ -269,7 +273,7 @@ module swarm_logistics::order_management_tests {
     #[test]
     #[expected_failure]
     fun test_insufficient_payment() {
-        let scenario_val = test_scenario::begin(CUSTOMER);
+        let mut scenario_val = test_scenario::begin(CUSTOMER);
         let scenario = &mut scenario_val;
         let clock = clock::create_for_testing(test_scenario::ctx(scenario));
 
@@ -293,6 +297,10 @@ module swarm_logistics::order_management_tests {
                 &clock,
                 test_scenario::ctx(scenario)
             );
+            
+            // These transfers won't be reached due to expected failure above
+            transfer::public_transfer(_order, CUSTOMER);
+            transfer::public_transfer(order_manager, CUSTOMER);
         };
 
         clock::destroy_for_testing(clock);
