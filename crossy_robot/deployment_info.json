@@ -1,0 +1,8 @@
+{
+  "package_id": "0xcf21b35cca41042a29b030ec7f8d7c54d80235b9fcac438cab72fd89616c82ab",
+  "tx_digest": "HC3jBPFjwEdFiyHcS3oSy1ydUR36DsVjfschWPTs8Wi1",
+  "network": "testnet",
+  "game_cost_sui": "0.05",
+  "game_cost_mist": 50000000,
+  "timestamp": "2025-05-26T04:34:02Z"
+}
