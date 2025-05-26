@@ -18,7 +18,7 @@ Crossy Robot is a pay-to-play game where:
 │   (User)    │                 │   (Sui Blockchain)│
 └─────────────┘                 └─────────────────┘
                                          │
-                                    Events │
+                                    Events │ Shared Game Objects
                                          ▼
                                 ┌─────────────────┐
                                 │ Physical Robot  │
@@ -26,26 +26,35 @@ Crossy Robot is a pay-to-play game where:
                                 └─────────────────┘
 ```
 
+**Key Architecture Features:**
+- **Shared Game Objects**: Games are created as shared objects, allowing both users and robots to interact
+- **Event-Driven Communication**: Real-time blockchain events trigger robot actions
+- **Direct Payment Transfer**: 0.05 SUI flows directly from user to robot upon connection
+- **Decentralized Control**: No central server required for game coordination
+
 ## 📋 **Game Flow**
 
 ### **1. Game Creation**
 - User submits 0.05 SUI payment through frontend
-- Smart contract creates `Game` object with unique ID
+- Smart contract creates shared `Game` object with unique ID
+- Payment is held in escrow within the game object
 - Emits `GameCreated` event with game details
 - Game status: `WAITING_FOR_ROBOT`
 
 ### **2. Robot Connection**
 - Physical robot monitors blockchain for `GameCreated` events
 - Robot calls `connect_robot()` function to accept the game
-- 0.05 SUI payment transferred directly to robot
+- 0.05 SUI payment transferred directly to robot's wallet
+- Robot address recorded in game object
 - Emits `RobotConnected` event
 - Game status: `ACTIVE`
 
 ### **3. Robot Control**
 - User clicks movement buttons in frontend
-- Each click submits `move_robot()` transaction
-- Smart contract emits `RobotMoved` event with direction
-- Physical robot listens to events and executes movement
+- Each click submits `move_robot()` transaction with direction (0-7)
+- Smart contract validates game is active and direction is valid
+- Emits `RobotMoved` event with direction and timestamp
+- Physical robot listens to events and executes movement in real-time
 
 ## 🎮 **Movement Directions**
 
@@ -82,9 +91,9 @@ public struct Game has key, store {
 - `RobotMoved` - Movement command issued
 
 ### **Functions**
-- `create_game(payment, clock, ctx)` - Create new game
-- `connect_robot(game, clock, ctx)` - Robot connects to game
-- `move_robot(game, direction, clock, ctx)` - Issue movement command
+- `create_game(payment, clock, ctx)` - Create new shared game object
+- `connect_robot(game, clock, ctx): Coin<SUI>` - Robot connects and receives payment
+- `move_robot(game, direction, clock, ctx)` - Issue movement command (0-7 directions)
 
 ## 🚀 **Deployment**
 
@@ -158,23 +167,29 @@ The deployment information is automatically saved to `deployment_info.json` for 
 
 ### **For Frontend Developers**
 ```typescript
-// Create game
+// Create game (creates shared object)
 const createGame = async () => {
-  const payment = /* 0.05 SUI coin */;
-  const tx = new TransactionBlock();
+  const tx = new Transaction();
+  const [coin] = tx.splitCoins(tx.gas, [tx.pure.u64(50_000_000)]); // 0.05 SUI
+  
   tx.moveCall({
     target: `${PACKAGE_ID}::crossy_robot::create_game`,
-    arguments: [payment, clock],
+    arguments: [coin, tx.object('0x6')], // Clock object
   });
+  
   return await signAndExecute(tx);
 };
 
-// Move robot
+// Move robot (requires active game)
 const moveRobot = async (gameId: string, direction: number) => {
-  const tx = new TransactionBlock();
+  const tx = new Transaction();
   tx.moveCall({
     target: `${PACKAGE_ID}::crossy_robot::move_robot`,
-    arguments: [gameId, direction, clock],
+    arguments: [
+      tx.object(gameId), 
+      tx.pure.u8(direction), // 0-7 directions
+      tx.object('0x6') // Clock object
+    ],
   });
   return await signAndExecute(tx);
 };
@@ -182,27 +197,39 @@ const moveRobot = async (gameId: string, direction: number) => {
 
 ### **For Robot Developers**
 ```python
-# Listen for game events
+# Listen for game events and auto-connect
 def listen_for_games():
-    # Subscribe to GameCreated events
-    # Parse event data to get game_id
-    # Call connect_robot() to accept game
+    # Subscribe to GameCreated events from package
+    # Parse event: game_id, user, payment_amount, timestamp
+    # Call connect_robot() to accept game and receive payment
+    
+    tx = Transaction()
+    [received_coin] = tx.move_call(
+        target=f"{PACKAGE_ID}::crossy_robot::connect_robot",
+        arguments=[game_id, clock_object]
+    )
+    # Transfer received payment to robot wallet
+    tx.transfer_objects([received_coin], robot_address)
 
-# Listen for movement events  
+# Listen for movement events and execute  
 def listen_for_movements():
-    # Subscribe to RobotMoved events
-    # Parse direction from event
-    # Execute physical movement
+    # Subscribe to RobotMoved events from active games
+    # Parse event: game_id, direction (0-7), timestamp
+    # Execute physical movement based on direction
+    # Directions: 0=up, 1=down, 2=left, 3=right, 4-7=diagonals
 ```
 
 ## 🎯 **Current MVP Features**
 
 ### **✅ Implemented**
 - Pay-to-play game creation (0.05 SUI)
-- Robot connection and payment transfer
-- 8-directional movement commands
-- Event-driven architecture
-- Comprehensive test suite
+- Shared game objects for multi-party access
+- Robot connection and automatic payment transfer
+- 8-directional movement commands (0-7)
+- Event-driven architecture with real-time blockchain events
+- Comprehensive test suite (8/8 tests passing)
+- End-to-end testing with TypeScript SDK
+- Automated deployment scripts with validation
 
 ### **🚧 Future Enhancements (TODOs)**
 - Position tracking for game state validation
@@ -234,11 +261,38 @@ def listen_for_movements():
 - Blockchain-based IoT control
 - Economic incentives for robot services
 
+## 🧪 **Testing & Validation**
+
+### **Smart Contract Tests**
+- ✅ 8/8 Move tests passing (100% success rate)
+- ✅ Game creation with valid/invalid payments
+- ✅ Robot connection scenarios
+- ✅ Movement validation for all 8 directions
+- ✅ Error handling and edge cases
+
+### **End-to-End Testing**
+- ✅ TypeScript E2E test suite with real blockchain interaction
+- ✅ Event-driven testing with WebSocket subscriptions
+- ✅ Automated wallet generation and funding
+- ✅ Complete user journey validation (create → connect → move)
+- ✅ Gas estimation and transaction optimization
+
+**Run Tests:**
+```bash
+# Smart contract tests
+sui move test
+
+# E2E tests (requires funded wallets)
+npm run test:simple    # Basic functionality test
+npm run test:full      # Complete event-driven test
+npm run generate-keys  # Generate test wallets
+```
+
 ## 🔗 **Related Projects**
 
 This is part of the **Suibotics** ecosystem:
-- **Suibotics DID**: Decentralized identity system for robots
-- **Crossy Robot**: Simple robot control game (this project)
+- **Suibotics DID**: Decentralized identity system for robots (deployed)
+- **Crossy Robot**: Simple robot control game (this project - deployed)
 - **Future**: Robot delivery, authentication, and reputation systems
 
 ## 📄 **License**
