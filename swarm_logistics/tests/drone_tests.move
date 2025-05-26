@@ -9,7 +9,7 @@ module swarm_logistics::drone_tests {
 
     #[test]
     fun test_drone_creation() {
-        let scenario_val = test_scenario::begin(DRONE_OWNER);
+        let mut scenario_val = test_scenario::begin(DRONE_OWNER);
         let scenario = &mut scenario_val;
         let clock = clock::create_for_testing(test_scenario::ctx(scenario));
 
@@ -45,7 +45,7 @@ module swarm_logistics::drone_tests {
 
     #[test]
     fun test_drone_status_updates() {
-        let scenario_val = test_scenario::begin(DRONE_OWNER);
+        let mut scenario_val = test_scenario::begin(DRONE_OWNER);
         let scenario = &mut scenario_val;
         let clock = clock::create_for_testing(test_scenario::ctx(scenario));
 
@@ -87,7 +87,7 @@ module swarm_logistics::drone_tests {
 
     #[test]
     fun test_drone_validation_functions() {
-        let scenario_val = test_scenario::begin(DRONE_OWNER);
+        let mut scenario_val = test_scenario::begin(DRONE_OWNER);
         let scenario = &mut scenario_val;
         let clock = clock::create_for_testing(test_scenario::ctx(scenario));
 
@@ -123,7 +123,7 @@ module swarm_logistics::drone_tests {
 
     #[test]
     fun test_drone_financials() {
-        let scenario_val = test_scenario::begin(DRONE_OWNER);
+        let mut scenario_val = test_scenario::begin(DRONE_OWNER);
         let scenario = &mut scenario_val;
 
         test_scenario::next_tx(scenario, DRONE_OWNER);
@@ -150,7 +150,7 @@ module swarm_logistics::drone_tests {
     #[test]
     #[expected_failure]
     fun test_invalid_autonomy_level() {
-        let scenario_val = test_scenario::begin(DRONE_OWNER);
+        let mut scenario_val = test_scenario::begin(DRONE_OWNER);
         let scenario = &mut scenario_val;
         let clock = clock::create_for_testing(test_scenario::ctx(scenario));
 
@@ -168,8 +168,11 @@ module swarm_logistics::drone_tests {
                 clock::timestamp_ms(&clock),
                 test_scenario::ctx(scenario)
             );
+            // Transfer to avoid drop error (though this should never execute due to expected failure)
+            transfer::public_transfer(_drone, DRONE_OWNER);
         };
 
+        // Cleanup (should never be reached due to expected failure)
         clock::destroy_for_testing(clock);
         test_scenario::end(scenario_val);
     }
