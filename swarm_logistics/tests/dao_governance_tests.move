@@ -74,7 +74,7 @@ module swarm_logistics::dao_governance_tests {
             assert!(dao_governance::membership_tier(&founder_membership) == 3, 5); // TIER_FOUNDER
             assert!(dao_governance::membership_reputation(&founder_membership) == 100, 6);
 
-            transfer::share_object(dao);
+            transfer::public_share_object(dao);
             transfer::public_transfer(founder_membership, FOUNDER);
         };
 
@@ -111,7 +111,7 @@ module swarm_logistics::dao_governance_tests {
                 test_scenario::ctx(scenario)
             );
 
-            transfer::share_object(dao);
+            transfer::public_share_object(dao);
             transfer::public_transfer(founder_membership, FOUNDER);
         };
 
@@ -179,7 +179,7 @@ module swarm_logistics::dao_governance_tests {
 
             test_scenario::return_shared(dao);
             transfer::public_transfer(founder_membership, FOUNDER);
-            transfer::share_object(proposal);
+            transfer::public_share_object(proposal);
         };
 
         // Vote on proposal
@@ -370,7 +370,7 @@ module swarm_logistics::dao_governance_tests {
                 test_scenario::ctx(scenario)
             );
 
-            transfer::share_object(dao);
+            transfer::public_share_object(dao);
             transfer::public_transfer(founder_membership, FOUNDER);
         };
 
@@ -432,7 +432,7 @@ module swarm_logistics::dao_governance_tests {
 
             test_scenario::return_shared(dao);
             transfer::public_transfer(founder_membership, FOUNDER);
-            transfer::share_object(proposal);
+            transfer::public_share_object(proposal);
         };
     }
 

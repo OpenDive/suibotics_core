@@ -16,7 +16,7 @@ module swarm_logistics::dao_governance {
     // ==================== DAO STRUCTURES ====================
 
     /// Main DAO structure for drone fleet governance
-    public struct DroneDAO has key {
+    public struct DroneDAO has key, store {
         id: UID,
         dao_name: String,
         total_members: u64,
