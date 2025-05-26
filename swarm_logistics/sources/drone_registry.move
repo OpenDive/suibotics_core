@@ -69,7 +69,7 @@ module swarm_logistics::drone_registry {
         let sender = tx_context::sender(ctx);
 
         // Create the drone using the constructor function
-        let drone = types::new_drone(
+        let drone = drone_mod::new_drone(
             sender,
             operation_mode,
             autonomy_level,
@@ -81,10 +81,10 @@ module swarm_logistics::drone_registry {
             ctx
         );
 
-        let drone_id = types::drone_id(&drone);
+        let drone_id = drone_mod::drone_id(&drone);
 
         // Create financial management
-        let financials = types::new_drone_financials(drone_id, ctx);
+        let financials = drone_mod::new_drone_financials(drone_id, ctx);
 
         // Create capability for autonomous operations
         let capability = DroneCapability {
@@ -100,7 +100,7 @@ module swarm_logistics::drone_registry {
         registry.active_drones = registry.active_drones + 1;
 
         // Note: Event emission will be handled separately
-        let _event = types::new_drone_registered_event(
+        let _event = events_mod::new_drone_registered_event(
             drone_id,
             sender,
             operation_mode,
