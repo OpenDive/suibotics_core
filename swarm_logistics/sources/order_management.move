@@ -12,8 +12,50 @@ module swarm_logistics::order_management {
     use std::vector;
     use std::option::{Self, Option};
     use swarm_logistics::drone::{Self as drone_mod, Drone};
-    use swarm_logistics::events::{Self as events_mod};
-    use swarm_logistics::delivery::{Self as delivery_mod};
+
+    // ==================== EVENTS ====================
+    
+    /// Event emitted when a new order is created
+    public struct OrderCreatedEvent has copy, drop {
+        order_id: ID,
+        order_number: u64,
+        customer: address,
+        pickup_location: String,
+        dropoff_location: String,
+        payment_amount: u64,
+        priority_level: u8,
+        created_at: u64,
+    }
+
+    /// Event emitted when an order is assigned to a drone
+    public struct OrderAssignedEvent has copy, drop {
+        order_id: ID,
+        drone_id: ID,
+        assigned_at: u64,
+        estimated_completion: u64,
+    }
+
+    /// Event emitted when order status is updated
+    public struct OrderStatusUpdatedEvent has copy, drop {
+        order_id: ID,
+        new_status: u8,
+        updated_at: u64,
+    }
+
+    /// Event emitted when an order is completed
+    public struct OrderCompletedEvent has copy, drop {
+        order_id: ID,
+        order_number: u64,
+        drone_payout: u64,
+        platform_fee: u64,
+    }
+
+    /// Event emitted when an order is cancelled
+    public struct OrderCancelledEvent has copy, drop {
+        order_id: ID,
+        order_number: u64,
+        refund_amount: u64,
+    }
 
     /// Order management system
     public struct OrderManager has key {
@@ -159,16 +201,16 @@ module swarm_logistics::order_management {
         };
 
         // Emit order created event
-        event::emit(events_mod::new_order_created_event(
-            object::uid_to_inner(&order.id),
-            order_id,
-            tx_context::sender(ctx),
+        event::emit(OrderCreatedEvent {
+            order_id: object::uid_to_inner(&order.id),
+            order_number: order_id,
+            customer: tx_context::sender(ctx),
             pickup_location,
             dropoff_location,
             payment_amount,
             priority_level,
-            current_time,
-        ));
+            created_at: current_time,
+        });
 
         order
     }
@@ -213,12 +255,12 @@ module swarm_logistics::order_management {
         };
 
         // Emit assignment event
-        event::emit(events_mod::new_order_assigned_event(
-            object::uid_to_inner(&order.id),
+        event::emit(OrderAssignedEvent {
+            order_id: object::uid_to_inner(&order.id),
             drone_id,
-            current_time,
+            assigned_at: current_time,
             estimated_completion,
-        ));
+        });
 
         assignment
     }
@@ -248,11 +290,11 @@ module swarm_logistics::order_management {
         vector::push_back(&mut order.tracking_updates, update_message);
 
         // Emit status update event
-        event::emit(events_mod::new_order_status_updated_event(
-            object::uid_to_inner(&order.id),
+        event::emit(OrderStatusUpdatedEvent {
+            order_id: object::uid_to_inner(&order.id),
             new_status,
-            current_time,
-        ));
+            updated_at: current_time,
+        });
     }
 
     /// Complete order and release payment (called by customer or automated)
@@ -301,12 +343,12 @@ module swarm_logistics::order_management {
             b"Order completed successfully - payment released".to_string());
 
         // Emit completion event
-        event::emit(events_mod::new_order_completed_event(
-            object::uid_to_inner(&order.id),
-            order.order_id,
+        event::emit(OrderCompletedEvent {
+            order_id: object::uid_to_inner(&order.id),
+            order_number: order.order_id,
             drone_payout,
             platform_fee,
-        ));
+        });
     }
 
     /// Cancel order and refund customer
@@ -331,11 +373,11 @@ module swarm_logistics::order_management {
             b"Order cancelled by customer - full refund issued".to_string());
 
         // Emit cancellation event
-        event::emit(events_mod::new_order_cancelled_event(
-            object::uid_to_inner(&order.id),
-            order.order_id,
+        event::emit(OrderCancelledEvent {
+            order_id: object::uid_to_inner(&order.id),
+            order_number: order.order_id,
             refund_amount,
-        ));
+        });
     }
 
     // ==================== GETTER FUNCTIONS ====================
