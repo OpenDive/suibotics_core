@@ -239,7 +239,7 @@ module swarm_logistics::economic_dao_example {
         ctx: &mut TxContext
     ) {
         // Cast vote on proposal
-        let _vote = dao_governance::cast_vote(
+        let vote = dao_governance::cast_vote(
             dao,
             proposal,
             membership,
@@ -248,6 +248,9 @@ module swarm_logistics::economic_dao_example {
             clock,
             ctx
         );
+        
+        // Transfer vote to sender since it can't be dropped
+        transfer::public_transfer(vote, tx_context::sender(ctx));
 
         // Simulate time passing (voting period ends)
         // In real usage, this would happen naturally over time
@@ -258,7 +261,7 @@ module swarm_logistics::economic_dao_example {
         // If proposal passed, execute it
         if (dao_governance::proposal_status(proposal) == 1) { // STATUS_PASSED
             dao_governance::execute_proposal(dao, proposal, clock, ctx);
-        }
+        };
     }
 
     // ==================== INTEGRATED EXAMPLES ====================
@@ -287,7 +290,7 @@ module swarm_logistics::economic_dao_example {
         transfer::public_transfer(member_membership, tx_context::sender(ctx));
 
         // Create pricing proposal
-        let _pricing_proposal = dao_governance::create_proposal(
+        let pricing_proposal = dao_governance::create_proposal(
             &mut dao,
             &founder_membership,
             0, // Parameter proposal type
@@ -298,6 +301,9 @@ module swarm_logistics::economic_dao_example {
             clock,
             ctx
         );
+        
+        // Transfer proposal to sender since it can't be dropped
+        transfer::public_transfer(pricing_proposal, tx_context::sender(ctx));
 
         // Create corresponding pricing model
         let pricing_model = economic_engine::create_pricing_model(
