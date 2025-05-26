@@ -518,6 +518,18 @@ module swarm_logistics::logistics_manager {
             status: BACKUP_ASSIGNED,
         };
 
+        // Create a copy to return
+        let assignment_copy = BackupAssignment {
+            backup_drone,
+            original_drone,
+            order_id,
+            activation_reason,
+            activation_time: current_time,
+            handoff_location,
+            estimated_delay: 900000, // 15 minutes estimated delay
+            status: BACKUP_ASSIGNED,
+        };
+
         // Add to active backups
         vector::push_back(&mut coordinator.active_backups, assignment);
         
@@ -525,7 +537,7 @@ module swarm_logistics::logistics_manager {
         coordinator.total_backup_activations = coordinator.total_backup_activations + 1;
         manager.backup_activations = manager.backup_activations + 1;
 
-        option::some(assignment)
+        option::some(assignment_copy)
     }
 
     /// Complete backup handoff
