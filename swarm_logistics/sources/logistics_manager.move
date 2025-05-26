@@ -632,4 +632,21 @@ module swarm_logistics::logistics_manager {
     public fun coordinator_backup_success_rate(coordinator: &BackupCoordinator): u64 {
         coordinator.backup_success_rate
     }
+
+    // ==================== TEST HELPER FUNCTIONS ====================
+
+    #[test_only]
+    public fun create_test_logistics_manager(ctx: &mut TxContext): LogisticsManager {
+        LogisticsManager {
+            id: object::new(ctx),
+            active_deliveries: vector::empty(),
+            completed_deliveries: vector::empty(),
+            failed_deliveries: vector::empty(),
+            total_packages_processed: 0,
+            successful_delivery_rate: 100,
+            average_delivery_time: 1800000, // 30 minutes default
+            backup_activations: 0,
+            route_optimizations: 0,
+        }
+    }
 } 
