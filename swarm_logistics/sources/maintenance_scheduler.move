@@ -13,7 +13,7 @@ module swarm_logistics::maintenance_scheduler {
     // ==================== MAINTENANCE STRUCTURES ====================
 
     /// Central maintenance coordination system
-    public struct MaintenanceScheduler has key {
+    public struct MaintenanceScheduler has key, store {
         id: UID,
         scheduled_maintenance: vector<ID>,
         active_maintenance: vector<ID>,

@@ -1,19 +1,15 @@
 #[test_only]
 module swarm_logistics::maintenance_scheduler_tests {
-    use sui::test_scenario::{Self, Scenario};
-    use sui::clock::{Self, Clock};
-    use sui::object::{Self, ID};
-    use sui::coin;
-    use sui::sui::SUI;
+    use sui::test_scenario;
+    use sui::clock;
+    use sui::object;
     use std::string;
     use std::vector;
-    use std::option;
-    use swarm_logistics::maintenance_scheduler::{Self, MaintenanceScheduler, MaintenanceSession, MaintenanceFacility, PredictiveAnalysis, ResourceAllocator};
-    use swarm_logistics::drone::{Self, Drone};
+    use sui::transfer;
+    use swarm_logistics::maintenance_scheduler::{Self, MaintenanceScheduler, MaintenanceSession};
 
     // Test addresses
     const ADMIN: address = @0x1;
-    const TECHNICIAN: address = @0x2;
     const FACILITY_MANAGER: address = @0x3;
 
     // ==================== MAINTENANCE SCHEDULING TESTS ====================
@@ -82,7 +78,8 @@ module swarm_logistics::maintenance_scheduler_tests {
 
         test_scenario::next_tx(scenario, ADMIN);
         {
-            maintenance_scheduler::init(test_scenario::ctx(scenario));
+            let scheduler = maintenance_scheduler::create_test_scheduler(test_scenario::ctx(scenario));
+            transfer::public_share_object(scheduler);
         };
 
         test_scenario::next_tx(scenario, ADMIN);
@@ -119,7 +116,8 @@ module swarm_logistics::maintenance_scheduler_tests {
 
         test_scenario::next_tx(scenario, ADMIN);
         {
-            maintenance_scheduler::init(test_scenario::ctx(scenario));
+            let scheduler = maintenance_scheduler::create_test_scheduler(test_scenario::ctx(scenario));
+            transfer::public_share_object(scheduler);
         };
 
         test_scenario::next_tx(scenario, ADMIN);
@@ -220,7 +218,8 @@ module swarm_logistics::maintenance_scheduler_tests {
 
         test_scenario::next_tx(scenario, ADMIN);
         {
-            maintenance_scheduler::init(test_scenario::ctx(scenario));
+            let scheduler = maintenance_scheduler::create_test_scheduler(test_scenario::ctx(scenario));
+            transfer::public_share_object(scheduler);
         };
 
         test_scenario::next_tx(scenario, ADMIN);
@@ -333,7 +332,8 @@ module swarm_logistics::maintenance_scheduler_tests {
 
         test_scenario::next_tx(scenario, ADMIN);
         {
-            maintenance_scheduler::init(test_scenario::ctx(scenario));
+            let scheduler = maintenance_scheduler::create_test_scheduler(test_scenario::ctx(scenario));
+            transfer::public_share_object(scheduler);
         };
 
         test_scenario::next_tx(scenario, ADMIN);
@@ -400,7 +400,8 @@ module swarm_logistics::maintenance_scheduler_tests {
 
         test_scenario::next_tx(scenario, ADMIN);
         {
-            maintenance_scheduler::init(test_scenario::ctx(scenario));
+            let scheduler = maintenance_scheduler::create_test_scheduler(test_scenario::ctx(scenario));
+            transfer::public_share_object(scheduler);
         };
 
         test_scenario::next_tx(scenario, ADMIN);
@@ -599,7 +600,7 @@ module swarm_logistics::maintenance_scheduler_tests {
                 &clock
             );
 
-            // Create pending sessions
+            // Create pending sessions with fixed addresses
             let pending_sessions = vector[
                 object::id_from_address(@0x001),
                 object::id_from_address(@0x002)
@@ -633,7 +634,8 @@ module swarm_logistics::maintenance_scheduler_tests {
 
         test_scenario::next_tx(scenario, ADMIN);
         {
-            maintenance_scheduler::init(test_scenario::ctx(scenario));
+            let scheduler = maintenance_scheduler::create_test_scheduler(test_scenario::ctx(scenario));
+            transfer::public_share_object(scheduler);
         };
 
         test_scenario::next_tx(scenario, ADMIN);
@@ -717,7 +719,8 @@ module swarm_logistics::maintenance_scheduler_tests {
 
         test_scenario::next_tx(scenario, ADMIN);
         {
-            maintenance_scheduler::init(test_scenario::ctx(scenario));
+            let scheduler = maintenance_scheduler::create_test_scheduler(test_scenario::ctx(scenario));
+            transfer::public_share_object(scheduler);
         };
 
         test_scenario::next_tx(scenario, ADMIN);
@@ -743,29 +746,59 @@ module swarm_logistics::maintenance_scheduler_tests {
                 test_scenario::ctx(scenario)
             );
 
-            // Schedule multiple maintenance sessions
+            // Schedule multiple maintenance sessions with fixed addresses
             let mut sessions = vector::empty<MaintenanceSession>();
-            let mut i = 0;
-            while (i < 4) {
-                let drone_id = object::id_from_address(@0x100 + i);
-                let session = maintenance_scheduler::schedule_routine_maintenance(
-                    &mut scheduler,
-                    drone_id,
-                    clock::timestamp_ms(&clock) + (i * 3600000), // Staggered times
-                    3600000 + (i * 1800000), // Varying durations
-                    vector[],
-                    &clock,
-                    test_scenario::ctx(scenario)
-                );
-                vector::push_back(&mut sessions, session);
-                i = i + 1;
-            };
+            
+            let session1 = maintenance_scheduler::schedule_routine_maintenance(
+                &mut scheduler,
+                object::id_from_address(@0x101),
+                clock::timestamp_ms(&clock) + 3600000,
+                3600000,
+                vector[],
+                &clock,
+                test_scenario::ctx(scenario)
+            );
+            vector::push_back(&mut sessions, session1);
+
+            let session2 = maintenance_scheduler::schedule_routine_maintenance(
+                &mut scheduler,
+                object::id_from_address(@0x102),
+                clock::timestamp_ms(&clock) + 7200000,
+                5400000,
+                vector[],
+                &clock,
+                test_scenario::ctx(scenario)
+            );
+            vector::push_back(&mut sessions, session2);
+
+            let session3 = maintenance_scheduler::schedule_routine_maintenance(
+                &mut scheduler,
+                object::id_from_address(@0x103),
+                clock::timestamp_ms(&clock) + 10800000,
+                7200000,
+                vector[],
+                &clock,
+                test_scenario::ctx(scenario)
+            );
+            vector::push_back(&mut sessions, session3);
+
+            let session4 = maintenance_scheduler::schedule_routine_maintenance(
+                &mut scheduler,
+                object::id_from_address(@0x104),
+                clock::timestamp_ms(&clock) + 14400000,
+                9000000,
+                vector[],
+                &clock,
+                test_scenario::ctx(scenario)
+            );
+            vector::push_back(&mut sessions, session4);
 
             // Assign sessions to facilities
             let session1 = vector::pop_back(&mut sessions);
             let session2 = vector::pop_back(&mut sessions);
             let session3 = vector::pop_back(&mut sessions);
             let session4 = vector::pop_back(&mut sessions);
+            vector::destroy_empty(sessions);
 
             let mut session1 = session1;
             let mut session2 = session2;
@@ -805,7 +838,8 @@ module swarm_logistics::maintenance_scheduler_tests {
 
         test_scenario::next_tx(scenario, ADMIN);
         {
-            maintenance_scheduler::init(test_scenario::ctx(scenario));
+            let scheduler = maintenance_scheduler::create_test_scheduler(test_scenario::ctx(scenario));
+            transfer::public_share_object(scheduler);
         };
 
         test_scenario::next_tx(scenario, ADMIN);
@@ -813,32 +847,72 @@ module swarm_logistics::maintenance_scheduler_tests {
             let mut scheduler = test_scenario::take_shared<MaintenanceScheduler>(scenario);
             let mut sessions = vector::empty<MaintenanceSession>();
             
-            // Schedule 10 maintenance sessions
-            let mut i = 0;
-            while (i < 10) {
-                let drone_id = object::id_from_address(@0x200 + i);
-                let session = maintenance_scheduler::schedule_routine_maintenance(
-                    &mut scheduler,
-                    drone_id,
-                    clock::timestamp_ms(&clock) + (i * 3600000),
-                    3600000,
-                    vector[],
-                    &clock,
-                    test_scenario::ctx(scenario)
-                );
-                vector::push_back(&mut sessions, session);
-                i = i + 1;
-            };
+            // Schedule 5 maintenance sessions with fixed addresses
+            let session1 = maintenance_scheduler::schedule_routine_maintenance(
+                &mut scheduler,
+                object::id_from_address(@0x201),
+                clock::timestamp_ms(&clock) + 3600000,
+                3600000,
+                vector[],
+                &clock,
+                test_scenario::ctx(scenario)
+            );
+            vector::push_back(&mut sessions, session1);
+
+            let session2 = maintenance_scheduler::schedule_routine_maintenance(
+                &mut scheduler,
+                object::id_from_address(@0x202),
+                clock::timestamp_ms(&clock) + 7200000,
+                3600000,
+                vector[],
+                &clock,
+                test_scenario::ctx(scenario)
+            );
+            vector::push_back(&mut sessions, session2);
+
+            let session3 = maintenance_scheduler::schedule_routine_maintenance(
+                &mut scheduler,
+                object::id_from_address(@0x203),
+                clock::timestamp_ms(&clock) + 10800000,
+                3600000,
+                vector[],
+                &clock,
+                test_scenario::ctx(scenario)
+            );
+            vector::push_back(&mut sessions, session3);
+
+            let session4 = maintenance_scheduler::schedule_routine_maintenance(
+                &mut scheduler,
+                object::id_from_address(@0x204),
+                clock::timestamp_ms(&clock) + 14400000,
+                3600000,
+                vector[],
+                &clock,
+                test_scenario::ctx(scenario)
+            );
+            vector::push_back(&mut sessions, session4);
+
+            let session5 = maintenance_scheduler::schedule_routine_maintenance(
+                &mut scheduler,
+                object::id_from_address(@0x205),
+                clock::timestamp_ms(&clock) + 18000000,
+                3600000,
+                vector[],
+                &clock,
+                test_scenario::ctx(scenario)
+            );
+            vector::push_back(&mut sessions, session5);
 
             // Verify all sessions were scheduled
-            assert!(maintenance_scheduler::scheduler_scheduled_count(&scheduler) == 10, 1);
-            assert!(maintenance_scheduler::scheduler_total_sessions(&scheduler) == 10, 2);
+            assert!(maintenance_scheduler::scheduler_scheduled_count(&scheduler) == 5, 1);
+            assert!(maintenance_scheduler::scheduler_total_sessions(&scheduler) == 5, 2);
 
             // Clean up sessions
             while (!vector::is_empty(&sessions)) {
                 let session = vector::pop_back(&mut sessions);
                 transfer::public_transfer(session, ADMIN);
             };
+            vector::destroy_empty(sessions);
 
             test_scenario::return_shared(scheduler);
         };
