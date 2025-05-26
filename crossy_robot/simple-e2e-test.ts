@@ -13,6 +13,7 @@ import { SuiClient, getFullnodeUrl } from '@mysten/sui/client';
 import { Transaction } from '@mysten/sui/transactions';
 import { Ed25519Keypair } from '@mysten/sui/keypairs/ed25519';
 import { fromB64 } from '@mysten/sui/utils';
+import { decodeSuiPrivateKey } from '@mysten/sui/cryptography';
 import * as fs from 'fs';
 import * as dotenv from 'dotenv';
 
@@ -80,12 +81,17 @@ class SimpleCrossyRobotTest {
     try {
       // Handle both Sui CLI format (suiprivkey1...) and base64 format
       if (privateKey.startsWith('suiprivkey1')) {
-        return Ed25519Keypair.deriveKeypair(privateKey);
+        const { schema, secretKey } = decodeSuiPrivateKey(privateKey);
+        if (schema === 'ED25519') {
+          return Ed25519Keypair.fromSecretKey(secretKey);
+        } else {
+          throw new Error('Only ED25519 keys are supported');
+        }
       } else {
         return Ed25519Keypair.fromSecretKey(fromB64(privateKey));
       }
     } catch (error) {
-      console.error(`❌ Invalid private key format for ${envVar}`);
+      console.error(`❌ Invalid private key format for ${envVar}:`, error);
       console.log('💡 Private key should be either Sui CLI format (suiprivkey1...) or base64 encoded');
       process.exit(1);
     }
@@ -137,9 +143,9 @@ class SimpleCrossyRobotTest {
       const tx = new Transaction();
       
       // Split coins for exact payment
-      const [coin] = tx.splitCoins(tx.gas, [GAME_COST]);
+      const [coin] = tx.splitCoins(tx.gas, [tx.pure.u64(GAME_COST)]);
       
-      // Create game
+      // Create game (now shared object)
       tx.moveCall({
         target: `${this.packageId}::crossy_robot::create_game`,
         arguments: [
@@ -162,7 +168,7 @@ class SimpleCrossyRobotTest {
         throw new Error(`Transaction failed: ${result.effects?.status?.error}`);
       }
       
-      // Extract game object ID
+      // Extract game object ID (now a shared object)
       const gameObject = result.objectChanges?.find(
         (change: any) => change.type === 'created' && 
         change.objectType?.includes('Game')
@@ -191,13 +197,17 @@ class SimpleCrossyRobotTest {
     try {
       const tx = new Transaction();
       
-      tx.moveCall({
+      // Connect robot and capture the returned payment coin
+      const [receivedCoin] = tx.moveCall({
         target: `${this.packageId}::crossy_robot::connect_robot`,
         arguments: [
           tx.object(gameId),
           tx.object('0x6'), // Clock object
         ],
       });
+      
+      // Transfer the payment coin to the robot
+      tx.transferObjects([receivedCoin], tx.pure.address(this.robotKeypair.getPublicKey().toSuiAddress()));
       
       const result = await this.client.signAndExecuteTransaction({
         signer: this.robotKeypair,

@@ -1,14 +1,14 @@
 {
-  "package_id": "0x026e404cc7799d16f55c8e44e1a13868bbe58d48a38aebc6739e04c62d857d94",
-  "transaction_digest": "A9Nc7XDaq6Fv8qthM1VFabPSygbrPHaDLJwtUjdzcucu",
+  "package_id": "0xaa4fbd2d5507be23930ee1d1febba86ba0fdd438d8167b5629114c2bc548d76f",
+  "transaction_digest": "7UsUEzk9x6yvurXvyZe57CJjBCzeMPe5Qw27nnp8DsLr",
   "network": "testnet",
-  "timestamp": "2025-01-26T00:37:14Z",
+  "deployed_at": "2024-12-19T08:59:00Z",
   "package_name": "crossy_robot",
   "gas_budget": 100000000,
   "gas_used": 18193480,
   "game_cost_sui": "0.05",
   "game_cost_mist": 50000000,
-  "upgrade_cap": "0x0cc8ce202a6fd374968decd54a88ee03f8e99a51a2c62d981923b0dca676b2aa",
+  "upgrade_cap": "0x2caf2de6d8deed0ebe70b135f98fd572b0508ed9efe25b7261aebe780f12c9cc",
   "contract_functions": {
     "create_game": "Create new game with 0.05 SUI payment",
     "connect_robot": "Robot connects to game and receives payment",
@@ -20,7 +20,10 @@
     "RobotMoved": "Movement command issued"
   },
   "explorer_links": {
-    "package": "https://suiscan.xyz/testnet/object/0x026e404cc7799d16f55c8e44e1a13868bbe58d48a38aebc6739e04c62d857d94",
-    "transaction": "https://suiscan.xyz/testnet/tx/A9Nc7XDaq6Fv8qthM1VFabPSygbrPHaDLJwtUjdzcucu"
-  }
+    "package": "https://testnet.suivision.xyz/package/0xaa4fbd2d5507be23930ee1d1febba86ba0fdd438d8167b5629114c2bc548d76f",
+    "transaction": "https://testnet.suivision.xyz/txblock/7UsUEzk9x6yvurXvyZe57CJjBCzeMPe5Qw27nnp8DsLr"
+  },
+  "explorer_url": "https://testnet.suivision.xyz/package/0xaa4fbd2d5507be23930ee1d1febba86ba0fdd438d8167b5629114c2bc548d76f",
+  "transaction_url": "https://testnet.suivision.xyz/txblock/7UsUEzk9x6yvurXvyZe57CJjBCzeMPe5Qw27nnp8DsLr",
+  "notes": "Updated contract with shared game objects - robots can now connect to games created by users"
 }

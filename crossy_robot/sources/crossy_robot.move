@@ -77,7 +77,7 @@ module crossy_robot::crossy_robot {
         payment: Coin<SUI>,
         clock: &Clock,
         ctx: &mut TxContext
-    ): Game {
+    ) {
         // Validate payment amount
         assert!(coin::value(&payment) == GAME_COST, E_INVALID_PAYMENT);
 
@@ -102,7 +102,8 @@ module crossy_robot::crossy_robot {
             timestamp,
         });
 
-        game
+        // Share the game object so both user and robot can access it
+        transfer::share_object(game);
     }
 
     /// Robot connects to a game and receives payment

@@ -309,15 +309,19 @@ class CrossyRobotE2ETest {
 
   private async robotConnectToGame(gameId: string): Promise<void> {
     try {
-      const tx = new TransactionBlock();
+      const tx = new Transaction();
       
-      tx.moveCall({
+      // Connect robot and capture the returned payment coin
+      const [receivedCoin] = tx.moveCall({
         target: `${this.packageId}::crossy_robot::connect_robot`,
         arguments: [
           tx.object(gameId),
           tx.object('0x6'), // Clock object
         ],
       });
+      
+      // Transfer the payment coin to the robot
+      tx.transferObjects([receivedCoin], tx.pure.address(this.robotKeypair.getPublicKey().toSuiAddress()));
       
       const result = await this.client.signAndExecuteTransactionBlock({
         signer: this.robotKeypair,
