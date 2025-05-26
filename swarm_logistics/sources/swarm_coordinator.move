@@ -525,6 +525,26 @@ module swarm_logistics::swarm_coordinator {
         vector::length(&load_balancer.pending_orders)
     }
 
+    public fun emergency_response_id(response: &EmergencyResponse): ID {
+        response.emergency_id
+    }
+
+    public fun emergency_response_type(response: &EmergencyResponse): u8 {
+        response.response_type
+    }
+
+    public fun emergency_response_drones(response: &EmergencyResponse): &vector<ID> {
+        &response.responding_drones
+    }
+
+    public fun emergency_response_success_rate(response: &EmergencyResponse): u8 {
+        response.success_rate
+    }
+
+    public fun emergency_response_actual_time(response: &EmergencyResponse): &Option<u64> {
+        &response.actual_response_time
+    }
+
     // ==================== TEST HELPER FUNCTIONS ====================
 
     #[test_only]
