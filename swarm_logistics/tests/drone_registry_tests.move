@@ -9,7 +9,7 @@ module swarm_logistics::drone_registry_tests {
 
     #[test]
     fun test_drone_registration() {
-        let scenario_val = test_scenario::begin(DRONE_OWNER);
+        let mut scenario_val = test_scenario::begin(DRONE_OWNER);
         let scenario = &mut scenario_val;
         let clock = clock::create_for_testing(test_scenario::ctx(scenario));
 
@@ -48,7 +48,7 @@ module swarm_logistics::drone_registry_tests {
 
     #[test]
     fun test_autonomous_order_evaluation() {
-        let scenario_val = test_scenario::begin(DRONE_OWNER);
+        let mut scenario_val = test_scenario::begin(DRONE_OWNER);
         let scenario = &mut scenario_val;
         let clock = clock::create_for_testing(test_scenario::ctx(scenario));
 
@@ -104,7 +104,7 @@ module swarm_logistics::drone_registry_tests {
 
     #[test]
     fun test_drone_self_status_update() {
-        let scenario_val = test_scenario::begin(DRONE_OWNER);
+        let mut scenario_val = test_scenario::begin(DRONE_OWNER);
         let scenario = &mut scenario_val;
         let clock = clock::create_for_testing(test_scenario::ctx(scenario));
 
@@ -149,7 +149,7 @@ module swarm_logistics::drone_registry_tests {
 
     #[test]
     fun test_autonomous_maintenance_scheduling() {
-        let scenario_val = test_scenario::begin(DRONE_OWNER);
+        let mut scenario_val = test_scenario::begin(DRONE_OWNER);
         let scenario = &mut scenario_val;
         let clock = clock::create_for_testing(test_scenario::ctx(scenario));
 
@@ -195,7 +195,7 @@ module swarm_logistics::drone_registry_tests {
 
     #[test]
     fun test_emergency_assistance_capability() {
-        let scenario_val = test_scenario::begin(DRONE_OWNER);
+        let mut scenario_val = test_scenario::begin(DRONE_OWNER);
         let scenario = &mut scenario_val;
         let clock = clock::create_for_testing(test_scenario::ctx(scenario));
 

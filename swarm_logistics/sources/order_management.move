@@ -58,7 +58,7 @@ module swarm_logistics::order_management {
     }
 
     /// Order management system
-    public struct OrderManager has key {
+    public struct OrderManager has key, store {
         id: UID,
         total_orders: u64,
         active_orders: u64,
@@ -93,7 +93,7 @@ module swarm_logistics::order_management {
     }
 
     /// Order assignment capability for drones
-    public struct OrderAssignment has key {
+    public struct OrderAssignment has key, store {
         id: UID,
         order_id: ID,
         drone_id: ID,
