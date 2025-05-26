@@ -16,7 +16,7 @@ module swarm_logistics::logistics_manager {
     // ==================== LOGISTICS STRUCTURES ====================
 
     /// Central logistics coordination hub
-    public struct LogisticsManager has key {
+    public struct LogisticsManager has key, store {
         id: UID,
         active_deliveries: vector<ID>,
         completed_deliveries: vector<ID>,
