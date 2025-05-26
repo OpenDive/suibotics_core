@@ -808,4 +808,10 @@ module swarm_logistics::dao_governance {
     public fun membership_tier(membership: &DAOMembership): u8 {
         membership.membership_tier
     }
+
+    // ==================== TEST-COMPATIBLE GETTER FUNCTIONS ====================
+
+    public fun total_members(dao: &DroneDAO): u64 {
+        dao.total_members
+    }
 } 

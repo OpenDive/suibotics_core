@@ -603,6 +603,16 @@ module swarm_logistics::flight_controller {
         vector::length(&nav_state.obstacles_detected)
     }
 
+    // ==================== TEST-COMPATIBLE GETTER FUNCTIONS ====================
+
+    public fun route_distance(route: &FlightRoute): u64 {
+        route.total_distance
+    }
+
+    public fun estimated_duration(route: &FlightRoute): u64 {
+        route.estimated_flight_time
+    }
+
     public fun navigation_decisions_count(nav_state: &NavigationState): u64 {
         vector::length(&nav_state.autonomous_decisions)
     }

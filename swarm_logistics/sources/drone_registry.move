@@ -279,6 +279,56 @@ module swarm_logistics::drone_registry {
         drone_mod::drone_battery_level(drone) > 50
     }
 
+    // ==================== TEST-COMPATIBLE FUNCTIONS ====================
+
+    /// Simplified drone registration for testing (returns objects instead of transferring)
+    public fun register_drone_for_test(
+        _model_name: String,
+        operation_mode: u8,
+        autonomy_level: u8,
+        payload_capacity: u64,
+        max_range: u64,
+        service_area: String,
+        initial_location: String,
+        current_time: u64,
+        ctx: &mut TxContext
+    ): (Drone, DroneFinancials, DroneCapability) {
+        // Validate inputs
+        assert!(drone_mod::is_valid_operation_mode(operation_mode), events_mod::e_invalid_operation_mode());
+        assert!(drone_mod::is_valid_autonomy_level(autonomy_level), events_mod::e_invalid_autonomy_level());
+
+        let sender = tx_context::sender(ctx);
+
+        // Create the drone using the constructor function
+        let drone = drone_mod::new_drone(
+            sender,
+            operation_mode,
+            autonomy_level,
+            payload_capacity,
+            max_range,
+            service_area,
+            initial_location,
+            current_time,
+            ctx
+        );
+
+        let drone_id = drone_mod::drone_id(&drone);
+
+        // Create financial management
+        let financials = drone_mod::new_drone_financials(drone_id, ctx);
+
+        // Create capability for autonomous operations
+        let capability = DroneCapability {
+            id: object::new(ctx),
+            drone_id,
+            can_self_manage: autonomy_level >= 50,
+            can_coordinate: autonomy_level >= 70,
+            can_emergency_assist: autonomy_level >= 80,
+        };
+
+        (drone, financials, capability)
+    }
+
     #[test_only]
     public fun test_init(ctx: &mut TxContext) {
         init(ctx);

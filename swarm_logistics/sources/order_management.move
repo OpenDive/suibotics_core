@@ -433,4 +433,38 @@ module swarm_logistics::order_management {
     public fun get_average_delivery_time(manager: &OrderManager): u64 {
         manager.average_delivery_time
     }
+
+    // ==================== TEST-COMPATIBLE GETTER FUNCTIONS ====================
+
+    public fun package_weight(order: &DeliveryOrder): u64 {
+        order.package_weight
+    }
+
+    public fun order_id(order: &DeliveryOrder): u64 {
+        order.order_id
+    }
+
+    public fun order_status(order: &DeliveryOrder): u8 {
+        order.status
+    }
+
+    public fun customer(order: &DeliveryOrder): address {
+        order.customer
+    }
+
+    public fun payment_amount(order: &DeliveryOrder): u64 {
+        order.payment_amount
+    }
+
+    public fun priority_level(order: &DeliveryOrder): u8 {
+        order.priority_level
+    }
+
+    public fun pickup_location(order: &DeliveryOrder): String {
+        order.pickup_location
+    }
+
+    public fun dropoff_location(order: &DeliveryOrder): String {
+        order.dropoff_location
+    }
 } 

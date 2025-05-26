@@ -170,6 +170,30 @@ module swarm_logistics::drone {
         drone.swarm_reputation
     }
 
+    public fun autonomy_level(drone: &Drone): u8 {
+        drone.autonomy_level
+    }
+
+    public fun payload_capacity(drone: &Drone): u64 {
+        drone.payload_capacity
+    }
+
+    public fun max_range(drone: &Drone): u64 {
+        drone.max_range
+    }
+
+    public fun operation_mode(drone: &Drone): u8 {
+        drone.operation_mode
+    }
+
+    public fun current_location(drone: &Drone): String {
+        drone.current_location
+    }
+
+    public fun service_area(drone: &Drone): String {
+        drone.service_area
+    }
+
     public fun financials_maintenance_fund(financials: &DroneFinancials): u64 {
         financials.maintenance_fund
     }
