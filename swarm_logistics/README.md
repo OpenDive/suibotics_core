@@ -48,9 +48,12 @@ swarm_logistics/
 │   ├── delivery.move              # Delivery tracking types
 │   ├── logistics_manager.move     # Package tracking and logistics workflows
 │   ├── maintenance_scheduler.move # Predictive maintenance and scheduling
+│   ├── economic_engine.move       # Dynamic pricing and financial management
+│   ├── dao_governance.move        # DAO governance and collective ownership
 │   └── events.move                # Event definitions and emissions
 ├── examples/
-│   └── basic_workflow.move        # Example usage patterns
+│   ├── basic_workflow.move        # Basic usage patterns
+│   └── economic_dao_example.move  # Economic Engine and DAO examples
 └── Move.toml                      # Project configuration
 ```
 
@@ -98,6 +101,24 @@ Predictive maintenance system:
 - Resource allocation and technician scheduling
 - Parts inventory management
 - Maintenance facility coordination
+
+### 💰 **Economic Engine** (`economic_engine.move`)
+Advanced financial management and dynamic pricing:
+- **Dynamic Pricing Models**: Multi-factor pricing with demand, weather, and time-of-day adjustments
+- **Market Making**: Price discovery and volatility tracking for delivery services
+- **Revenue Distribution**: Automated revenue sharing with performance-based bonuses
+- **Treasury Management**: Autonomous fund allocation and investment strategies
+- **Performance Metrics**: Comprehensive financial analytics and ROI tracking
+- **Surge Pricing**: Real-time supply/demand-based pricing adjustments
+
+### 🏛️ **DAO Governance** (`dao_governance.move`)
+Decentralized autonomous organization for fleet management:
+- **Collective Ownership**: Democratic control of drone fleets through governance tokens
+- **Proposal System**: Create and vote on fleet decisions, treasury allocations, and parameter changes
+- **Vote Delegation**: Delegate voting power to trusted community members
+- **Treasury Management**: Community-controlled fund allocation and revenue distribution
+- **Membership Tiers**: Different membership levels with varying voting power and benefits
+- **Execution Framework**: Automatic execution of passed proposals with time delays
 
 ### 📊 **Events System** (`events.move`)
 Comprehensive event tracking:
@@ -302,6 +323,132 @@ let facility = maintenance_scheduler::create_maintenance_facility(
 );
 ```
 
+### 7. Economic Engine - Dynamic Pricing
+
+```move
+// Create dynamic pricing model
+let pricing_model = economic_engine::create_pricing_model(
+    b"Urban Express Delivery".to_string(),
+    2000000000,  // 2 SUI base rate
+    100000000,   // 0.1 SUI per km
+    1000,        // 1000 MIST per gram
+    vector[100, 120, 150, 200], // Urgency multipliers
+    &mut ctx
+);
+
+// Calculate dynamic delivery price
+let price = economic_engine::calculate_delivery_price(
+    &engine,
+    &pricing_model,
+    5,    // 5 km distance
+    500,  // 500 grams
+    2,    // Rush urgency
+    14,   // 2 PM (peak hours)
+    1,    // Light rain weather
+    2     // High demand
+);
+
+// Create revenue distribution pool
+let distribution_rules = economic_engine::create_distribution_rules(
+    50,  // 50% to drone
+    25,  // 25% to owner
+    10,  // 10% to platform
+    10,  // 10% to maintenance
+    5,   // 5% to insurance
+    0,   // No bonus pool
+    100000000  // 0.1 SUI minimum
+);
+
+let revenue_pool = economic_engine::create_revenue_pool(
+    0, // Drone pool type
+    distribution_rules,
+    86400000, // Daily distribution
+    &mut ctx
+);
+```
+
+### 8. DAO Governance - Collective Fleet Management
+
+```move
+// Create governance configuration
+let governance_config = dao_governance::create_governance_config(
+    1000,      // 1000 tokens to create proposal
+    604800000, // 7 days voting period
+    172800000, // 2 days execution delay
+    25,        // 25% quorum required
+    60,        // 60% approval required
+    100,       // 100 tokens for membership
+    1000000000, // 1 SUI proposal deposit
+    10         // Max 10 concurrent proposals
+);
+
+// Create revenue sharing rules
+let revenue_rules = dao_governance::create_revenue_rules(
+    60,   // 60% to members
+    25,   // 25% to treasury
+    10,   // 10% for reinvestment
+    5,    // 5% for operations
+    0,    // No performance bonus
+    2592000000 // Monthly distribution
+);
+
+// Create drone fleet DAO
+let (dao, founder_membership) = dao_governance::create_dao(
+    b"SkyNet Delivery DAO".to_string(),
+    initial_treasury,
+    governance_config,
+    revenue_rules,
+    10000, // Founder gets 10,000 tokens
+    &clock,
+    &mut ctx
+);
+
+// Join DAO as member
+let membership = dao_governance::join_dao(
+    &mut dao,
+    membership_payment,
+    5000, // Request 5000 governance tokens
+    &clock,
+    &mut ctx
+);
+
+// Create governance proposal
+let proposal = dao_governance::create_proposal(
+    &mut dao,
+    &membership,
+    1, // Treasury proposal type
+    b"Fund New Drone Purchase".to_string(),
+    b"Proposal to allocate 100 SUI for 2 new delivery drones".to_string(),
+    vector[1, 100, 0, 0, 0, 0, 0, 0], // Encoded proposal data
+    proposal_deposit,
+    &clock,
+    &mut ctx
+);
+
+// Cast vote on proposal
+let vote = dao_governance::cast_vote(
+    &mut dao,
+    &mut proposal,
+    &mut membership,
+    1, // Vote FOR
+    b"This investment will improve our delivery capacity".to_string(),
+    &clock,
+    &mut ctx
+);
+
+// Delegate voting power
+let delegation = dao_governance::delegate_votes(
+    &dao,
+    &mut delegator_membership,
+    delegate_address,
+    2000,   // Delegate 2000 tokens
+    option::some(delegation_end),
+    0,      // All proposal types
+    &clock,
+    &mut ctx
+);
+```
+
 ## 🔧 Configuration
 
 ### Optimization Parameters
@@ -424,11 +571,22 @@ For support and questions:
 - ✅ Resource allocation and facility management
 - ✅ Parts inventory tracking
 
-**Financial Systems:**
-- ✅ Autonomous financial management
-- ✅ Revenue sharing and profit distribution
-- ✅ Maintenance fund allocation
-- ✅ Performance-based pricing
+**Economic Engine:**
+- ✅ Dynamic pricing with multi-factor adjustments
+- ✅ Market making and price discovery
+- ✅ Automated revenue distribution with performance bonuses
+- ✅ Autonomous treasury management and investment strategies
+- ✅ Comprehensive financial analytics and ROI tracking
+- ✅ Real-time surge pricing based on supply/demand
+
+**DAO Governance:**
+- ✅ Decentralized autonomous organization for fleet management
+- ✅ Governance token-based voting system
+- ✅ Proposal creation and democratic decision-making
+- ✅ Vote delegation and proxy voting
+- ✅ Community-controlled treasury management
+- ✅ Automated proposal execution with time delays
+- ✅ Multi-tier membership system with varying privileges
 
 ### 📊 **System Statistics**
 
