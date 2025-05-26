@@ -73,7 +73,7 @@ module swarm_logistics::dao_governance_tests {
             assert!(dao_governance::membership_tier(&founder_membership) == 3, 5); // TIER_FOUNDER
             assert!(dao_governance::membership_reputation(&founder_membership) == 100, 6);
 
-            transfer::public_transfer(dao, FOUNDER);
+            transfer::share_object(dao);
             transfer::public_transfer(founder_membership, FOUNDER);
         };
 
