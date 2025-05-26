@@ -1,8 +1,26 @@
 {
-  "package_id": "0xcf21b35cca41042a29b030ec7f8d7c54d80235b9fcac438cab72fd89616c82ab",
-  "tx_digest": "HC3jBPFjwEdFiyHcS3oSy1ydUR36DsVjfschWPTs8Wi1",
+  "package_id": "0x026e404cc7799d16f55c8e44e1a13868bbe58d48a38aebc6739e04c62d857d94",
+  "transaction_digest": "A9Nc7XDaq6Fv8qthM1VFabPSygbrPHaDLJwtUjdzcucu",
   "network": "testnet",
+  "timestamp": "2025-01-26T00:37:14Z",
+  "package_name": "crossy_robot",
+  "gas_budget": 100000000,
+  "gas_used": 18193480,
   "game_cost_sui": "0.05",
   "game_cost_mist": 50000000,
-  "timestamp": "2025-05-26T04:34:02Z"
+  "upgrade_cap": "0x0cc8ce202a6fd374968decd54a88ee03f8e99a51a2c62d981923b0dca676b2aa",
+  "contract_functions": {
+    "create_game": "Create new game with 0.05 SUI payment",
+    "connect_robot": "Robot connects to game and receives payment",
+    "move_robot": "Issue movement command (0-7 directions)"
+  },
+  "events": {
+    "GameCreated": "New game available for robots",
+    "RobotConnected": "Robot accepted the game",
+    "RobotMoved": "Movement command issued"
+  },
+  "explorer_links": {
+    "package": "https://suiscan.xyz/testnet/object/0x026e404cc7799d16f55c8e44e1a13868bbe58d48a38aebc6739e04c62d857d94",
+    "transaction": "https://suiscan.xyz/testnet/tx/A9Nc7XDaq6Fv8qthM1VFabPSygbrPHaDLJwtUjdzcucu"
+  }
 }

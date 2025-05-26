@@ -1,0 +1,463 @@
+Crossy Robot deployment started at: Mon May 26 00:37:04 AST 2025
+[note] Dependencies on Bridge, MoveStdlib, Sui, and SuiSystem are automatically added, but this feature is disabled for your package because you have explicitly included dependencies on Sui. Consider removing these dependencies from Move.toml.
+UPDATING GIT DEPENDENCY https://github.com/MystenLabs/sui.git
+INCLUDING DEPENDENCY Sui
+INCLUDING DEPENDENCY MoveStdlib
+BUILDING crossy_robot
+[0m[1m[38;5;11mwarning[W02021][0m[1m: duplicate alias[0m
+  [0m[34m┌─[0m ./sources/crossy_robot.move:4:23
+  [0m[34m│[0m
+[0m[34m4[0m [0m[34m│[0m     use sui::object::{[0m[33mSelf[0m, UID, ID};
+  [0m[34m│[0m                       [0m[33m^^^^[0m [0m[33mUnnecessary alias 'object' for module 'sui::object'. This alias is provided by default[0m
+  [0m[34m│[0m
+  [0m[34m=[0m This warning can be suppressed with '#[allow(duplicate_alias)]' applied to the 'module' or module member ('const', 'fun', or 'struct')
+
+[0m[1m[38;5;11mwarning[W02021][0m[1m: duplicate alias[0m
+  [0m[34m┌─[0m ./sources/crossy_robot.move:4:29
+  [0m[34m│[0m
+[0m[34m4[0m [0m[34m│[0m     use sui::object::{Self, [0m[33mUID[0m, ID};
+  [0m[34m│[0m                             [0m[33m^^^[0m [0m[33mUnnecessary alias 'UID' for module member 'sui::object::UID'. This alias is provided by default[0m
+  [0m[34m│[0m
+  [0m[34m=[0m This warning can be suppressed with '#[allow(duplicate_alias)]' applied to the 'module' or module member ('const', 'fun', or 'struct')
+
+[0m[1m[38;5;11mwarning[W02021][0m[1m: duplicate alias[0m
+  [0m[34m┌─[0m ./sources/crossy_robot.move:4:34
+  [0m[34m│[0m
+[0m[34m4[0m [0m[34m│[0m     use sui::object::{Self, UID, [0m[33mID[0m};
+  [0m[34m│[0m                                  [0m[33m^^[0m [0m[33mUnnecessary alias 'ID' for module member 'sui::object::ID'. This alias is provided by default[0m
+  [0m[34m│[0m
+  [0m[34m=[0m This warning can be suppressed with '#[allow(duplicate_alias)]' applied to the 'module' or module member ('const', 'fun', or 'struct')
+
+[0m[1m[38;5;11mwarning[W02021][0m[1m: duplicate alias[0m
+  [0m[34m┌─[0m ./sources/crossy_robot.move:5:27
+  [0m[34m│[0m
+[0m[34m5[0m [0m[34m│[0m     use sui::tx_context::{[0m[33mSelf[0m, TxContext};
+  [0m[34m│[0m                           [0m[33m^^^^[0m [0m[33mUnnecessary alias 'tx_context' for module 'sui::tx_context'. This alias is provided by default[0m
+  [0m[34m│[0m
+  [0m[34m=[0m This warning can be suppressed with '#[allow(duplicate_alias)]' applied to the 'module' or module member ('const', 'fun', or 'struct')
+
+[0m[1m[38;5;11mwarning[W02021][0m[1m: duplicate alias[0m
+  [0m[34m┌─[0m ./sources/crossy_robot.move:5:33
+  [0m[34m│[0m
+[0m[34m5[0m [0m[34m│[0m     use sui::tx_context::{Self, [0m[33mTxContext[0m};
+  [0m[34m│[0m                                 [0m[33m^^^^^^^^^[0m [0m[33mUnnecessary alias 'TxContext' for module member 'sui::tx_context::TxContext'. This alias is provided by default[0m
+  [0m[34m│[0m
+  [0m[34m=[0m This warning can be suppressed with '#[allow(duplicate_alias)]' applied to the 'module' or module member ('const', 'fun', or 'struct')
+
+[0m[1m[38;5;11mwarning[W02021][0m[1m: duplicate alias[0m
+   [0m[34m┌─[0m ./sources/crossy_robot.move:10:23
+   [0m[34m│[0m
+[0m[34m10[0m [0m[34m│[0m     use std::option::{[0m[33mSelf[0m, Option};
+   [0m[34m│[0m                       [0m[33m^^^^[0m [0m[33mUnnecessary alias 'option' for module 'std::option'. This alias is provided by default[0m
+   [0m[34m│[0m
+   [0m[34m=[0m This warning can be suppressed with '#[allow(duplicate_alias)]' applied to the 'module' or module member ('const', 'fun', or 'struct')
+
+[0m[1m[38;5;11mwarning[W02021][0m[1m: duplicate alias[0m
+   [0m[34m┌─[0m ./sources/crossy_robot.move:10:29
+   [0m[34m│[0m
+[0m[34m10[0m [0m[34m│[0m     use std::option::{Self, [0m[33mOption[0m};
+   [0m[34m│[0m                             [0m[33m^^^^^^[0m [0m[33mUnnecessary alias 'Option' for module member 'std::option::Option'. This alias is provided by default[0m
+   [0m[34m│[0m
+   [0m[34m=[0m This warning can be suppressed with '#[allow(duplicate_alias)]' applied to the 'module' or module member ('const', 'fun', or 'struct')
+
+[note] Dependencies on Bridge, MoveStdlib, Sui, and SuiSystem are automatically added, but this feature is disabled for your package because you have explicitly included dependencies on Sui. Consider removing these dependencies from Move.toml.
+INCLUDING DEPENDENCY Sui
+INCLUDING DEPENDENCY MoveStdlib
+BUILDING crossy_robot
+[0m[1m[38;5;11mwarning[W09001][0m[1m: unused alias[0m
+   [0m[34m┌─[0m ./tests/crossy_robot_tests.move:22:42
+   [0m[34m│[0m
+[0m[34m22[0m [0m[34m│[0m     use sui::test_scenario::{Self as ts, [0m[33mScenario[0m};
+   [0m[34m│[0m                                          [0m[33m^^^^^^^^[0m [0m[33mUnused 'use' of alias 'Scenario'. Consider removing it[0m
+   [0m[34m│[0m
+   [0m[34m=[0m This warning can be suppressed with '#[allow(unused_use)]' applied to the 'module' or module member ('const', 'fun', or 'struct')
+
+[0m[1m[38;5;11mwarning[W09001][0m[1m: unused alias[0m
+   [0m[34m┌─[0m ./tests/crossy_robot_tests.move:23:27
+   [0m[34m│[0m
+[0m[34m23[0m [0m[34m│[0m     use sui::coin::{Self, [0m[33mCoin[0m};
+   [0m[34m│[0m                           [0m[33m^^^^[0m [0m[33mUnused 'use' of alias 'Coin'. Consider removing it[0m
+   [0m[34m│[0m
+   [0m[34m=[0m This warning can be suppressed with '#[allow(unused_use)]' applied to the 'module' or module member ('const', 'fun', or 'struct')
+
+[0m[1m[38;5;11mwarning[W09001][0m[1m: unused alias[0m
+   [0m[34m┌─[0m ./tests/crossy_robot_tests.move:25:28
+   [0m[34m│[0m
+[0m[34m25[0m [0m[34m│[0m     use sui::clock::{Self, [0m[33mClock[0m};
+   [0m[34m│[0m                            [0m[33m^^^^^[0m [0m[33mUnused 'use' of alias 'Clock'. Consider removing it[0m
+   [0m[34m│[0m
+   [0m[34m=[0m This warning can be suppressed with '#[allow(unused_use)]' applied to the 'module' or module member ('const', 'fun', or 'struct')
+
+[0m[1m[38;5;11mwarning[W09001][0m[1m: unused alias[0m
+   [0m[34m┌─[0m ./tests/crossy_robot_tests.move:27:44
+   [0m[34m│[0m
+[0m[34m27[0m [0m[34m│[0m     use crossy_robot::crossy_robot::{Self, [0m[33mGame[0m};
+   [0m[34m│[0m                                            [0m[33m^^^^[0m [0m[33mUnused 'use' of alias 'Game'. Consider removing it[0m
+   [0m[34m│[0m
+   [0m[34m=[0m This warning can be suppressed with '#[allow(unused_use)]' applied to the 'module' or module member ('const', 'fun', or 'struct')
+
+[0m[1m[38;5;11mwarning[W09002][0m[1m: unused variable[0m
+   [0m[34m┌─[0m ./tests/crossy_robot_tests.move:49:27
+   [0m[34m│[0m
+[0m[34m49[0m [0m[34m│[0m         let (user, robot, [0m[33mstatus[0m, _created_at) = crossy_robot::get_game_info(&game);
+   [0m[34m│[0m                           [0m[33m^^^^^^[0m [0m[33mUnused local variable 'status'. Consider removing or prefixing with an underscore: '_status'[0m
+   [0m[34m│[0m
+   [0m[34m=[0m This warning can be suppressed with '#[allow(unused_variable)]' applied to the 'module' or module member ('const', 'fun', or 'struct')
+
+[0m[1m[38;5;11mwarning[W10007][0m[1m: issue with attribute value[0m
+   [0m[34m┌─[0m ./tests/crossy_robot_tests.move:62:24
+   [0m[34m│[0m
+[0m[34m62[0m [0m[34m│[0m     #[expected_failure([0m[33mabort_code = 3[0m)]
+   [0m[34m│[0m                        [0m[33m^^^^^^^^^^^^^^[0m
+   [0m[34m│[0m                        [0m[33m│[0m            [0m[34m│[0m
+   [0m[34m│[0m                        [0m[33m│[0m            [0m[34mReplace value with a constant from expected module or add 'location=...'[0m
+   [0m[34m│[0m                        [0m[33mWARNING: passes for an abort from any module[0m
+
+[0m[1m[38;5;11mwarning[W09002][0m[1m: unused variable[0m
+   [0m[34m┌─[0m ./tests/crossy_robot_tests.move:94:31
+   [0m[34m│[0m
+[0m[34m94[0m [0m[34m│[0m         let (user, robot_opt, [0m[33mstatus[0m, _created_at) = crossy_robot::get_game_info(&game);
+   [0m[34m│[0m                               [0m[33m^^^^^^[0m [0m[33mUnused local variable 'status'. Consider removing or prefixing with an underscore: '_status'[0m
+   [0m[34m│[0m
+   [0m[34m=[0m This warning can be suppressed with '#[allow(unused_variable)]' applied to the 'module' or module member ('const', 'fun', or 'struct')
+
+[0m[1m[38;5;11mwarning[W10007][0m[1m: issue with attribute value[0m
+    [0m[34m┌─[0m ./tests/crossy_robot_tests.move:112:24
+    [0m[34m│[0m
+[0m[34m112[0m [0m[34m│[0m     #[expected_failure([0m[33mabort_code = 1[0m)]
+    [0m[34m│[0m                        [0m[33m^^^^^^^^^^^^^^[0m
+    [0m[34m│[0m                        [0m[33m│[0m            [0m[34m│[0m
+    [0m[34m│[0m                        [0m[33m│[0m            [0m[34mReplace value with a constant from expected module or add 'location=...'[0m
+    [0m[34m│[0m                        [0m[33mWARNING: passes for an abort from any module[0m
+
+[0m[1m[38;5;11mwarning[W10007][0m[1m: issue with attribute value[0m
+    [0m[34m┌─[0m ./tests/crossy_robot_tests.move:174:24
+    [0m[34m│[0m
+[0m[34m174[0m [0m[34m│[0m     #[expected_failure([0m[33mabort_code = 5[0m)]
+    [0m[34m│[0m                        [0m[33m^^^^^^^^^^^^^^[0m
+    [0m[34m│[0m                        [0m[33m│[0m            [0m[34m│[0m
+    [0m[34m│[0m                        [0m[33m│[0m            [0m[34mReplace value with a constant from expected module or add 'location=...'[0m
+    [0m[34m│[0m                        [0m[33mWARNING: passes for an abort from any module[0m
+
+[0m[1m[38;5;11mwarning[W10007][0m[1m: issue with attribute value[0m
+    [0m[34m┌─[0m ./tests/crossy_robot_tests.move:192:24
+    [0m[34m│[0m
+[0m[34m192[0m [0m[34m│[0m     #[expected_failure([0m[33mabort_code = 4[0m)]
+    [0m[34m│[0m                        [0m[33m^^^^^^^^^^^^^^[0m
+    [0m[34m│[0m                        [0m[33m│[0m            [0m[34m│[0m
+    [0m[34m│[0m                        [0m[33m│[0m            [0m[34mReplace value with a constant from expected module or add 'location=...'[0m
+    [0m[34m│[0m                        [0m[33mWARNING: passes for an abort from any module[0m
+
+[0m[1m[38;5;11mwarning[W02021][0m[1m: duplicate alias[0m
+  [0m[34m┌─[0m ./sources/crossy_robot.move:4:23
+  [0m[34m│[0m
+[0m[34m4[0m [0m[34m│[0m     use sui::object::{[0m[33mSelf[0m, UID, ID};
+  [0m[34m│[0m                       [0m[33m^^^^[0m [0m[33mUnnecessary alias 'object' for module 'sui::object'. This alias is provided by default[0m
+  [0m[34m│[0m
+  [0m[34m=[0m This warning can be suppressed with '#[allow(duplicate_alias)]' applied to the 'module' or module member ('const', 'fun', or 'struct')
+
+[0m[1m[38;5;11mwarning[W02021][0m[1m: duplicate alias[0m
+  [0m[34m┌─[0m ./sources/crossy_robot.move:4:29
+  [0m[34m│[0m
+[0m[34m4[0m [0m[34m│[0m     use sui::object::{Self, [0m[33mUID[0m, ID};
+  [0m[34m│[0m                             [0m[33m^^^[0m [0m[33mUnnecessary alias 'UID' for module member 'sui::object::UID'. This alias is provided by default[0m
+  [0m[34m│[0m
+  [0m[34m=[0m This warning can be suppressed with '#[allow(duplicate_alias)]' applied to the 'module' or module member ('const', 'fun', or 'struct')
+
+[0m[1m[38;5;11mwarning[W02021][0m[1m: duplicate alias[0m
+  [0m[34m┌─[0m ./sources/crossy_robot.move:4:34
+  [0m[34m│[0m
+[0m[34m4[0m [0m[34m│[0m     use sui::object::{Self, UID, [0m[33mID[0m};
+  [0m[34m│[0m                                  [0m[33m^^[0m [0m[33mUnnecessary alias 'ID' for module member 'sui::object::ID'. This alias is provided by default[0m
+  [0m[34m│[0m
+  [0m[34m=[0m This warning can be suppressed with '#[allow(duplicate_alias)]' applied to the 'module' or module member ('const', 'fun', or 'struct')
+
+[0m[1m[38;5;11mwarning[W02021][0m[1m: duplicate alias[0m
+  [0m[34m┌─[0m ./sources/crossy_robot.move:5:27
+  [0m[34m│[0m
+[0m[34m5[0m [0m[34m│[0m     use sui::tx_context::{[0m[33mSelf[0m, TxContext};
+  [0m[34m│[0m                           [0m[33m^^^^[0m [0m[33mUnnecessary alias 'tx_context' for module 'sui::tx_context'. This alias is provided by default[0m
+  [0m[34m│[0m
+  [0m[34m=[0m This warning can be suppressed with '#[allow(duplicate_alias)]' applied to the 'module' or module member ('const', 'fun', or 'struct')
+
+[0m[1m[38;5;11mwarning[W02021][0m[1m: duplicate alias[0m
+  [0m[34m┌─[0m ./sources/crossy_robot.move:5:33
+  [0m[34m│[0m
+[0m[34m5[0m [0m[34m│[0m     use sui::tx_context::{Self, [0m[33mTxContext[0m};
+  [0m[34m│[0m                                 [0m[33m^^^^^^^^^[0m [0m[33mUnnecessary alias 'TxContext' for module member 'sui::tx_context::TxContext'. This alias is provided by default[0m
+  [0m[34m│[0m
+  [0m[34m=[0m This warning can be suppressed with '#[allow(duplicate_alias)]' applied to the 'module' or module member ('const', 'fun', or 'struct')
+
+[0m[1m[38;5;11mwarning[W02021][0m[1m: duplicate alias[0m
+   [0m[34m┌─[0m ./sources/crossy_robot.move:10:23
+   [0m[34m│[0m
+[0m[34m10[0m [0m[34m│[0m     use std::option::{[0m[33mSelf[0m, Option};
+   [0m[34m│[0m                       [0m[33m^^^^[0m [0m[33mUnnecessary alias 'option' for module 'std::option'. This alias is provided by default[0m
+   [0m[34m│[0m
+   [0m[34m=[0m This warning can be suppressed with '#[allow(duplicate_alias)]' applied to the 'module' or module member ('const', 'fun', or 'struct')
+
+[0m[1m[38;5;11mwarning[W02021][0m[1m: duplicate alias[0m
+   [0m[34m┌─[0m ./sources/crossy_robot.move:10:29
+   [0m[34m│[0m
+[0m[34m10[0m [0m[34m│[0m     use std::option::{Self, [0m[33mOption[0m};
+   [0m[34m│[0m                             [0m[33m^^^^^^[0m [0m[33mUnnecessary alias 'Option' for module member 'std::option::Option'. This alias is provided by default[0m
+   [0m[34m│[0m
+   [0m[34m=[0m This warning can be suppressed with '#[allow(duplicate_alias)]' applied to the 'module' or module member ('const', 'fun', or 'struct')
+
+[0m[1m[38;5;11mwarning[W09001][0m[1m: unused alias[0m
+    [0m[34m┌─[0m ./sources/crossy_robot.move:197:14
+    [0m[34m│[0m
+[0m[34m197[0m [0m[34m│[0m     use sui::[0m[33mtest_scenario[0m;
+    [0m[34m│[0m              [0m[33m^^^^^^^^^^^^^[0m [0m[33mUnused 'use' of alias 'test_scenario'. Consider removing it[0m
+    [0m[34m│[0m
+    [0m[34m=[0m This warning can be suppressed with '#[allow(unused_use)]' applied to the 'module' or module member ('const', 'fun', or 'struct')
+
+[0m[1m[38;5;11mwarning[W09001][0m[1m: unused alias[0m
+    [0m[34m┌─[0m ./sources/crossy_robot.move:199:14
+    [0m[34m│[0m
+[0m[34m199[0m [0m[34m│[0m     use sui::[0m[33mtest_utils[0m;
+    [0m[34m│[0m              [0m[33m^^^^^^^^^^[0m [0m[33mUnused 'use' of alias 'test_utils'. Consider removing it[0m
+    [0m[34m│[0m
+    [0m[34m=[0m This warning can be suppressed with '#[allow(unused_use)]' applied to the 'module' or module member ('const', 'fun', or 'struct')
+
+Running Move unit tests
+[ PASS    ] crossy_robot::crossy_robot_tests::test_create_game_invalid_payment
+[ PASS    ] crossy_robot::crossy_robot_tests::test_create_game_success
+[ PASS    ] crossy_robot::crossy_robot_tests::test_direction_names
+[ PASS    ] crossy_robot::crossy_robot_tests::test_move_robot_all_directions
+[ PASS    ] crossy_robot::crossy_robot_tests::test_move_robot_game_not_active
+[ PASS    ] crossy_robot::crossy_robot_tests::test_move_robot_invalid_direction
+[ PASS    ] crossy_robot::crossy_robot_tests::test_robot_connect_already_active
+[ PASS    ] crossy_robot::crossy_robot_tests::test_robot_connect_success
+Test result: OK. Total tests: 8; passed: 8; failed: 0
+[Note]: Dependency sources are no longer verified automatically during publication and upgrade. You can pass the `--verify-deps` option if you would like to verify them as part of publication or upgrade.
+[note] Dependencies on Bridge, MoveStdlib, Sui, and SuiSystem are automatically added, but this feature is disabled for your package because you have explicitly included dependencies on Sui. Consider removing these dependencies from Move.toml.
+UPDATING GIT DEPENDENCY https://github.com/MystenLabs/sui.git
+INCLUDING DEPENDENCY Sui
+INCLUDING DEPENDENCY MoveStdlib
+BUILDING crossy_robot
+[0m[1m[38;5;11mwarning[W02021][0m[1m: duplicate alias[0m
+  [0m[34m┌─[0m /Users/kpatch/startup/opendive/products/suibotics_core/crossy_robot/sources/crossy_robot.move:4:23
+  [0m[34m│[0m
+[0m[34m4[0m [0m[34m│[0m     use sui::object::{[0m[33mSelf[0m, UID, ID};
+  [0m[34m│[0m                       [0m[33m^^^^[0m [0m[33mUnnecessary alias 'object' for module 'sui::object'. This alias is provided by default[0m
+  [0m[34m│[0m
+  [0m[34m=[0m This warning can be suppressed with '#[allow(duplicate_alias)]' applied to the 'module' or module member ('const', 'fun', or 'struct')
+
+[0m[1m[38;5;11mwarning[W02021][0m[1m: duplicate alias[0m
+  [0m[34m┌─[0m /Users/kpatch/startup/opendive/products/suibotics_core/crossy_robot/sources/crossy_robot.move:4:29
+  [0m[34m│[0m
+[0m[34m4[0m [0m[34m│[0m     use sui::object::{Self, [0m[33mUID[0m, ID};
+  [0m[34m│[0m                             [0m[33m^^^[0m [0m[33mUnnecessary alias 'UID' for module member 'sui::object::UID'. This alias is provided by default[0m
+  [0m[34m│[0m
+  [0m[34m=[0m This warning can be suppressed with '#[allow(duplicate_alias)]' applied to the 'module' or module member ('const', 'fun', or 'struct')
+
+[0m[1m[38;5;11mwarning[W02021][0m[1m: duplicate alias[0m
+  [0m[34m┌─[0m /Users/kpatch/startup/opendive/products/suibotics_core/crossy_robot/sources/crossy_robot.move:4:34
+  [0m[34m│[0m
+[0m[34m4[0m [0m[34m│[0m     use sui::object::{Self, UID, [0m[33mID[0m};
+  [0m[34m│[0m                                  [0m[33m^^[0m [0m[33mUnnecessary alias 'ID' for module member 'sui::object::ID'. This alias is provided by default[0m
+  [0m[34m│[0m
+  [0m[34m=[0m This warning can be suppressed with '#[allow(duplicate_alias)]' applied to the 'module' or module member ('const', 'fun', or 'struct')
+
+[0m[1m[38;5;11mwarning[W02021][0m[1m: duplicate alias[0m
+  [0m[34m┌─[0m /Users/kpatch/startup/opendive/products/suibotics_core/crossy_robot/sources/crossy_robot.move:5:27
+  [0m[34m│[0m
+[0m[34m5[0m [0m[34m│[0m     use sui::tx_context::{[0m[33mSelf[0m, TxContext};
+  [0m[34m│[0m                           [0m[33m^^^^[0m [0m[33mUnnecessary alias 'tx_context' for module 'sui::tx_context'. This alias is provided by default[0m
+  [0m[34m│[0m
+  [0m[34m=[0m This warning can be suppressed with '#[allow(duplicate_alias)]' applied to the 'module' or module member ('const', 'fun', or 'struct')
+
+[0m[1m[38;5;11mwarning[W02021][0m[1m: duplicate alias[0m
+  [0m[34m┌─[0m /Users/kpatch/startup/opendive/products/suibotics_core/crossy_robot/sources/crossy_robot.move:5:33
+  [0m[34m│[0m
+[0m[34m5[0m [0m[34m│[0m     use sui::tx_context::{Self, [0m[33mTxContext[0m};
+  [0m[34m│[0m                                 [0m[33m^^^^^^^^^[0m [0m[33mUnnecessary alias 'TxContext' for module member 'sui::tx_context::TxContext'. This alias is provided by default[0m
+  [0m[34m│[0m
+  [0m[34m=[0m This warning can be suppressed with '#[allow(duplicate_alias)]' applied to the 'module' or module member ('const', 'fun', or 'struct')
+
+[0m[1m[38;5;11mwarning[W02021][0m[1m: duplicate alias[0m
+   [0m[34m┌─[0m /Users/kpatch/startup/opendive/products/suibotics_core/crossy_robot/sources/crossy_robot.move:10:23
+   [0m[34m│[0m
+[0m[34m10[0m [0m[34m│[0m     use std::option::{[0m[33mSelf[0m, Option};
+   [0m[34m│[0m                       [0m[33m^^^^[0m [0m[33mUnnecessary alias 'option' for module 'std::option'. This alias is provided by default[0m
+   [0m[34m│[0m
+   [0m[34m=[0m This warning can be suppressed with '#[allow(duplicate_alias)]' applied to the 'module' or module member ('const', 'fun', or 'struct')
+
+[0m[1m[38;5;11mwarning[W02021][0m[1m: duplicate alias[0m
+   [0m[34m┌─[0m /Users/kpatch/startup/opendive/products/suibotics_core/crossy_robot/sources/crossy_robot.move:10:29
+   [0m[34m│[0m
+[0m[34m10[0m [0m[34m│[0m     use std::option::{Self, [0m[33mOption[0m};
+   [0m[34m│[0m                             [0m[33m^^^^^^[0m [0m[33mUnnecessary alias 'Option' for module member 'std::option::Option'. This alias is provided by default[0m
+   [0m[34m│[0m
+   [0m[34m=[0m This warning can be suppressed with '#[allow(duplicate_alias)]' applied to the 'module' or module member ('const', 'fun', or 'struct')
+
+Skipping dependency verification
+{
+  "digest": "A9Nc7XDaq6Fv8qthM1VFabPSygbrPHaDLJwtUjdzcucu",
+  "transaction": {
+    "data": {
+      "messageVersion": "v1",
+      "transaction": {
+        "kind": "ProgrammableTransaction",
+        "inputs": [
+          {
+            "type": "pure",
+            "valueType": "address",
+            "value": "0x3783e5d43d5494fc73bd8d1d1aa119ce1b142978dc722a3ae6deab5bef9e3079"
+          }
+        ],
+        "transactions": [
+          {
+            "Publish": [
+              "0x0000000000000000000000000000000000000000000000000000000000000001",
+              "0x0000000000000000000000000000000000000000000000000000000000000002"
+            ]
+          },
+          {
+            "TransferObjects": [
+              [
+                {
+                  "Result": 0
+                }
+              ],
+              {
+                "Input": 0
+              }
+            ]
+          }
+        ]
+      },
+      "sender": "0x3783e5d43d5494fc73bd8d1d1aa119ce1b142978dc722a3ae6deab5bef9e3079",
+      "gasData": {
+        "payment": [
+          {
+            "objectId": "0x0ba1fb429dc345a11f5d0ad6af78e694a4fc1d87f1dca149a2deee003697c673",
+            "version": 349179596,
+            "digest": "8TMamobmJrSiUJ2twFByGEk63gWMAa1TbmfZWsgwtSki"
+          }
+        ],
+        "owner": "0x3783e5d43d5494fc73bd8d1d1aa119ce1b142978dc722a3ae6deab5bef9e3079",
+        "price": "1000",
+        "budget": "100000000"
+      }
+    },
+    "txSignatures": [
+      "AJUu92WPUh7zVo66HMUe5BoiuqHAPYDCsN4pWLjFax/BcXEHQom2w6WFPweC2ou5SlKjIEA2aYY7EYMXtGZa/glTG+GgmhrfxIGjn1xTgul1ZbXBeOKFD6vrFlfwQJPH6g=="
+    ]
+  },
+  "effects": {
+    "messageVersion": "v1",
+    "status": {
+      "status": "success"
+    },
+    "executedEpoch": "746",
+    "gasUsed": {
+      "computationCost": "1000000",
+      "storageCost": "18171600",
+      "storageRebate": "978120",
+      "nonRefundableStorageFee": "9880"
+    },
+    "modifiedAtVersions": [
+      {
+        "objectId": "0x0ba1fb429dc345a11f5d0ad6af78e694a4fc1d87f1dca149a2deee003697c673",
+        "sequenceNumber": "349179596"
+      }
+    ],
+    "transactionDigest": "A9Nc7XDaq6Fv8qthM1VFabPSygbrPHaDLJwtUjdzcucu",
+    "created": [
+      {
+        "owner": "Immutable",
+        "reference": {
+          "objectId": "0x026e404cc7799d16f55c8e44e1a13868bbe58d48a38aebc6739e04c62d857d94",
+          "version": 1,
+          "digest": "FVWvvmwynhCecpDZM9HfC3SWvQLEquXquTy9n9U8setL"
+        }
+      },
+      {
+        "owner": {
+          "AddressOwner": "0x3783e5d43d5494fc73bd8d1d1aa119ce1b142978dc722a3ae6deab5bef9e3079"
+        },
+        "reference": {
+          "objectId": "0x0cc8ce202a6fd374968decd54a88ee03f8e99a51a2c62d981923b0dca676b2aa",
+          "version": 349179597,
+          "digest": "2mVEsUiSMsFeDqYFEBBpvPyqdwcYgwL4TN1sZNpBQGhq"
+        }
+      }
+    ],
+    "mutated": [
+      {
+        "owner": {
+          "AddressOwner": "0x3783e5d43d5494fc73bd8d1d1aa119ce1b142978dc722a3ae6deab5bef9e3079"
+        },
+        "reference": {
+          "objectId": "0x0ba1fb429dc345a11f5d0ad6af78e694a4fc1d87f1dca149a2deee003697c673",
+          "version": 349179597,
+          "digest": "2G6Mq55mU63ZL5Y8hXKHuKPk7v62bmHfiJ1eG26g46Pk"
+        }
+      }
+    ],
+    "gasObject": {
+      "owner": {
+        "AddressOwner": "0x3783e5d43d5494fc73bd8d1d1aa119ce1b142978dc722a3ae6deab5bef9e3079"
+      },
+      "reference": {
+        "objectId": "0x0ba1fb429dc345a11f5d0ad6af78e694a4fc1d87f1dca149a2deee003697c673",
+        "version": 349179597,
+        "digest": "2G6Mq55mU63ZL5Y8hXKHuKPk7v62bmHfiJ1eG26g46Pk"
+      }
+    },
+    "dependencies": [
+      "6pZ2bpkwLwnCH4qdHS1NcJypXLFUNvSHRKfKXhZvXQuo",
+      "8GxJsh2Z34PMNFNDbAjFgwYvFjfoFmGkKK5F61m9zaPn",
+      "HC3jBPFjwEdFiyHcS3oSy1ydUR36DsVjfschWPTs8Wi1"
+    ]
+  },
+  "events": [],
+  "objectChanges": [
+    {
+      "type": "mutated",
+      "sender": "0x3783e5d43d5494fc73bd8d1d1aa119ce1b142978dc722a3ae6deab5bef9e3079",
+      "owner": {
+        "AddressOwner": "0x3783e5d43d5494fc73bd8d1d1aa119ce1b142978dc722a3ae6deab5bef9e3079"
+      },
+      "objectType": "0x2::coin::Coin<0x2::sui::SUI>",
+      "objectId": "0x0ba1fb429dc345a11f5d0ad6af78e694a4fc1d87f1dca149a2deee003697c673",
+      "version": "349179597",
+      "previousVersion": "349179596",
+      "digest": "2G6Mq55mU63ZL5Y8hXKHuKPk7v62bmHfiJ1eG26g46Pk"
+    },
+    {
+      "type": "published",
+      "packageId": "0x026e404cc7799d16f55c8e44e1a13868bbe58d48a38aebc6739e04c62d857d94",
+      "version": "1",
+      "digest": "FVWvvmwynhCecpDZM9HfC3SWvQLEquXquTy9n9U8setL",
+      "modules": [
+        "crossy_robot"
+      ]
+    },
+    {
+      "type": "created",
+      "sender": "0x3783e5d43d5494fc73bd8d1d1aa119ce1b142978dc722a3ae6deab5bef9e3079",
+      "owner": {
+        "AddressOwner": "0x3783e5d43d5494fc73bd8d1d1aa119ce1b142978dc722a3ae6deab5bef9e3079"
+      },
+      "objectType": "0x2::package::UpgradeCap",
+      "objectId": "0x0cc8ce202a6fd374968decd54a88ee03f8e99a51a2c62d981923b0dca676b2aa",
+      "version": "349179597",
+      "digest": "2mVEsUiSMsFeDqYFEBBpvPyqdwcYgwL4TN1sZNpBQGhq"
+    }
+  ],
+  "balanceChanges": [
+    {
+      "owner": {
+        "AddressOwner": "0x3783e5d43d5494fc73bd8d1d1aa119ce1b142978dc722a3ae6deab5bef9e3079"
+      },
+      "coinType": "0x2::sui::SUI",
+      "amount": "-18193480"
+    }
+  ],
+  "timestampMs": "1748234234820",
+  "confirmedLocalExecution": true,
+  "checkpoint": "200365741"
+}
