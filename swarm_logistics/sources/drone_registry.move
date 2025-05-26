@@ -9,6 +9,7 @@ module swarm_logistics::drone_registry {
     use std::vector;
     use swarm_logistics::drone::{Self as drone_mod, Drone, DroneFinancials};
     use swarm_logistics::events::{Self as events_mod, DroneRegistered};
+    use swarm_logistics::delivery::{Self as delivery_mod};
     
     /// Different ownership models for drones
     public struct OwnershipModel has store, drop {
@@ -125,17 +126,17 @@ module swarm_logistics::drone_registry {
         _ctx: &mut TxContext
     ) {
         // Verify the drone can self-manage
-        assert!(capability.can_self_manage, types::e_unauthorized_access());
-        assert!(capability.drone_id == types::drone_id(drone), types::e_unauthorized_access());
+        assert!(capability.can_self_manage, events_mod::e_unauthorized_access());
+        assert!(capability.drone_id == drone_mod::drone_id(drone), events_mod::e_unauthorized_access());
 
         // Update drone status using setter functions
-        types::set_drone_status(drone, new_status);
-        types::set_drone_location(drone, current_location);
-        types::set_drone_battery_level(drone, battery_level);
+        drone_mod::set_drone_status(drone, new_status);
+        drone_mod::set_drone_location(drone, current_location);
+        drone_mod::set_drone_battery_level(drone, battery_level);
 
         // Auto-schedule maintenance if needed
-        if (battery_level < 20 || types::is_maintenance_due(drone, clock::timestamp_ms(clock))) {
-            types::set_drone_status(drone, types::status_maintenance());
+        if (battery_level < 20 || drone_mod::is_maintenance_due(drone, clock::timestamp_ms(clock))) {
+            drone_mod::set_drone_status(drone, drone_mod::status_maintenance());
         };
     }
 
@@ -154,17 +155,17 @@ module swarm_logistics::drone_registry {
         let mut estimated_time = 3600000; // 1 hour default
 
         // Check if drone is available
-        if (!types::is_drone_available(drone)) {
+        if (!drone_mod::is_drone_available(drone)) {
             return (false, 0)
         };
 
         // Check payload capacity
-        if (!types::can_carry_payload(drone, package_weight)) {
+        if (!drone_mod::can_carry_payload(drone, package_weight)) {
             return (false, 0)
         };
 
         // Check if maintenance is due
-        if (types::is_maintenance_due(drone, clock::timestamp_ms(clock))) {
+        if (drone_mod::is_maintenance_due(drone, clock::timestamp_ms(clock))) {
             return (false, 0)
         };
 
@@ -175,7 +176,7 @@ module swarm_logistics::drone_registry {
         };
 
         // Adjust for priority
-        if (priority == types::priority_emergency()) {
+        if (priority == delivery_mod::priority_emergency()) {
             should_accept = true; // Always accept emergency orders
             estimated_time = estimated_time * 80 / 100; // 20% faster
         };
@@ -205,12 +206,12 @@ module swarm_logistics::drone_registry {
         _location: String,
         _ctx: &mut TxContext
     ) {
-        assert!(capability.can_coordinate, types::e_unauthorized_access());
-        assert!(capability.drone_id == types::drone_id(drone), types::e_unauthorized_access());
+        assert!(capability.can_coordinate, events_mod::e_unauthorized_access());
+        assert!(capability.drone_id == drone_mod::drone_id(drone), events_mod::e_unauthorized_access());
 
         // Add to coordination history
         let event_id = object::id_from_address(@0x1); // Placeholder
-        types::add_coordination_event(drone, event_id);
+        drone_mod::add_coordination_event(drone, event_id);
     }
 
     /// Update drone reputation based on performance
@@ -221,7 +222,7 @@ module swarm_logistics::drone_registry {
         _ctx: &mut TxContext
     ) {
         // Update individual drone reputation
-        types::update_drone_reputation(drone, performance_score);
+        drone_mod::update_drone_reputation(drone, performance_score);
 
         // Update network-wide reputation
         registry.network_reputation = (registry.network_reputation * 99 + performance_score) / 100;
@@ -237,24 +238,24 @@ module swarm_logistics::drone_registry {
         _ctx: &mut TxContext
     ) {
         // Check if drone has sufficient funds
-        assert!(types::financials_maintenance_fund(financials) >= estimated_cost, types::e_insufficient_funds());
+        assert!(drone_mod::financials_maintenance_fund(financials) >= estimated_cost, events_mod::e_insufficient_funds());
 
         // Schedule maintenance
-        types::set_drone_status(drone, types::status_maintenance());
-        types::set_drone_maintenance_due(drone, clock::timestamp_ms(clock) + (30 * 24 * 60 * 60 * 1000)); // Next month
+        drone_mod::set_drone_status(drone, drone_mod::status_maintenance());
+        drone_mod::set_drone_maintenance_due(drone, clock::timestamp_ms(clock) + (30 * 24 * 60 * 60 * 1000)); // Next month
 
         // Deduct from maintenance fund
-        types::deduct_maintenance_fund(financials, estimated_cost);
-        types::add_operational_cost(financials, estimated_cost);
+        drone_mod::deduct_maintenance_fund(financials, estimated_cost);
+        drone_mod::add_operational_cost(financials, estimated_cost);
     }
 
     /// Get drone statistics
     public fun get_drone_stats(drone: &Drone): (u64, u64, u64, u64) {
         (
-            types::drone_delivery_count(drone),
-            types::drone_success_rate(drone),
-            types::drone_earnings(drone),
-            types::drone_swarm_reputation(drone)
+            drone_mod::drone_delivery_count(drone),
+            drone_mod::drone_success_rate(drone),
+            drone_mod::drone_earnings(drone),
+            drone_mod::drone_swarm_reputation(drone)
         )
     }
 
@@ -274,8 +275,8 @@ module swarm_logistics::drone_registry {
         capability: &DroneCapability
     ): bool {
         capability.can_emergency_assist && 
-        types::is_drone_available(drone) && 
-        types::drone_battery_level(drone) > 50
+        drone_mod::is_drone_available(drone) && 
+        drone_mod::drone_battery_level(drone) > 50
     }
 
     #[test_only]
