@@ -60,6 +60,87 @@ module swarm_logistics::events {
         timestamp: u64,
     }
 
+    // ==================== DAO GOVERNANCE EVENTS ====================
+
+    /// Event emitted when a DAO is created
+    public struct DAOCreated has copy, drop {
+        dao_id: ID,
+        dao_name: String,
+        founder: address,
+        timestamp: u64,
+    }
+
+    /// Event emitted when a member joins a DAO
+    public struct MemberJoined has copy, drop {
+        dao_id: ID,
+        member: address,
+        tokens: u64,
+        timestamp: u64,
+    }
+
+    /// Event emitted when a proposal is created
+    public struct ProposalCreated has copy, drop {
+        proposal_id: ID,
+        dao_id: ID,
+        proposer: address,
+        proposal_type: u8,
+        timestamp: u64,
+    }
+
+    /// Event emitted when a vote is cast
+    public struct VoteCast has copy, drop {
+        proposal_id: ID,
+        voter: address,
+        vote_choice: u8,
+        voting_power: u64,
+        timestamp: u64,
+    }
+
+    /// Event emitted when a proposal is finalized
+    public struct ProposalFinalized has copy, drop {
+        proposal_id: ID,
+        status: u8,
+        timestamp: u64,
+    }
+
+    /// Event emitted when a proposal is executed
+    public struct ProposalExecuted has copy, drop {
+        proposal_id: ID,
+        timestamp: u64,
+    }
+
+    /// Event emitted when votes are delegated
+    public struct VoteDelegated has copy, drop {
+        delegator: address,
+        delegate: address,
+        power: u64,
+        timestamp: u64,
+    }
+
+    /// Event emitted when delegation is revoked
+    public struct DelegationRevoked has copy, drop {
+        delegator: address,
+        delegate: address,
+        power: u64,
+        timestamp: u64,
+    }
+
+    /// Event emitted when revenue is distributed
+    public struct RevenueDistributed has copy, drop {
+        dao_id: ID,
+        total_revenue: u64,
+        member_share: u64,
+        timestamp: u64,
+    }
+
+    /// Event emitted when treasury withdrawal occurs
+    public struct TreasuryWithdrawal has copy, drop {
+        dao_id: ID,
+        amount: u64,
+        recipient: address,
+        authorized_by: ID,
+    }
+
     // ==================== ERROR CODES ====================
     const E_INVALID_OPERATION_MODE: u64 = 1;
     const E_INSUFFICIENT_BATTERY: u64 = 2;
@@ -195,5 +276,155 @@ module swarm_logistics::events {
             severity,
             timestamp,
         }
+    }
+
+    // ==================== DAO EVENT EMISSION FUNCTIONS ====================
+
+    /// Emit DAO created event
+    public fun emit_dao_created(
+        dao_id: ID,
+        dao_name: String,
+        founder: address,
+        timestamp: u64,
+    ) {
+        sui::event::emit(DAOCreated {
+            dao_id,
+            dao_name,
+            founder,
+            timestamp,
+        });
+    }
+
+    /// Emit member joined event
+    public fun emit_member_joined(
+        dao_id: ID,
+        member: address,
+        tokens: u64,
+        timestamp: u64,
+    ) {
+        sui::event::emit(MemberJoined {
+            dao_id,
+            member,
+            tokens,
+            timestamp,
+        });
+    }
+
+    /// Emit proposal created event
+    public fun emit_proposal_created(
+        proposal_id: ID,
+        dao_id: ID,
+        proposer: address,
+        proposal_type: u8,
+        timestamp: u64,
+    ) {
+        sui::event::emit(ProposalCreated {
+            proposal_id,
+            dao_id,
+            proposer,
+            proposal_type,
+            timestamp,
+        });
+    }
+
+    /// Emit vote cast event
+    public fun emit_vote_cast(
+        proposal_id: ID,
+        voter: address,
+        vote_choice: u8,
+        voting_power: u64,
+        timestamp: u64,
+    ) {
+        sui::event::emit(VoteCast {
+            proposal_id,
+            voter,
+            vote_choice,
+            voting_power,
+            timestamp,
+        });
+    }
+
+    /// Emit proposal finalized event
+    public fun emit_proposal_finalized(
+        proposal_id: ID,
+        status: u8,
+        timestamp: u64,
+    ) {
+        sui::event::emit(ProposalFinalized {
+            proposal_id,
+            status,
+            timestamp,
+        });
+    }
+
+    /// Emit proposal executed event
+    public fun emit_proposal_executed(
+        proposal_id: ID,
+        timestamp: u64,
+    ) {
+        sui::event::emit(ProposalExecuted {
+            proposal_id,
+            timestamp,
+        });
+    }
+
+    /// Emit vote delegated event
+    public fun emit_vote_delegated(
+        delegator: address,
+        delegate: address,
+        power: u64,
+        timestamp: u64,
+    ) {
+        sui::event::emit(VoteDelegated {
+            delegator,
+            delegate,
+            power,
+            timestamp,
+        });
+    }
+
+    /// Emit delegation revoked event
+    public fun emit_delegation_revoked(
+        delegator: address,
+        delegate: address,
+        power: u64,
+        timestamp: u64,
+    ) {
+        sui::event::emit(DelegationRevoked {
+            delegator,
+            delegate,
+            power,
+            timestamp,
+        });
+    }
+
+    /// Emit revenue distributed event
+    public fun emit_revenue_distributed(
+        dao_id: ID,
+        total_revenue: u64,
+        member_share: u64,
+        timestamp: u64,
+    ) {
+        sui::event::emit(RevenueDistributed {
+            dao_id,
+            total_revenue,
+            member_share,
+            timestamp,
+        });
+    }
+
+    /// Emit treasury withdrawal event
+    public fun emit_treasury_withdrawal(
+        dao_id: ID,
+        amount: u64,
+        recipient: address,
+        authorized_by: ID,
+    ) {
+        sui::event::emit(TreasuryWithdrawal {
+            dao_id,
+            amount,
+            recipient,
+            authorized_by,
+        });
     }
 } 
