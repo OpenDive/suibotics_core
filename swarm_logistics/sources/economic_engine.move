@@ -696,6 +696,29 @@ module swarm_logistics::economic_engine {
             (metrics.customer_satisfaction * 9 + satisfaction_score) / 10;
     }
 
+    // ==================== CONSTRUCTOR FUNCTIONS ====================
+
+    /// Create distribution rules
+    public fun create_distribution_rules(
+        drone_percentage: u64,
+        owner_percentage: u64,
+        platform_percentage: u64,
+        maintenance_percentage: u64,
+        insurance_percentage: u64,
+        performance_bonus_pool: u64,
+        minimum_payout: u64
+    ): DistributionRules {
+        DistributionRules {
+            drone_percentage,
+            owner_percentage,
+            platform_percentage,
+            maintenance_percentage,
+            insurance_percentage,
+            performance_bonus_pool,
+            minimum_payout,
+        }
+    }
+
     // ==================== GETTER FUNCTIONS ====================
 
     public fun engine_total_revenue(engine: &EconomicEngine): u64 {

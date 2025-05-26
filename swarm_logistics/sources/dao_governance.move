@@ -723,6 +723,50 @@ module swarm_logistics::dao_governance {
         membership.governance_tokens + membership.delegation_power
     }
 
+    // ==================== CONSTRUCTOR FUNCTIONS ====================
+
+    /// Create governance configuration
+    public fun create_governance_config(
+        proposal_threshold: u64,
+        voting_period: u64,
+        execution_delay: u64,
+        quorum_threshold: u64,
+        approval_threshold: u64,
+        member_admission_threshold: u64,
+        proposal_deposit: u64,
+        max_active_proposals: u64
+    ): GovernanceConfig {
+        GovernanceConfig {
+            proposal_threshold,
+            voting_period,
+            execution_delay,
+            quorum_threshold,
+            approval_threshold,
+            member_admission_threshold,
+            proposal_deposit,
+            max_active_proposals,
+        }
+    }
+
+    /// Create revenue rules
+    public fun create_revenue_rules(
+        member_share_percentage: u64,
+        treasury_percentage: u64,
+        reinvestment_percentage: u64,
+        operational_percentage: u64,
+        performance_bonus_pool: u64,
+        distribution_frequency: u64
+    ): RevenueRules {
+        RevenueRules {
+            member_share_percentage,
+            treasury_percentage,
+            reinvestment_percentage,
+            operational_percentage,
+            performance_bonus_pool,
+            distribution_frequency,
+        }
+    }
+
     // ==================== GETTER FUNCTIONS ====================
 
     public fun dao_total_members(dao: &DroneDAO): u64 {
