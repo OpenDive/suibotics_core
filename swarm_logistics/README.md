@@ -559,6 +559,522 @@ Community-driven fleet management through:
 - Multi-tier membership with varying privileges
 - Community-controlled treasury and revenue distribution
 
+## 🔄 Smart Contract Interactions & System Flow
+
+### **System Architecture Diagram**
+
+```
+┌─────────────────────────────────────────────────────────────────────────────────┐
+│                           SWARM LOGISTICS ECOSYSTEM                            │
+├─────────────────────────────────────────────────────────────────────────────────┤
+│                                                                                 │
+│  ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐             │
+│  │   CUSTOMERS     │    │     DRONES      │    │  DAO MEMBERS    │             │
+│  │                 │    │                 │    │                 │             │
+│  │ • Place Orders  │    │ • Self Register │    │ • Vote on       │             │
+│  │ • Make Payments │    │ • Accept Orders │    │   Proposals     │             │
+│  │ • Track Delivery│    │ • Navigate      │    │ • Manage Fleet  │             │
+│  └─────────┬───────┘    │ • Coordinate    │    │ • Share Revenue │             │
+│            │            │ • Maintain Self │    └─────────┬───────┘             │
+│            │            └─────────┬───────┘              │                     │
+│            │                      │                      │                     │
+│            ▼                      ▼                      ▼                     │
+│  ┌─────────────────────────────────────────────────────────────────────────┐   │
+│  │                        SMART CONTRACT LAYER                            │   │
+│  │                                                                         │   │
+│  │  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐    │   │
+│  │  │   ORDER     │  │   DRONE     │  │   FLIGHT    │  │   SWARM     │    │   │
+│  │  │ MANAGEMENT  │  │  REGISTRY   │  │ CONTROLLER  │  │COORDINATOR  │    │   │
+│  │  │             │  │             │  │             │  │             │    │   │
+│  │  │ • Escrow    │  │ • Register  │  │ • Route     │  │ • Airspace  │    │   │
+│  │  │ • Assign    │  │ • Validate  │  │ • Navigate  │  │ • Emergency │    │   │
+│  │  │ • Track     │  │ • Authorize │  │ • Optimize  │  │ • Balance   │    │   │
+│  │  └──────┬──────┘  └──────┬──────┘  └──────┬──────┘  └──────┬──────┘    │   │
+│  │         │                │                │                │           │   │
+│  │         └────────────────┼────────────────┼────────────────┘           │   │
+│  │                          │                │                            │   │
+│  │  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐    │   │
+│  │  │ LOGISTICS   │  │MAINTENANCE  │  │  ECONOMIC   │  │    DAO      │    │   │
+│  │  │  MANAGER    │  │ SCHEDULER   │  │   ENGINE    │  │ GOVERNANCE  │    │   │
+│  │  │             │  │             │  │             │  │             │    │   │
+│  │  │ • Package   │  │ • Predict   │  │ • Price     │  │ • Proposals │    │   │
+│  │  │ • Route     │  │ • Schedule  │  │ • Revenue   │  │ • Voting    │    │   │
+│  │  │ • Backup    │  │ • Allocate  │  │ • Treasury  │  │ • Treasury  │    │   │
+│  │  └─────────────┘  └─────────────┘  └─────────────┘  └─────────────┘    │   │
+│  │                                                                         │   │
+│  │  ┌─────────────┐  ┌─────────────┐                                      │   │
+│  │  │   EVENTS    │  │  DELIVERY   │                                      │   │
+│  │  │   SYSTEM    │  │   TYPES     │                                      │   │
+│  │  │             │  │             │                                      │   │
+│  │  │ • Monitor   │  │ • Tracking  │                                      │   │
+│  │  │ • Log       │  │ • Status    │                                      │   │
+│  │  │ • Alert     │  │ • Metadata  │                                      │   │
+│  │  └─────────────┘  └─────────────┘                                      │   │
+│  └─────────────────────────────────────────────────────────────────────────┘   │
+│                                                                                 │
+└─────────────────────────────────────────────────────────────────────────────────┘
+```
+
+### **Module Dependency Graph**
+
+```
+                    ┌─────────────────┐
+                    │     EVENTS      │ ◄─────────────────┐
+                    │   (Foundation)  │                   │
+                    └─────────────────┘                   │
+                             ▲                            │
+                             │                            │
+                    ┌─────────────────┐                   │
+                    │     DRONE       │                   │
+                    │   (Core Types)  │                   │
+                    └─────────┬───────┘                   │
+                             │                            │
+                             ▼                            │
+                    ┌─────────────────┐                   │
+                    │ DRONE REGISTRY  │                   │
+                    │ (Registration)  │                   │
+                    └─────────┬───────┘                   │
+                             │                            │
+                ┌────────────┼────────────┐               │
+                ▼            ▼            ▼               │
+    ┌─────────────────┐ ┌─────────────────┐ ┌─────────────────┐
+    │ ORDER MANAGEMENT│ │ FLIGHT CONTROLLER│ │ SWARM COORDINATOR│
+    │   (Lifecycle)   │ │   (Navigation)   │ │ (Coordination)  │
+    └─────────┬───────┘ └─────────┬───────┘ └─────────┬───────┘
+             │                   │                   │
+             ▼                   ▼                   ▼
+    ┌─────────────────┐ ┌─────────────────┐ ┌─────────────────┐
+    │ LOGISTICS MANAGER│ │MAINTENANCE SCHED│ │  ECONOMIC ENGINE│
+    │   (Tracking)    │ │  (Predictive)   │ │   (Financial)   │
+    └─────────────────┘ └─────────────────┘ └─────────┬───────┘
+                                                     │
+                                                     ▼
+                                            ┌─────────────────┐
+                                            │  DAO GOVERNANCE │
+                                            │  (Collective)   │
+                                            └─────────────────┘
+```
+
+### **Core Interaction Patterns**
+
+#### **1. Registration & Onboarding Flow**
+```
+Drone Owner → Drone Registry → Drone + Financials + Capability
+     │              │                    │
+     │              ▼                    ▼
+     │         Events System ←──── Economic Engine
+     │              │                    │
+     ▼              ▼                    ▼
+DAO Governance ← Swarm Coordinator → Maintenance Scheduler
+```
+
+#### **2. Order Processing Flow**
+```
+Customer → Order Management → Drone Registry → Flight Controller
+    │            │                  │               │
+    │            ▼                  ▼               ▼
+    │       Events System    Swarm Coordinator → Logistics Manager
+    │            │                  │               │
+    ▼            ▼                  ▼               ▼
+Economic Engine ← ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ┘
+```
+
+#### **3. Autonomous Operations Flow**
+```
+Drone → Flight Controller → Swarm Coordinator → Maintenance Scheduler
+  │           │                    │                    │
+  ▼           ▼                    ▼                    ▼
+Events ← Economic Engine ← Logistics Manager ← DAO Governance
+```
+
+### **Smart Contract Dependencies**
+
+#### **Core Dependencies (Required)**
+- **`events.move`**: Foundation module - provides error codes and event structures
+- **`drone.move`**: Core types - defines fundamental drone and financial structures
+- **`delivery.move`**: Basic types - delivery order structures and tracking data
+
+#### **Business Logic Dependencies**
+- **`drone_registry.move`**: Depends on `drone.move`, `events.move`, `delivery.move`
+- **`order_management.move`**: Depends on `drone.move`, `events.move`
+- **`flight_controller.move`**: Depends on `drone.move`, `swarm.move`
+- **`swarm_coordinator.move`**: Depends on `swarm.move`, `drone.move`, `events.move`
+- **`logistics_manager.move`**: Depends on `delivery.move`, `drone.move`, `events.move`
+- **`maintenance_scheduler.move`**: Depends on `drone.move`
+- **`economic_engine.move`**: Depends on `drone.move`
+- **`dao_governance.move`**: Depends on `events.move`
+
+#### **Cross-Module Interactions**
+1. **Order Management** ↔ **Economic Engine**: Payment processing and revenue distribution
+2. **Flight Controller** ↔ **Swarm Coordinator**: Route coordination and conflict resolution
+3. **Logistics Manager** ↔ **Maintenance Scheduler**: Delivery scheduling around maintenance
+4. **Economic Engine** ↔ **DAO Governance**: Treasury management and revenue sharing
+5. **All Modules** → **Events System**: Comprehensive monitoring and logging
+
+## 🔄 System Interaction Flows
+
+### **1. Customer Journey Flow**
+
+```
+┌─────────────────────────────────────────────────────────────────────────────────┐
+│                            CUSTOMER INTERACTION FLOW                           │
+└─────────────────────────────────────────────────────────────────────────────────┘
+
+1. ORDER CREATION
+   Customer App → Order Management Contract
+   ├─ Validates delivery parameters (weight, distance, urgency)
+   ├─ Calculates pricing via Economic Engine
+   ├─ Creates escrow with payment
+   └─ Emits OrderCreated event
+
+2. DRONE ASSIGNMENT
+   Order Management → Drone Registry
+   ├─ Queries available drones in service area
+   ├─ Evaluates autonomous acceptance criteria
+   ├─ Assigns optimal drone based on capacity/location
+   └─ Updates order status to "Assigned"
+
+3. ROUTE PLANNING
+   Assigned Drone → Flight Controller
+   ├─ Calculates optimal route considering weather/traffic
+   ├─ Requests airspace reservation via Swarm Coordinator
+   ├─ Generates navigation waypoints
+   └─ Initializes autonomous flight systems
+
+4. DELIVERY EXECUTION
+   Flight Controller → Logistics Manager
+   ├─ Creates package tracker with real-time updates
+   ├─ Monitors delivery progress and environmental conditions
+   ├─ Handles backup coordination if needed
+   └─ Confirms delivery completion with proof
+
+5. PAYMENT SETTLEMENT
+   Logistics Manager → Economic Engine
+   ├─ Releases escrow payment upon delivery confirmation
+   ├─ Distributes revenue according to sharing rules
+   ├─ Updates performance metrics and reputation scores
+   └─ Processes customer rating and feedback
+```
+
+### **2. Drone Autonomous Operations Flow**
+
+```
+┌─────────────────────────────────────────────────────────────────────────────────┐
+│                         DRONE AUTONOMOUS OPERATIONS                            │
+└─────────────────────────────────────────────────────────────────────────────────┘
+
+1. SELF-REGISTRATION
+   Drone → Drone Registry Contract
+   ├─ Validates operation mode and autonomy level
+   ├─ Creates drone entity with financial management
+   ├─ Generates capability permissions
+   └─ Joins swarm network for coordination
+
+2. AUTONOMOUS DECISION MAKING
+   Drone → Order Management Contract
+   ├─ Evaluates incoming orders for profitability
+   ├─ Considers battery level, maintenance schedule
+   ├─ Makes accept/reject decisions autonomously
+   └─ Updates availability status
+
+3. FLIGHT OPERATIONS
+   Drone → Flight Controller Contract
+   ├─ Executes autonomous navigation
+   ├─ Makes real-time route adjustments
+   ├─ Detects and avoids obstacles automatically
+   └─ Handles emergency situations
+
+4. SWARM COORDINATION
+   Drone → Swarm Coordinator Contract
+   ├─ Participates in airspace management
+   ├─ Provides emergency assistance to other drones
+   ├─ Shares environmental data and conditions
+   └─ Collaborates in load balancing
+
+5. SELF-MAINTENANCE
+   Drone → Maintenance Scheduler Contract
+   ├─ Reports flight data and component wear
+   ├─ Receives predictive maintenance analysis
+   ├─ Schedules maintenance autonomously
+   └─ Manages maintenance fund allocation
+
+6. FINANCIAL MANAGEMENT
+   Drone → Economic Engine Contract
+   ├─ Receives revenue distributions automatically
+   ├─ Allocates funds for maintenance and upgrades
+   ├─ Participates in dynamic pricing decisions
+   └─ Builds reputation through performance
+```
+
+### **3. DAO Governance Flow**
+
+```
+┌─────────────────────────────────────────────────────────────────────────────────┐
+│                           DAO GOVERNANCE INTERACTION                           │
+└─────────────────────────────────────────────────────────────────────────────────┘
+
+1. MEMBERSHIP & PARTICIPATION
+   Community Members → DAO Governance Contract
+   ├─ Join DAO with governance token purchase
+   ├─ Receive voting power based on token holdings
+   ├─ Participate in different membership tiers
+   └─ Delegate voting power to trusted members
+
+2. PROPOSAL CREATION & VOTING
+   DAO Members → DAO Governance Contract
+   ├─ Create proposals for fleet decisions
+   ├─ Vote on treasury allocations and parameter changes
+   ├─ Participate in democratic decision-making
+   └─ Execute approved proposals automatically
+
+3. FLEET MANAGEMENT
+   DAO → Multiple Contracts
+   ├─ Purchase new drones via treasury operations
+   ├─ Set network-wide pricing parameters
+   ├─ Allocate resources for maintenance and upgrades
+   └─ Manage collective revenue distribution
+
+4. TREASURY OPERATIONS
+   DAO → Economic Engine Contract
+   ├─ Control community treasury funds
+   ├─ Approve major expenditures and investments
+   ├─ Set revenue sharing rules for members
+   └─ Monitor financial performance metrics
+```
+
+### **4. Emergency & Coordination Flow**
+
+```
+┌─────────────────────────────────────────────────────────────────────────────────┐
+│                        EMERGENCY & SWARM COORDINATION                          │
+└─────────────────────────────────────────────────────────────────────────────────┘
+
+1. EMERGENCY DETECTION
+   Drone → Swarm Coordinator Contract
+   ├─ Detects low battery, malfunction, or weather emergency
+   ├─ Creates emergency request with location and severity
+   ├─ Broadcasts assistance request to swarm network
+   └─ Initiates emergency protocols
+
+2. RESPONSE COORDINATION
+   Swarm Coordinator → Available Drones
+   ├─ Identifies nearby drones capable of assistance
+   ├─ Calculates optimal response plan and resource allocation
+   ├─ Coordinates multi-drone emergency response
+   └─ Manages backup delivery assignments
+
+3. AIRSPACE MANAGEMENT
+   Multiple Drones → Swarm Coordinator Contract
+   ├─ Request airspace reservations for planned routes
+   ├─ Detect and resolve airspace conflicts automatically
+   ├─ Implement dynamic route adjustments
+   └─ Maintain safe separation and traffic flow
+
+4. LOAD BALANCING
+   Swarm Coordinator → Order Management
+   ├─ Monitors drone workload distribution
+   ├─ Redistributes orders for optimal efficiency
+   ├─ Handles capacity management during peak times
+   └─ Optimizes network-wide performance
+```
+
+### **5. Maintenance & Predictive Operations Flow**
+
+```
+┌─────────────────────────────────────────────────────────────────────────────────┐
+│                      MAINTENANCE & PREDICTIVE OPERATIONS                       │
+└─────────────────────────────────────────────────────────────────────────────────┘
+
+1. PREDICTIVE ANALYSIS
+   Drone Flight Data → Maintenance Scheduler Contract
+   ├─ Analyzes component wear patterns and usage
+   ├─ Predicts potential failures with confidence scores
+   ├─ Generates maintenance recommendations
+   └─ Calculates optimal maintenance timing
+
+2. AUTONOMOUS SCHEDULING
+   Maintenance Scheduler → Drone Registry
+   ├─ Schedules maintenance based on predictions
+   ├─ Allocates technician resources and parts inventory
+   ├─ Coordinates with delivery schedules
+   └─ Manages maintenance facility capacity
+
+3. RESOURCE OPTIMIZATION
+   Maintenance Scheduler → Economic Engine
+   ├─ Optimizes maintenance costs and resource allocation
+   ├─ Tracks cost savings from predictive vs reactive maintenance
+   ├─ Manages parts inventory and supplier relationships
+   └─ Calculates ROI on maintenance investments
+
+4. INTEGRATION WITH OPERATIONS
+   Maintenance Scheduler ↔ Flight Controller
+   ├─ Considers maintenance schedules in route planning
+   ├─ Adjusts drone availability based on maintenance needs
+   ├─ Coordinates emergency maintenance during flights
+   └─ Optimizes fleet utilization around maintenance windows
+```
+
+### **Key Integration Points**
+
+1. **Events System**: All modules emit events for comprehensive monitoring and analytics
+2. **Economic Engine**: Central hub for all financial operations and revenue distribution
+3. **Swarm Coordinator**: Manages all multi-drone interactions and coordination
+4. **DAO Governance**: Provides democratic oversight and community control
+5. **Maintenance Scheduler**: Ensures fleet reliability through predictive operations
+
+This interconnected system creates a fully autonomous, self-managing drone delivery network where each component works together to optimize performance, safety, and profitability while maintaining democratic governance and community ownership.
+
+### **Complete Delivery Sequence Diagram**
+
+```
+┌─────────────────────────────────────────────────────────────────────────────────┐
+│                        COMPLETE DELIVERY FLOW SEQUENCE                         │
+└─────────────────────────────────────────────────────────────────────────────────┘
+
+Customer    Order Mgmt    Economic    Drone Reg    Flight Ctrl    Swarm Coord    Logistics    Events
+    │           │         Engine         │             │              │            │           │
+    │ 1. Create │            │           │             │              │            │           │
+    │   Order   │            │           │             │              │            │           │
+    ├──────────►│            │           │             │              │            │           │
+    │           │ 2. Calculate│           │             │              │            │           │
+    │           │   Pricing  │           │             │              │            │           │
+    │           ├───────────►│           │             │              │            │           │
+    │           │◄───────────┤           │             │              │            │           │
+    │           │ 3. Create  │           │             │              │            │           │
+    │           │   Escrow   │           │             │              │            │           │
+    │           ├───────────►│           │             │              │            │           │
+    │           │            │           │             │              │            │           │
+    │           │ 4. Find    │           │             │              │            │           │
+    │           │   Available│           │             │              │            │           │
+    │           │   Drones   │           │             │              │            │           │
+    │           ├──────────────────────►│             │              │            │           │
+    │           │◄──────────────────────┤             │              │            │           │
+    │           │            │           │             │              │            │           │
+    │           │ 5. Assign  │           │             │              │            │           │
+    │           │   Order    │           │             │              │            │           │
+    │           ├──────────────────────►│             │              │            │           │
+    │           │            │           │ 6. Calculate│              │            │           │
+    │           │            │           │   Route     │              │            │           │
+    │           │            │           ├────────────►│              │            │           │
+    │           │            │           │             │ 7. Request   │            │           │
+    │           │            │           │             │   Airspace   │            │           │
+    │           │            │           │             ├─────────────►│            │           │
+    │           │            │           │             │◄─────────────┤            │           │
+    │           │            │           │             │              │            │           │
+    │           │            │           │             │ 8. Create    │            │           │
+    │           │            │           │           │   Package    │            │           │
+    │           │            │           │           │   Tracker    │            │           │
+    │           │            │           │           ├─────────────────────────►│           │
+    │           │            │           │           │              │            │           │
+    │           │ 9. Emit    │           │           │              │            │           │
+    │           │   Events   │           │           │              │            │           │
+    │           ├──────────────────────────────────────────────────────────────────────────►│
+    │           │            │           │           │              │            │           │
+    │           │            │           │ 10. Execute│              │            │           │
+    │           │            │           │    Flight   │              │            │           │
+    │           │            │           ├────────────►│              │            │           │
+    │           │            │           │             │ 11. Real-time│            │           │
+    │           │            │           │             │    Updates   │            │           │
+    │           │            │           │             ├─────────────────────────►│           │
+    │           │            │           │             │              │            │           │
+    │           │            │           │             │ 12. Delivery │            │           │
+    │           │            │           │             │    Complete  │            │           │
+    │           │            │           │             ├─────────────────────────►│           │
+    │           │            │           │             │              │ 13. Release│           │
+    │           │            │           │             │              │    Escrow  │           │
+    │           │            │           │             │              ├───────────►│           │
+    │           │ 14. Revenue│           │           │              │            │           │
+    │           │    Distribution        │           │              │            │           │
+    │           ├───────────►│           │           │              │            │           │
+    │           │            │ 15. Update│           │              │            │           │
+    │           │            │    Metrics│           │              │            │           │
+    │           │            ├──────────────────────────────────────────────────────────────►│
+    │           │            │           │           │              │            │           │
+    │ 16. Delivery           │           │           │              │            │           │
+    │    Confirmation        │           │           │              │            │           │
+    │◄──────────┤            │           │           │              │            │           │
+    │           │            │           │           │              │            │           │
+```
+
+### **Entity Interaction Matrix**
+
+| Entity/Contract | Customers | Drones | DAO Members | Maintenance | External APIs |
+|----------------|-----------|---------|-------------|-------------|---------------|
+| **Order Management** | ✅ Direct | ✅ Assignment | ❌ None | ❌ None | 🔄 Payment |
+| **Drone Registry** | ❌ None | ✅ Registration | ✅ Ownership | ❌ None | ❌ None |
+| **Flight Controller** | ❌ None | ✅ Navigation | ❌ None | 🔄 Schedule | 🔄 Weather |
+| **Swarm Coordinator** | ❌ None | ✅ Coordination | ❌ None | ❌ None | ❌ None |
+| **Logistics Manager** | 🔄 Tracking | ✅ Updates | ❌ None | 🔄 Schedule | 🔄 Delivery |
+| **Maintenance Scheduler** | ❌ None | ✅ Scheduling | ✅ Funding | ✅ Direct | 🔄 Parts |
+| **Economic Engine** | ✅ Pricing | ✅ Revenue | ✅ Treasury | 🔄 Costs | 🔄 Market |
+| **DAO Governance** | ❌ None | 🔄 Ownership | ✅ Voting | 🔄 Funding | ❌ None |
+| **Events System** | 🔄 Notifications | 🔄 Monitoring | 🔄 Analytics | 🔄 Alerts | 🔄 Logging |
+
+**Legend:**
+- ✅ **Direct Interaction**: Primary interface for this entity
+- 🔄 **Indirect Interaction**: Secondary or conditional interaction
+- ❌ **No Interaction**: No direct relationship
+
+### **Data Flow Architecture**
+
+```
+┌─────────────────────────────────────────────────────────────────────────────────┐
+│                              DATA FLOW LAYERS                                  │
+└─────────────────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────────────────┐
+│ PRESENTATION LAYER (Off-Chain)                                                 │
+│ ┌─────────────┐ ┌─────────────┐ ┌─────────────┐ ┌─────────────┐               │
+│ │ Customer    │ │ Drone       │ │ DAO         │ │ Maintenance │               │
+│ │ Mobile App  │ │ Interface   │ │ Dashboard   │ │ Portal      │               │
+│ │             │ │             │ │             │ │             │               │
+│ └─────────────┘ └─────────────┘ └─────────────┘ └─────────────┘               │
+└─────────────────────────────────────────────────────────────────────────────────┘
+                                    │
+                                    ▼
+┌─────────────────────────────────────────────────────────────────────────────────┐
+│ API GATEWAY LAYER (Off-Chain)                                                  │
+│ ┌─────────────┐ ┌─────────────┐ ┌─────────────┐ ┌─────────────┐               │
+│ │ REST APIs   │ │ WebSocket   │ │ GraphQL     │ │ Event       │               │
+│ │             │ │ Real-time   │ │ Queries     │ │ Streaming   │               │
+│ └─────────────┘ └─────────────┘ └─────────────┘ └─────────────┘               │
+└─────────────────────────────────────────────────────────────────────────────────┘
+                                    │
+                                    ▼
+┌─────────────────────────────────────────────────────────────────────────────────┐
+│ SMART CONTRACT LAYER (On-Chain)                                                │
+│                                                                                 │
+│ ┌─────────────────────────────────────────────────────────────────────────┐   │
+│ │                        BUSINESS LOGIC CONTRACTS                        │   │
+│ │ ┌─────────────┐ ┌─────────────┐ ┌─────────────┐ ┌─────────────┐       │   │
+│ │ │ Order Mgmt  │ │ Flight Ctrl │ │ Swarm Coord │ │ Logistics   │       │   │
+│ │ └─────────────┘ └─────────────┘ └─────────────┘ └─────────────┘       │   │
+│ │ ┌─────────────┐ ┌─────────────┐ ┌─────────────┐ ┌─────────────┐       │   │
+│ │ │ Maintenance │ │ Economic    │ │ DAO         │ │ Drone       │       │   │
+│ │ │ Scheduler   │ │ Engine      │ │ Governance  │ │ Registry    │       │   │
+│ │ └─────────────┘ └─────────────┘ └─────────────┘ └─────────────┘       │   │
+│ └─────────────────────────────────────────────────────────────────────────┘   │
+│                                    │                                           │
+│                                    ▼                                           │
+│ ┌─────────────────────────────────────────────────────────────────────────┐   │
+│ │                         FOUNDATION CONTRACTS                           │   │
+│ │ ┌─────────────┐ ┌─────────────┐ ┌─────────────┐                       │   │
+│ │ │ Events      │ │ Drone Types │ │ Delivery    │                       │   │
+│ │ │ System      │ │ & Swarm     │ │ Types       │                       │   │
+│ │ └─────────────┘ └─────────────┘ └─────────────┘                       │   │
+│ └─────────────────────────────────────────────────────────────────────────┘   │
+└─────────────────────────────────────────────────────────────────────────────────┘
+                                    │
+                                    ▼
+┌─────────────────────────────────────────────────────────────────────────────────┐
+│ BLOCKCHAIN LAYER (Sui Network)                                                 │
+│ ┌─────────────┐ ┌─────────────┐ ┌─────────────┐ ┌─────────────┐               │
+│ │ Transaction │ │ Object      │ │ Event       │ │ Consensus   │               │
+│ │ Processing  │ │ Storage     │ │ Emission    │ │ Mechanism   │               │
+│ └─────────────┘ └─────────────┘ └─────────────┘ └─────────────┘               │
+└─────────────────────────────────────────────────────────────────────────────────┘
+```
+
 ## 🔮 Future Enhancements
 
 - **Insurance Integration**: Automated insurance claims and coverage
