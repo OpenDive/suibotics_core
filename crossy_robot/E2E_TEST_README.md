@@ -1,8 +1,8 @@
-# Crossy Robot E2E Testing 🤖🧪
+# Crossy Robot E2E Testing
 
 This directory contains an event-driven end-to-end test that simulates the complete Crossy Robot game flow using real blockchain interactions.
 
-## 🎯 What This Test Does
+## What This Test Does
 
 The test simulates the real-world interaction between users and robots:
 
@@ -12,7 +12,7 @@ The test simulates the real-world interaction between users and robots:
 4. **Robot** listens for `RobotMoved` events and simulates physical movement
 5. **Verification** ensures all events are captured and processed correctly
 
-## 🚀 Quick Start
+## Quick Start
 
 ### 1. Install Dependencies
 ```bash
@@ -38,7 +38,7 @@ Get testnet tokens from: https://faucet.sui.io/
 npm test
 ```
 
-## 📋 Prerequisites
+## Prerequisites
 
 ### Required Files
 - `deployment_info.json` - Contains the deployed contract package ID
@@ -63,7 +63,7 @@ From Sui Wallet Browser Extension:
 1. Go to Settings → Export Private Key
 2. Copy the base64 encoded private key
 
-## 🔧 Configuration
+## Configuration
 
 ### Environment Variables
 ```bash
@@ -85,7 +85,7 @@ MOVEMENT_DELAY_MS=2000
 - **Test Timeout**: 30 seconds (configurable)
 - **Movement Delay**: 2 seconds between commands (configurable)
 
-## 📊 Expected Output
+## Expected Output
 
 ```
 🤖 Crossy Robot E2E Test Initialized
@@ -147,7 +147,7 @@ MOVEMENT_DELAY_MS=2000
 🤖 Crossy Robot contract is working perfectly!
 ```
 
-## 🛠️ Troubleshooting
+## Troubleshooting
 
 ### Common Issues
 
@@ -179,7 +179,7 @@ MOVEMENT_DELAY_MS=2000
 ### Debug Mode
 For more detailed logging, you can modify the script to add debug output or check transaction details on the Sui explorer.
 
-## 🔍 What This Tests
+## What This Tests
 
 ### Core Functionality
 - ✅ Game creation with correct payment
@@ -204,7 +204,7 @@ For more detailed logging, you can modify the script to add debug output or chec
 - ✅ WebSocket event subscription
 - ✅ Transaction building and signing
 
-## 🎮 Next Steps
+## Next Steps
 
 After successful testing, you can:
 
@@ -213,11 +213,11 @@ After successful testing, you can:
 3. **Add More Features** - Extend the contract and test new functionality
 4. **Deploy to Mainnet** - Use the same testing approach on mainnet
 
-## 📝 Notes
+## Notes
 
 - This test uses real testnet transactions and consumes real SUI
 - Each test run creates new game objects on the blockchain
 - Events are captured in real-time using WebSocket connections
 - The test validates the complete user journey from game creation to robot movement
 
-This E2E test proves that the Crossy Robot contract works correctly in a real blockchain environment! 🎉 
+This E2E test proves that the Crossy Robot contract works correctly in a real blockchain environment!

@@ -8,19 +8,19 @@ Suibotics Core provides a comprehensive framework for managing digital identitie
 
 ## Features
 
-### 🔐 Decentralized Identity (DID) Management
+### Decentralized Identity (DID) Management
 - **DID Registration**: Create unique decentralized identifiers for IoT devices
 - **Key Management**: Add, revoke, and manage cryptographic keys for devices
 - **Service Endpoints**: Register and manage service endpoints for device communication
 - **Controller Verification**: Ensure only authorized entities can modify DID documents
 
-### 📜 Verifiable Credentials
+### Verifiable Credentials
 - **Credential Issuance**: Issue tamper-proof credentials to devices
 - **Schema Validation**: Support for structured credential schemas
 - **Revocation Management**: Revoke credentials when necessary
 - **Timestamp Tracking**: Track credential issuance and revocation times
 
-### 🛡️ Security Features
+### Security Features
 - **Input Validation**: Comprehensive validation for all inputs
 - **Access Control**: Role-based access control for DID and credential operations
 - **Event Logging**: Immutable event logs for all operations
@@ -278,7 +278,3 @@ The deployment information is automatically saved to `deployment_info.json` for 
 ## License
 
 [Add your license information here]
-
-## Support
-
-For questions and support, please [add contact information or issue tracker link].

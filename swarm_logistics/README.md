@@ -2,37 +2,37 @@
 
 A comprehensive blockchain-based system for autonomous drone delivery operations built on the Sui blockchain. This project implements smart contracts that enable fully autonomous drones to self-register, accept delivery orders, optimize flight routes, coordinate with other drones, and manage their own finances.
 
-## 🚁 Overview
+## Overview
 
 Swarm Logistics represents the future of autonomous delivery systems where drones operate as independent economic agents on the blockchain. The system combines advanced route optimization, swarm intelligence, autonomous decision-making, and decentralized financial management to create a fully autonomous delivery network.
 
-## ✨ Key Features
+## Key Features
 
-### 🤖 **Autonomous Operations**
+### **Autonomous Operations**
 - **Self-Registration**: Drones can autonomously register themselves on the network
 - **Independent Decision Making**: AI-driven flight decisions with confidence scoring
 - **Autonomous Financial Management**: Drones manage their own earnings, maintenance funds, and operational costs
 - **Self-Maintenance Scheduling**: Automated maintenance planning and execution
 
-### 🛣️ **Advanced Route Optimization**
+### **Advanced Route Optimization**
 - **Multi-Factor Optimization**: Considers weather, traffic, energy efficiency, and safety
 - **Real-Time Route Adjustment**: Dynamic route modifications based on changing conditions
 - **Obstacle Detection & Avoidance**: Handles aircraft, weather, buildings, no-fly zones, and wildlife
 - **Emergency Protocols**: Automatic emergency landing and assistance requests
 
-### 🤝 **Swarm Intelligence**
+### **Swarm Intelligence**
 - **Airspace Coordination**: Intelligent airspace slot management to prevent conflicts
 - **Emergency Assistance**: Drones can request and provide help to each other
 - **Load Balancing**: Automatic distribution of delivery orders across the fleet
 - **Reputation System**: Performance-based reputation scoring for reliability
 
-### 💰 **Economic Engine**
+### **Economic Engine**
 - **Escrow-Based Payments**: Secure payment handling with automatic release
 - **Dynamic Revenue Sharing**: Configurable profit distribution between drone, owner, and platform
 - **Autonomous Fund Management**: Automatic allocation for maintenance, upgrades, and insurance
 - **Performance-Based Pricing**: Delivery costs based on distance, urgency, and conditions
 
-## 🏗️ Architecture
+## Architecture
 
 The system is built using a modular architecture with the following core modules:
 
@@ -57,9 +57,9 @@ swarm_logistics/
 └── Move.toml                      # Project configuration
 ```
 
-## 📦 Modules
+## Modules
 
-### 🤖 **Core Drone System**
+### **Core Drone System**
 
 **`drone.move`** - Fundamental drone structures:
 - Autonomous drone entities with financial management
@@ -73,7 +73,7 @@ swarm_logistics/
 - Ownership model support (Individual, Fleet, Autonomous, DAO)
 - Capability-based permissions for autonomous operations
 
-### 📋 **Order and Delivery Management**
+### **Order and Delivery Management**
 
 **`order_management.move`** - Complete order lifecycle:
 - Escrow-based payment system with automatic release
@@ -86,7 +86,7 @@ swarm_logistics/
 - Delivery status progression and proof systems
 - Customer interaction and rating systems
 
-### 🧭 **Autonomous Navigation**
+### **Autonomous Navigation**
 
 **`flight_controller.move`** - Advanced flight control (649 lines):
 - **Route Optimization**: Multi-factor algorithms considering weather, traffic, energy
@@ -95,7 +95,7 @@ swarm_logistics/
 - **Emergency Protocols**: Automatic emergency landing and safety procedures
 - **Autonomous Decisions**: AI-driven flight decisions with confidence scoring
 
-### 🤝 **Swarm Intelligence**
+### **Swarm Intelligence**
 
 **`swarm.move`** - Coordination data structures:
 - Airspace slot management and environmental monitoring
@@ -108,7 +108,7 @@ swarm_logistics/
 - **Load Balancing**: Intelligent workload distribution across fleet
 - **Resource Optimization**: Efficiency-based task allocation
 
-### 🚚 **Logistics Operations**
+### **Logistics Operations**
 
 **`logistics_manager.move`** - Comprehensive logistics (635 lines):
 - **Package Tracking**: End-to-end tracking with environmental monitoring
@@ -116,7 +116,7 @@ swarm_logistics/
 - **Backup Coordination**: Automatic backup drone assignment and handoff
 - **Delivery Analytics**: Performance metrics and success tracking
 
-### 🔧 **Predictive Maintenance**
+### **Predictive Maintenance**
 
 **`maintenance_scheduler.move`** - Autonomous maintenance (798 lines):
 - **Predictive Analysis**: Component wear prediction and failure forecasting
@@ -124,7 +124,7 @@ swarm_logistics/
 - **Resource Management**: Technician allocation and parts inventory
 - **Facility Coordination**: Maintenance facility management and optimization
 
-### 💰 **Economic Engine**
+### **Economic Engine**
 
 **`economic_engine.move`** - Advanced financial management (771 lines):
 - **Dynamic Pricing**: Multi-factor pricing with demand, weather, time-of-day adjustments
@@ -133,7 +133,7 @@ swarm_logistics/
 - **Treasury Management**: Autonomous fund allocation with investment strategies
 - **Financial Analytics**: ROI tracking, profit margins, and performance metrics
 
-### 🏛️ **DAO Governance**
+### **DAO Governance**
 
 **`dao_governance.move`** - Decentralized fleet management (811 lines):
 - **Collective Ownership**: Democratic control through governance tokens
@@ -142,7 +142,7 @@ swarm_logistics/
 - **Treasury Control**: Community-managed fund allocation and revenue distribution
 - **Membership Tiers**: Multi-tier system with varying privileges and voting power
 
-### 📊 **Event System**
+### **Event System**
 
 **`events.move`** - Comprehensive monitoring (430 lines):
 - **Drone Events**: Registration, status changes, maintenance events
@@ -152,7 +152,7 @@ swarm_logistics/
 - **DAO Events**: Governance activities, voting, proposal execution
 - **Financial Events**: Revenue distribution, treasury operations
 
-## 🚀 Getting Started
+## Getting Started
 
 ### Prerequisites
 
@@ -183,7 +183,7 @@ swarm_logistics/
    sui client publish --gas-budget 100000000
    ```
 
-## 💡 Usage Examples
+## Usage Examples
 
 ### 1. Register an Autonomous Drone
 
@@ -474,7 +474,7 @@ let delegation = dao_governance::delegate_votes(
 );
 ```
 
-## 🔧 Configuration
+## Configuration
 
 ### Optimization Parameters
 
@@ -508,7 +508,7 @@ let revenue_share = RevenueShare {
 };
 ```
 
-## 📊 Events and Monitoring
+## Events and Monitoring
 
 The system emits comprehensive events for monitoring and analytics:
 
@@ -520,7 +520,7 @@ The system emits comprehensive events for monitoring and analytics:
 - **Maintenance Events**: Predictive analysis, scheduling, facility management
 - **Financial Events**: Payments, revenue distribution, fund management
 
-## 🛡️ Security Features
+## Security Features
 
 - **Escrow-Based Payments**: Funds held securely until delivery completion
 - **Capability-Based Access**: Granular permissions for autonomous operations
@@ -529,7 +529,7 @@ The system emits comprehensive events for monitoring and analytics:
 - **Autonomous Validation**: Self-validating drones with confidence scoring
 - **Conflict Resolution**: Automatic airspace conflict detection and resolution
 
-## 🚀 Key Innovations
+## Key Innovations
 
 ### **Autonomous Economic Agents**
 Drones operate as independent economic entities that can:
@@ -559,7 +559,7 @@ Community-driven fleet management through:
 - Multi-tier membership with varying privileges
 - Community-controlled treasury and revenue distribution
 
-## 🔄 Smart Contract Interactions & System Flow
+## Smart Contract Interactions & System Flow
 
 ### **System Architecture Diagram**
 
@@ -711,7 +711,7 @@ Events ← Economic Engine ← Logistics Manager ← DAO Governance
 4. **Economic Engine** ↔ **DAO Governance**: Treasury management and revenue sharing
 5. **All Modules** → **Events System**: Comprehensive monitoring and logging
 
-## 🔄 System Interaction Flows
+## System Interaction Flows
 
 ### **1. Customer Journey Flow**
 
@@ -1075,7 +1075,7 @@ Customer    Order Mgmt    Economic    Drone Reg    Flight Ctrl    Swarm Coord   
 └─────────────────────────────────────────────────────────────────────────────────┘
 ```
 
-## 🔮 Future Enhancements
+## Future Enhancements
 
 - **Insurance Integration**: Automated insurance claims and coverage
 - **Cross-Chain Integration**: Multi-blockchain delivery networks
@@ -1086,38 +1086,10 @@ Customer    Order Mgmt    Economic    Drone Reg    Flight Ctrl    Swarm Coord   
 - **Mobile Applications**: Customer and operator mobile interfaces
 - **API Gateway**: RESTful APIs for third-party integrations
 
-## 🤝 Contributing
 
-We welcome contributions! Please see our contributing guidelines for:
+## Implementation Status
 
-- Code style and standards
-- Testing requirements
-- Pull request process
-- Issue reporting
-
-## 📄 License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
-
-## 🆘 Support
-
-For support and questions:
-
-- **Documentation**: [Link to docs]
-- **Discord**: [Community Discord]
-- **Issues**: [GitHub Issues]
-- **Email**: support@swarmlogistics.io
-
-## 🙏 Acknowledgments
-
-- Sui Foundation for the blockchain infrastructure
-- Move language team for the smart contract platform
-- Drone technology pioneers for inspiration
-- Open source community for tools and libraries
-
-## 🎯 Implementation Status
-
-### ✅ **Completed Features**
+### **Completed Features**
 
 **Core Infrastructure:**
 - ✅ Autonomous drone registration and management
@@ -1160,16 +1132,7 @@ For support and questions:
 - ✅ Automated proposal execution with time delays
 - ✅ Multi-tier membership system with varying privileges
 
-### 📊 **System Statistics**
-
-- **Total Modules**: 12 smart contract modules
-- **Lines of Code**: 6,000+ lines of Move code (5,989 in sources, 24,281 total with examples)
-- **Functions**: 337 public and private functions
-- **Data Structures**: 87 comprehensive structs
-- **Event Types**: 33+ event categories for comprehensive monitoring
-- **Build Status**: ✅ Successfully compiling with zero errors
-
-### 🏗️ **Architecture Highlights**
+### **Architecture Highlights**
 
 - **Modular Design**: Clean separation between types and business logic
 - **Autonomous Operations**: Drones operate as independent economic agents
@@ -1178,7 +1141,7 @@ For support and questions:
 - **Economic Engine**: Complete financial management and revenue sharing
 - **Safety First**: Comprehensive emergency protocols and conflict resolution
 
-### 🔬 **Advanced Technical Capabilities**
+### **Advanced Technical Capabilities**
 
 **Autonomous Decision-Making:**
 - Confidence-scored AI decisions with outcome tracking
@@ -1212,6 +1175,4 @@ For support and questions:
 
 ---
 
-**Built with ❤️ for the future of autonomous delivery**
-
-*Swarm Logistics - Where drones think, decide, and deliver autonomously on the blockchain.* 
+Built with ❤️ for the future of autonomous delivery

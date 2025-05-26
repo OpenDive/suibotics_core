@@ -1,8 +1,8 @@
-# Crossy Robot Deployment Guide 🚀
+# Crossy Robot Deployment Guide
 
 This guide covers deploying the Crossy Robot game contract to Sui testnet.
 
-## 📋 Prerequisites
+## Prerequisites
 
 Before deploying, ensure you have:
 
@@ -32,7 +32,7 @@ Before deploying, ensure you have:
    brew install jq  # macOS
    ```
 
-## 🎯 Deployment Options
+## Deployment Options
 
 ### Option 1: Comprehensive Deployment (Recommended)
 
@@ -60,10 +60,10 @@ Use this for rapid testing and development:
 ```
 
 **Features:**
-- ⚡ Fast deployment with minimal checks
-- 🎯 Essential steps only
-- 📦 Package ID extraction
-- 🔗 Explorer links
+- Fast deployment with minimal checks
+- Essential steps only
+- Package ID extraction
+- Explorer links
 
 ### Option 3: Manual Deployment
 
@@ -81,7 +81,7 @@ sui move test
 sui client publish --gas-budget 100000000
 ```
 
-## 📊 Deployment Results
+## Deployment Results
 
 After successful deployment, you'll receive:
 
@@ -155,7 +155,7 @@ async def listen_for_movements():
     pass
 ```
 
-## 🛠️ Troubleshooting
+## Troubleshooting
 
 ### Common Issues
 
@@ -209,7 +209,7 @@ brew install jq  # macOS
 apt-get install jq  # Ubuntu/Debian
 ```
 
-## 📁 Generated Files
+## Generated Files
 
 After deployment, these files are created:
 
@@ -217,7 +217,7 @@ After deployment, these files are created:
 - `deployment_YYYYMMDD_HHMMSS.log` - Detailed deployment logs (comprehensive script only)
 - `build/` - Compiled Move bytecode
 
-## 🔄 Redeployment
+## Redeployment
 
 To redeploy (creates new package):
 ```bash
@@ -228,23 +228,6 @@ rm -rf build/ deployment_info.json
 ./deploy_testnet.sh
 ```
 
-## 📞 Support
-
-If you encounter issues:
-
-1. Check the deployment logs
-2. Verify your Sui CLI version: `sui --version`
-3. Ensure you're on testnet: `sui client envs`
-4. Check gas balance: `sui client gas`
-5. Review the troubleshooting section above
-
-## 🎮 Next Steps
-
-After successful deployment:
-
-1. **Build Frontend**: Create a web interface for users to create games and control robots
-2. **Implement Robot Listeners**: Set up physical robots to listen for blockchain events
-3. **Test Game Flow**: Create games, connect robots, and issue movement commands
-4. **Monitor Events**: Use blockchain explorers to track game activity
+## GM
 
 Your Crossy Robot game is now live on Sui testnet! 🤖🎮 

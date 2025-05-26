@@ -1,8 +1,8 @@
-# Crossy Robot 🤖🎮
+# Crossy Robot
 
 A simple blockchain-based robot control game where users pay to control physical robots in real-time.
 
-## 🎯 **Game Concept**
+## **Game Concept**
 
 Crossy Robot is a pay-to-play game where:
 1. **Users** create games by paying 0.05 SUI
@@ -10,7 +10,7 @@ Crossy Robot is a pay-to-play game where:
 3. **Users** control the connected robot through blockchain transactions
 4. **Robots** execute movements in the physical world based on blockchain events
 
-## 🏗️ **Architecture**
+## **Architecture**
 
 ```
 ┌─────────────┐    0.05 SUI     ┌─────────────────┐
@@ -32,7 +32,7 @@ Crossy Robot is a pay-to-play game where:
 - **Direct Payment Transfer**: 0.05 SUI flows directly from user to robot upon connection
 - **Decentralized Control**: No central server required for game coordination
 
-## 📋 **Game Flow**
+## **Game Flow**
 
 ### **1. Game Creation**
 - User submits 0.05 SUI payment through frontend
@@ -56,7 +56,7 @@ Crossy Robot is a pay-to-play game where:
 - Emits `RobotMoved` event with direction and timestamp
 - Physical robot listens to events and executes movement in real-time
 
-## 🎮 **Movement Directions**
+## **Movement Directions**
 
 The game supports 8-directional movement:
 
@@ -71,7 +71,7 @@ The game supports 8-directional movement:
 | Down-Left | 6 | Move diagonally backward-left |
 | Down-Right | 7 | Move diagonally backward-right |
 
-## 📦 **Smart Contract Structure**
+## **Smart Contract Structure**
 
 ### **Core Types**
 ```move
@@ -95,7 +95,7 @@ public struct Game has key, store {
 - `connect_robot(game, clock, ctx): Coin<SUI>` - Robot connects and receives payment
 - `move_robot(game, direction, clock, ctx)` - Issue movement command (0-7 directions)
 
-## 🚀 **Deployment**
+## **Deployment**
 
 ### **Prerequisites**
 - Sui CLI installed
@@ -219,9 +219,9 @@ def listen_for_movements():
     # Directions: 0=up, 1=down, 2=left, 3=right, 4-7=diagonals
 ```
 
-## 🎯 **Current MVP Features**
+##  **Current MVP Features**
 
-### **✅ Implemented**
+### **Implemented**
 - Pay-to-play game creation (0.05 SUI)
 - Shared game objects for multi-party access
 - Robot connection and automatic payment transfer
@@ -231,7 +231,7 @@ def listen_for_movements():
 - End-to-end testing with TypeScript SDK
 - Automated deployment scripts with validation
 
-### **🚧 Future Enhancements (TODOs)**
+### **Future Enhancements (TODOs)**
 - Position tracking for game state validation
 - Movement frequency rate limiting
 - Game creator validation for moves
@@ -244,7 +244,7 @@ def listen_for_movements():
 - Game session timeout functionality
 - Pause/resume game functionality
 
-## 💡 **Use Cases**
+## **Use Cases**
 
 ### **Entertainment**
 - Remote robot control games
@@ -261,7 +261,7 @@ def listen_for_movements():
 - Blockchain-based IoT control
 - Economic incentives for robot services
 
-## 🧪 **Testing & Validation**
+## **Testing & Validation**
 
 ### **Smart Contract Tests**
 - ✅ 8/8 Move tests passing (100% success rate)
@@ -299,13 +299,10 @@ This is part of the **Suibotics** ecosystem:
 
 [Add your license information here]
 
-## 🤝 **Contributing**
+## **Contributing**
 
 1. Ensure all tests pass: `sui move test`
 2. Follow Move coding conventions
 3. Add tests for new functionality
 4. Update documentation as needed
-
-## 📞 **Support**
-
-For questions and support, please [add contact information or issue tracker link]. 
+ 
