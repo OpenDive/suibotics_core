@@ -7,9 +7,16 @@ module swarm_logistics::drone_registry {
     use sui::clock::{Self, Clock};
     use std::string::String;
     use std::vector;
-    use swarm_logistics::types::{
-        Self, Drone, DroneFinancials, OwnershipModel, DroneRegistered
-    };
+    use swarm_logistics::drone::{Self as drone_mod, Drone, DroneFinancials};
+    use swarm_logistics::events::{Self as events_mod, DroneRegistered};
+    
+    /// Different ownership models for drones
+    public struct OwnershipModel has store, drop {
+        model_type: u8,              // 0=Individual, 1=Fleet, 2=Autonomous, 3=DAO
+        voting_power: u64,           // For DAO ownership
+        profit_sharing: vector<u8>,  // How profits are distributed
+        decision_authority: u8,      // Who can make decisions about the drone
+    }
 
     /// Global registry of all drones in the swarm
     public struct DroneRegistry has key {
@@ -55,8 +62,8 @@ module swarm_logistics::drone_registry {
         ctx: &mut TxContext
     ) {
         // Validate inputs
-        assert!(types::is_valid_operation_mode(operation_mode), types::e_invalid_operation_mode());
-        assert!(types::is_valid_autonomy_level(autonomy_level), types::e_invalid_autonomy_level());
+        assert!(drone_mod::is_valid_operation_mode(operation_mode), events_mod::e_invalid_operation_mode());
+        assert!(drone_mod::is_valid_autonomy_level(autonomy_level), events_mod::e_invalid_autonomy_level());
 
         let current_time = clock::timestamp_ms(clock);
         let sender = tx_context::sender(ctx);
