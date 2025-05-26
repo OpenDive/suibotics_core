@@ -39,12 +39,13 @@ module swarm_logistics::flight_controller_tests {
             );
 
             // Create environment data
-            let weather_data = swarm_mod::create_environment_data(
+            let weather_data = swarm_mod::new_environment_data(
                 0, // Clear weather
+                80, // 80% visibility
                 15, // 15 km/h wind
-                25, // 25°C temperature
-                60, // 60% humidity
-                test_scenario::ctx(scenario)
+                2500, // 25°C temperature (25 * 100)
+                1, // Medium air traffic
+                vector::empty() // No no-fly zones
             );
 
             // Create optimization parameters
@@ -98,12 +99,13 @@ module swarm_logistics::flight_controller_tests {
             );
 
             // Create stormy weather data
-            let weather_data = swarm_mod::create_environment_data(
+            let weather_data = swarm_mod::new_environment_data(
                 4, // Storm
+                30, // Low visibility
                 45, // High wind
-                10, // Cold temperature
-                90, // High humidity
-                test_scenario::ctx(scenario)
+                1000, // 10°C temperature (10 * 100)
+                3, // Critical air traffic
+                vector::empty() // No no-fly zones
             );
 
             let optimization_params = flight_controller::default_optimization_params();
@@ -150,12 +152,13 @@ module swarm_logistics::flight_controller_tests {
                 test_scenario::ctx(scenario)
             );
 
-            let weather_data = swarm_mod::create_environment_data(
+            let weather_data = swarm_mod::new_environment_data(
                 1, // Light rain
-                20,
-                20,
-                70,
-                test_scenario::ctx(scenario)
+                70, // Good visibility
+                20, // Moderate wind
+                2000, // 20°C temperature (20 * 100)
+                1, // Medium air traffic
+                vector::empty() // No no-fly zones
             );
 
             // Use emergency optimization parameters
@@ -205,9 +208,13 @@ module swarm_logistics::flight_controller_tests {
                 test_scenario::ctx(scenario)
             );
 
-            let weather_data = swarm_mod::create_environment_data(
-                0, 15, 25, 60,
-                test_scenario::ctx(scenario)
+            let weather_data = swarm_mod::new_environment_data(
+                0, // Clear weather
+                90, // Excellent visibility
+                15, // Light wind
+                2500, // 25°C temperature
+                1, // Medium air traffic
+                vector::empty()
             );
 
             let optimization_params = flight_controller::default_optimization_params();
@@ -268,9 +275,13 @@ module swarm_logistics::flight_controller_tests {
                 test_scenario::ctx(scenario)
             );
 
-            let weather_data = swarm_mod::create_environment_data(
-                0, 15, 25, 60,
-                test_scenario::ctx(scenario)
+            let weather_data = swarm_mod::new_environment_data(
+                0, // Clear weather
+                90, // Excellent visibility
+                15, // Light wind
+                2500, // 25°C temperature
+                1, // Medium air traffic
+                vector::empty()
             );
 
             let optimization_params = flight_controller::default_optimization_params();
@@ -295,9 +306,13 @@ module swarm_logistics::flight_controller_tests {
             );
 
             // Update navigation state
-            let new_weather = swarm_mod::create_environment_data(
-                1, 25, 22, 65,
-                test_scenario::ctx(scenario)
+            let new_weather = swarm_mod::new_environment_data(
+                1, // Light rain
+                75, // Good visibility
+                25, // Moderate wind
+                2200, // 22°C temperature
+                2, // High air traffic
+                vector::empty()
             );
 
             flight_controller::update_navigation_state(
@@ -347,9 +362,13 @@ module swarm_logistics::flight_controller_tests {
                 test_scenario::ctx(scenario)
             );
 
-            let weather_data = swarm_mod::create_environment_data(
-                0, 15, 25, 60,
-                test_scenario::ctx(scenario)
+            let weather_data = swarm_mod::new_environment_data(
+                0, // Clear weather
+                90, // Excellent visibility
+                15, // Light wind
+                2500, // 25°C temperature
+                1, // Medium air traffic
+                vector::empty()
             );
 
             let optimization_params = flight_controller::default_optimization_params();
@@ -415,9 +434,13 @@ module swarm_logistics::flight_controller_tests {
                 test_scenario::ctx(scenario)
             );
 
-            let weather_data = swarm_mod::create_environment_data(
-                0, 15, 25, 60,
-                test_scenario::ctx(scenario)
+            let weather_data = swarm_mod::new_environment_data(
+                0, // Clear weather
+                90, // Excellent visibility
+                15, // Light wind
+                2500, // 25°C temperature
+                1, // Medium air traffic
+                vector::empty()
             );
 
             let optimization_params = flight_controller::default_optimization_params();
@@ -443,7 +466,7 @@ module swarm_logistics::flight_controller_tests {
 
             // Create aircraft obstacle
             let mut obstacles = vector::empty();
-            vector::push_back(&mut obstacles, create_test_obstacle(
+            vector::push_back(&mut obstacles, flight_controller::create_test_obstacle(
                 0, // OBSTACLE_AIRCRAFT
                 string::utf8(b"37.7759,-122.4154"),
                 100, // 100m diameter
@@ -462,7 +485,7 @@ module swarm_logistics::flight_controller_tests {
             );
 
             // Execute obstacle avoidance
-            let obstacle = create_test_obstacle(
+            let obstacle = flight_controller::create_test_obstacle(
                 0, // OBSTACLE_AIRCRAFT
                 string::utf8(b"37.7759,-122.4154"),
                 100,
@@ -510,9 +533,13 @@ module swarm_logistics::flight_controller_tests {
                 test_scenario::ctx(scenario)
             );
 
-            let weather_data = swarm_mod::create_environment_data(
-                0, 15, 25, 60,
-                test_scenario::ctx(scenario)
+            let weather_data = swarm_mod::new_environment_data(
+                0, // Clear weather
+                90, // Excellent visibility
+                15, // Light wind
+                2500, // 25°C temperature
+                1, // Medium air traffic
+                vector::empty()
             );
 
             let optimization_params = flight_controller::default_optimization_params();
@@ -537,7 +564,7 @@ module swarm_logistics::flight_controller_tests {
             );
 
             // Create critical obstacle
-            let critical_obstacle = create_test_obstacle(
+            let critical_obstacle = flight_controller::create_test_obstacle(
                 3, // OBSTACLE_NO_FLY_ZONE
                 string::utf8(b"37.7749,-122.4194"), // Same location as drone
                 50,
@@ -588,9 +615,13 @@ module swarm_logistics::flight_controller_tests {
                 test_scenario::ctx(scenario)
             );
 
-            let weather_data = swarm_mod::create_environment_data(
-                0, 15, 25, 60,
-                test_scenario::ctx(scenario)
+            let weather_data = swarm_mod::new_environment_data(
+                0, // Clear weather
+                90, // Excellent visibility
+                15, // Light wind
+                2500, // 25°C temperature
+                1, // Medium air traffic
+                vector::empty()
             );
 
             let optimization_params = flight_controller::default_optimization_params();
@@ -649,9 +680,13 @@ module swarm_logistics::flight_controller_tests {
             );
 
             // Create weather conditions
-            let weather_data = swarm_mod::create_environment_data(
-                1, 20, 22, 65, // Light rain
-                test_scenario::ctx(scenario)
+            let weather_data = swarm_mod::new_environment_data(
+                1, // Light rain
+                70, // Good visibility
+                20, // Moderate wind
+                2200, // 22°C temperature
+                2, // High air traffic
+                vector::empty()
             );
 
             // Calculate route
@@ -680,9 +715,13 @@ module swarm_logistics::flight_controller_tests {
             flight_controller::set_route_status(&mut route, 1); // ROUTE_ACTIVE
 
             // Simulate flight progress with updates
-            let updated_weather = swarm_mod::create_environment_data(
-                2, 35, 20, 70, // Snow with higher wind
-                test_scenario::ctx(scenario)
+            let updated_weather = swarm_mod::new_environment_data(
+                2, // Snow
+                50, // Reduced visibility
+                35, // Higher wind
+                2000, // 20°C temperature
+                3, // Critical air traffic
+                vector::empty()
             );
 
             flight_controller::update_navigation_state(
@@ -747,9 +786,13 @@ module swarm_logistics::flight_controller_tests {
             // Set battery to low level
             drone_mod::set_drone_battery_level(&mut drone, 25); // Below 30% threshold
 
-            let weather_data = swarm_mod::create_environment_data(
-                0, 15, 25, 60,
-                test_scenario::ctx(scenario)
+            let weather_data = swarm_mod::new_environment_data(
+                0, // Clear weather
+                90, // Excellent visibility
+                15, // Light wind
+                2500, // 25°C temperature
+                1, // Medium air traffic
+                vector::empty()
             );
 
             let optimization_params = flight_controller::default_optimization_params();
@@ -794,9 +837,13 @@ module swarm_logistics::flight_controller_tests {
                 test_scenario::ctx(scenario)
             );
 
-            let weather_data = swarm_mod::create_environment_data(
-                0, 15, 25, 60,
-                test_scenario::ctx(scenario)
+            let weather_data = swarm_mod::new_environment_data(
+                0, // Clear weather
+                90, // Excellent visibility
+                15, // Light wind
+                2500, // 25°C temperature
+                1, // Medium air traffic
+                vector::empty()
             );
 
             let optimization_params = flight_controller::default_optimization_params();

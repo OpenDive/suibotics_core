@@ -656,4 +656,24 @@ module swarm_logistics::flight_controller {
             altitude_preference: 0, // Low altitude for emergency
         }
     }
+
+    /// Create a test obstacle (for testing purposes only)
+    #[test_only]
+    public fun create_test_obstacle(
+        obstacle_type: u8,
+        location: String,
+        size_estimate: u64,
+        threat_level: u8,
+        detection_time: u64
+    ): Obstacle {
+        Obstacle {
+            obstacle_type,
+            location,
+            size_estimate,
+            movement_vector: b"0,0".to_string(), // Stationary
+            threat_level,
+            detection_time,
+            avoidance_action: 0, // Will be determined by avoidance logic
+        }
+    }
 } 
