@@ -182,10 +182,10 @@ module swarm_logistics::swarm_coordinator_tests {
             );
 
             // Verify response properties
-            assert!(response.emergency_id == swarm_mod::emergency_id(&emergency_request), 1);
-            assert!(response.response_type == 0, 2); // RESPONSE_BATTERY_ASSIST
-            assert!(vector::length(&response.responding_drones) > 0, 3);
-            assert!(response.success_rate == 85, 4); // Estimated success rate
+            assert!(swarm_coordinator::emergency_response_id(&response) == swarm_mod::emergency_id(&emergency_request), 1);
+            assert!(swarm_coordinator::emergency_response_type(&response) == 0, 2); // RESPONSE_BATTERY_ASSIST
+            assert!(vector::length(swarm_coordinator::emergency_response_drones(&response)) > 0, 3);
+            assert!(swarm_coordinator::emergency_response_success_rate(&response) == 85, 4); // Estimated success rate
 
             transfer::public_transfer(emergency_request, ADMIN);
             transfer::public_transfer(response, ADMIN);
@@ -235,8 +235,8 @@ module swarm_logistics::swarm_coordinator_tests {
             );
 
             // Verify completion
-            assert!(option::is_some(&response.actual_response_time), 1);
-            assert!(response.success_rate == 100, 2); // Updated to 100% on success
+            assert!(option::is_some(swarm_coordinator::emergency_response_actual_time(&response)), 1);
+            assert!(swarm_coordinator::emergency_response_success_rate(&response) == 100, 2); // Updated to 100% on success
             assert!(swarm_coordinator::coordinator_emergency_responses(&coordinator) == 1, 3);
 
             transfer::public_transfer(emergency_request, ADMIN);
@@ -286,7 +286,7 @@ module swarm_logistics::swarm_coordinator_tests {
             );
 
             // Verify failure handling
-            assert!(response.success_rate == 0, 1); // Updated to 0% on failure
+            assert!(swarm_coordinator::emergency_response_success_rate(&response) == 0, 1); // Updated to 0% on failure
             assert!(swarm_coordinator::coordinator_emergency_responses(&coordinator) == 0, 2); // No successful responses
 
             transfer::public_transfer(emergency_request, ADMIN);
@@ -623,10 +623,17 @@ module swarm_logistics::swarm_coordinator_tests {
             };
 
             // Request multiple airspace reservations
+            let route_drone_ids = vector[
+                object::id_from_address(@0x1001),
+                object::id_from_address(@0x1002),
+                object::id_from_address(@0x1003),
+                object::id_from_address(@0x1004),
+                object::id_from_address(@0x1005)
+            ];
             let mut j = 0;
             let mut slots = vector::empty();
             while (j < 5) {
-                let drone_id = object::id_from_address(@0x1000 + j);
+                let drone_id = *vector::borrow(&route_drone_ids, j);
                 let route_name = string::utf8(b"high_volume_route_");
                 
                 let slot = swarm_coordinator::request_airspace_reservation(
