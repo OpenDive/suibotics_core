@@ -19,11 +19,10 @@ fun test_crossy_robot_fail() {
 
 #[test_only]
 module crossy_robot::crossy_robot_tests {
-    use sui::test_scenario::{Self as ts, Scenario};
-    use sui::coin::{Self, Coin};
+    use sui::test_scenario::{Self as ts};
+    use sui::coin;
     use sui::sui::SUI;
-    use sui::clock::{Self, Clock};
-    use sui::test_utils;
+    use sui::clock;
     use crossy_robot::crossy_robot::{Self, Game};
 
     // Test addresses
@@ -34,26 +33,33 @@ module crossy_robot::crossy_robot_tests {
     #[test]
     fun test_create_game_success() {
         let mut scenario = ts::begin(USER);
-        let ctx = ts::ctx(&mut scenario);
         
         // Create clock
-        let clock = clock::create_for_testing(ctx);
+        let clock = clock::create_for_testing(ts::ctx(&mut scenario));
         
         // Create payment coin
-        let payment = coin::mint_for_testing<SUI>(GAME_COST, ctx);
+        let payment = coin::mint_for_testing<SUI>(GAME_COST, ts::ctx(&mut scenario));
         
         // Create game
-        let game = crossy_robot::create_game(payment, &clock, ctx);
+        crossy_robot::create_game(payment, &clock, ts::ctx(&mut scenario));
+        
+        // Move to next transaction to access shared object
+        ts::next_tx(&mut scenario, USER);
+        
+        // Take the shared game object
+        let game = ts::take_shared<Game>(&scenario);
         
         // Verify game state
-        let (user, robot, status, _created_at) = crossy_robot::get_game_info(&game);
+        let (user, robot, _status, _created_at) = crossy_robot::get_game_info(&game);
         assert!(user == USER, 0);
-        assert!(option::is_none(&robot), 1);
+        assert!(robot.is_none(), 1);
         assert!(crossy_robot::is_waiting_for_robot(&game), 2);
         assert!(!crossy_robot::is_active(&game), 3);
         
+        // Return shared object
+        ts::return_shared(game);
+        
         // Clean up
-        test_utils::destroy(game);
         clock::destroy_for_testing(clock);
         ts::end(scenario);
     }
@@ -62,14 +68,12 @@ module crossy_robot::crossy_robot_tests {
     #[expected_failure(abort_code = 3)]
     fun test_create_game_invalid_payment() {
         let mut scenario = ts::begin(USER);
-        let ctx = ts::ctx(&mut scenario);
         
-        let clock = clock::create_for_testing(ctx);
-        let wrong_payment = coin::mint_for_testing<SUI>(GAME_COST + 1, ctx); // Wrong amount
+        let clock = clock::create_for_testing(ts::ctx(&mut scenario));
+        let wrong_payment = coin::mint_for_testing<SUI>(GAME_COST + 1, ts::ctx(&mut scenario)); // Wrong amount
         
-        let game = crossy_robot::create_game(wrong_payment, &clock, ctx);
+        crossy_robot::create_game(wrong_payment, &clock, ts::ctx(&mut scenario));
         
-        test_utils::destroy(game);
         clock::destroy_for_testing(clock);
         ts::end(scenario);
     }
@@ -77,24 +81,25 @@ module crossy_robot::crossy_robot_tests {
     #[test]
     fun test_robot_connect_success() {
         let mut scenario = ts::begin(USER);
-        let ctx = ts::ctx(&mut scenario);
         
-        let clock = clock::create_for_testing(ctx);
-        let payment = coin::mint_for_testing<SUI>(GAME_COST, ctx);
-        let mut game = crossy_robot::create_game(payment, &clock, ctx);
+        let clock = clock::create_for_testing(ts::ctx(&mut scenario));
+        let payment = coin::mint_for_testing<SUI>(GAME_COST, ts::ctx(&mut scenario));
+        crossy_robot::create_game(payment, &clock, ts::ctx(&mut scenario));
         
         // Switch to robot
         ts::next_tx(&mut scenario, ROBOT);
-        let ctx = ts::ctx(&mut scenario);
+        
+        // Take the shared game object
+        let mut game = ts::take_shared<Game>(&scenario);
         
         // Robot connects
-        let received_payment = crossy_robot::connect_robot(&mut game, &clock, ctx);
+        let received_payment = crossy_robot::connect_robot(&mut game, &clock, ts::ctx(&mut scenario));
         
         // Verify game state
         let (user, robot_opt, status, _created_at) = crossy_robot::get_game_info(&game);
         assert!(user == USER, 0);
-        assert!(option::is_some(&robot_opt), 1);
-        assert!(*option::borrow(&robot_opt) == ROBOT, 2);
+        assert!(robot_opt.is_some(), 1);
+        assert!(*robot_opt.borrow() == ROBOT, 2);
         assert!(crossy_robot::is_active(&game), 3);
         assert!(!crossy_robot::is_waiting_for_robot(&game), 4);
         
@@ -103,7 +108,7 @@ module crossy_robot::crossy_robot_tests {
         
         // Clean up
         coin::burn_for_testing(received_payment);
-        test_utils::destroy(game);
+        ts::return_shared(game);
         clock::destroy_for_testing(clock);
         ts::end(scenario);
     }
@@ -112,26 +117,26 @@ module crossy_robot::crossy_robot_tests {
     #[expected_failure(abort_code = 1)]
     fun test_robot_connect_already_active() {
         let mut scenario = ts::begin(USER);
-        let ctx = ts::ctx(&mut scenario);
         
-        let clock = clock::create_for_testing(ctx);
-        let payment = coin::mint_for_testing<SUI>(GAME_COST, ctx);
-        let mut game = crossy_robot::create_game(payment, &clock, ctx);
+        let clock = clock::create_for_testing(ts::ctx(&mut scenario));
+        let payment = coin::mint_for_testing<SUI>(GAME_COST, ts::ctx(&mut scenario));
+        crossy_robot::create_game(payment, &clock, ts::ctx(&mut scenario));
         
         // First robot connects
         ts::next_tx(&mut scenario, ROBOT);
-        let ctx = ts::ctx(&mut scenario);
-        let payment1 = crossy_robot::connect_robot(&mut game, &clock, ctx);
+        let mut game = ts::take_shared<Game>(&scenario);
+        let payment1 = crossy_robot::connect_robot(&mut game, &clock, ts::ctx(&mut scenario));
+        ts::return_shared(game);
         
         // Second robot tries to connect (should fail)
         ts::next_tx(&mut scenario, @0xc4a12);
-        let ctx = ts::ctx(&mut scenario);
-        let payment2 = crossy_robot::connect_robot(&mut game, &clock, ctx);
+        let mut game = ts::take_shared<Game>(&scenario);
+        let payment2 = crossy_robot::connect_robot(&mut game, &clock, ts::ctx(&mut scenario));
         
         // Clean up
         coin::burn_for_testing(payment1);
         coin::burn_for_testing(payment2);
-        test_utils::destroy(game);
+        ts::return_shared(game);
         clock::destroy_for_testing(clock);
         ts::end(scenario);
     }
@@ -139,33 +144,33 @@ module crossy_robot::crossy_robot_tests {
     #[test]
     fun test_move_robot_all_directions() {
         let mut scenario = ts::begin(USER);
-        let ctx = ts::ctx(&mut scenario);
         
-        let clock = clock::create_for_testing(ctx);
-        let payment = coin::mint_for_testing<SUI>(GAME_COST, ctx);
-        let mut game = crossy_robot::create_game(payment, &clock, ctx);
+        let clock = clock::create_for_testing(ts::ctx(&mut scenario));
+        let payment = coin::mint_for_testing<SUI>(GAME_COST, ts::ctx(&mut scenario));
+        crossy_robot::create_game(payment, &clock, ts::ctx(&mut scenario));
         
         // Robot connects
         ts::next_tx(&mut scenario, ROBOT);
-        let ctx = ts::ctx(&mut scenario);
-        let received_payment = crossy_robot::connect_robot(&mut game, &clock, ctx);
+        let mut game = ts::take_shared<Game>(&scenario);
+        let received_payment = crossy_robot::connect_robot(&mut game, &clock, ts::ctx(&mut scenario));
+        ts::return_shared(game);
         
         // Test all movement directions
         ts::next_tx(&mut scenario, USER);
-        let ctx = ts::ctx(&mut scenario);
+        let game = ts::take_shared<Game>(&scenario);
         
-        crossy_robot::move_robot(&game, 0, &clock, ctx); // up
-        crossy_robot::move_robot(&game, 1, &clock, ctx); // down
-        crossy_robot::move_robot(&game, 2, &clock, ctx); // left
-        crossy_robot::move_robot(&game, 3, &clock, ctx); // right
-        crossy_robot::move_robot(&game, 4, &clock, ctx); // up_right
-        crossy_robot::move_robot(&game, 5, &clock, ctx); // up_left
-        crossy_robot::move_robot(&game, 6, &clock, ctx); // down_left
-        crossy_robot::move_robot(&game, 7, &clock, ctx); // down_right
+        crossy_robot::move_robot(&game, 0, &clock, ts::ctx(&mut scenario)); // up
+        crossy_robot::move_robot(&game, 1, &clock, ts::ctx(&mut scenario)); // down
+        crossy_robot::move_robot(&game, 2, &clock, ts::ctx(&mut scenario)); // left
+        crossy_robot::move_robot(&game, 3, &clock, ts::ctx(&mut scenario)); // right
+        crossy_robot::move_robot(&game, 4, &clock, ts::ctx(&mut scenario)); // up_right
+        crossy_robot::move_robot(&game, 5, &clock, ts::ctx(&mut scenario)); // up_left
+        crossy_robot::move_robot(&game, 6, &clock, ts::ctx(&mut scenario)); // down_left
+        crossy_robot::move_robot(&game, 7, &clock, ts::ctx(&mut scenario)); // down_right
         
         // Clean up
         coin::burn_for_testing(received_payment);
-        test_utils::destroy(game);
+        ts::return_shared(game);
         clock::destroy_for_testing(clock);
         ts::end(scenario);
     }
@@ -174,16 +179,17 @@ module crossy_robot::crossy_robot_tests {
     #[expected_failure(abort_code = 5)]
     fun test_move_robot_game_not_active() {
         let mut scenario = ts::begin(USER);
-        let ctx = ts::ctx(&mut scenario);
         
-        let clock = clock::create_for_testing(ctx);
-        let payment = coin::mint_for_testing<SUI>(GAME_COST, ctx);
-        let game = crossy_robot::create_game(payment, &clock, ctx);
+        let clock = clock::create_for_testing(ts::ctx(&mut scenario));
+        let payment = coin::mint_for_testing<SUI>(GAME_COST, ts::ctx(&mut scenario));
+        crossy_robot::create_game(payment, &clock, ts::ctx(&mut scenario));
         
         // Try to move without robot connected (should fail)
-        crossy_robot::move_robot(&game, 0, &clock, ctx);
+        ts::next_tx(&mut scenario, USER);
+        let game = ts::take_shared<Game>(&scenario);
+        crossy_robot::move_robot(&game, 0, &clock, ts::ctx(&mut scenario));
         
-        test_utils::destroy(game);
+        ts::return_shared(game);
         clock::destroy_for_testing(clock);
         ts::end(scenario);
     }
@@ -192,24 +198,24 @@ module crossy_robot::crossy_robot_tests {
     #[expected_failure(abort_code = 4)]
     fun test_move_robot_invalid_direction() {
         let mut scenario = ts::begin(USER);
-        let ctx = ts::ctx(&mut scenario);
         
-        let clock = clock::create_for_testing(ctx);
-        let payment = coin::mint_for_testing<SUI>(GAME_COST, ctx);
-        let mut game = crossy_robot::create_game(payment, &clock, ctx);
+        let clock = clock::create_for_testing(ts::ctx(&mut scenario));
+        let payment = coin::mint_for_testing<SUI>(GAME_COST, ts::ctx(&mut scenario));
+        crossy_robot::create_game(payment, &clock, ts::ctx(&mut scenario));
         
         // Robot connects
         ts::next_tx(&mut scenario, ROBOT);
-        let ctx = ts::ctx(&mut scenario);
-        let received_payment = crossy_robot::connect_robot(&mut game, &clock, ctx);
+        let mut game = ts::take_shared<Game>(&scenario);
+        let received_payment = crossy_robot::connect_robot(&mut game, &clock, ts::ctx(&mut scenario));
+        ts::return_shared(game);
         
         // Try invalid direction (should fail)
         ts::next_tx(&mut scenario, USER);
-        let ctx = ts::ctx(&mut scenario);
-        crossy_robot::move_robot(&game, 8, &clock, ctx); // Invalid direction
+        let game = ts::take_shared<Game>(&scenario);
+        crossy_robot::move_robot(&game, 8, &clock, ts::ctx(&mut scenario)); // Invalid direction
         
         coin::burn_for_testing(received_payment);
-        test_utils::destroy(game);
+        ts::return_shared(game);
         clock::destroy_for_testing(clock);
         ts::end(scenario);
     }
