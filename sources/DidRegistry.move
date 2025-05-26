@@ -28,6 +28,12 @@ module suibotics_core::did_registry {
         share_object(registry);
     }
 
+    /// Test-only initialization function
+    #[test_only]
+    public fun test_init(ctx: &mut TxContext) {
+        init(ctx);
+    }
+
     /// Register a new DID with initial key
     public entry fun register_did(
         registry: &mut DIDRegistry,
@@ -69,7 +75,7 @@ module suibotics_core::did_registry {
 
         event::emit(KeyAdded {
             did_id,
-            key_id: b"key_0".to_vector(),
+            key_id: b"key_0",
             purpose,
             timestamp: ts,
         });

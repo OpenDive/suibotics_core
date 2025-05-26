@@ -16,6 +16,17 @@ module suibotics_core::identity_types {
     const E_FIELD_TOO_LONG: u64 = 8;
     const E_INVALID_ADDRESS: u64 = 9;
 
+    // Public error code accessors
+    public fun e_invalid_controller(): u64 { E_INVALID_CONTROLLER }
+    public fun e_key_not_found(): u64 { E_KEY_NOT_FOUND }
+    public fun e_key_already_exists(): u64 { E_KEY_ALREADY_EXISTS }
+    public fun e_name_already_exists(): u64 { E_NAME_ALREADY_EXISTS }
+    public fun e_invalid_public_key(): u64 { E_INVALID_PUBLIC_KEY }
+    public fun e_invalid_data_hash(): u64 { E_INVALID_DATA_HASH }
+    public fun e_empty_field(): u64 { E_EMPTY_FIELD }
+    public fun e_field_too_long(): u64 { E_FIELD_TOO_LONG }
+    public fun e_invalid_address(): u64 { E_INVALID_ADDRESS }
+
     // Constants for validation
     const MAX_NAME_LENGTH: u64 = 255;
     const MAX_SCHEMA_LENGTH: u64 = 1000;
@@ -287,6 +298,63 @@ module suibotics_core::identity_types {
         event::emit(CredentialRevoked {
             credential_id: sui::object::uid_to_address(&cred.id),
             issuer: cred.issuer,
+            timestamp,
+        });
+    }
+
+    // Public event creation functions for cross-module access
+    public fun emit_did_registered(
+        did_id: address,
+        controller: address,
+        name: vector<u8>,
+        timestamp: u64
+    ) {
+        event::emit(DIDRegistered {
+            did_id,
+            controller,
+            name,
+            timestamp,
+        });
+    }
+
+    public fun emit_key_added(
+        did_id: address,
+        key_id: vector<u8>,
+        purpose: vector<u8>,
+        timestamp: u64
+    ) {
+        event::emit(KeyAdded {
+            did_id,
+            key_id,
+            purpose,
+            timestamp,
+        });
+    }
+
+    public fun emit_key_revoked(
+        did_id: address,
+        key_id: vector<u8>,
+        timestamp: u64
+    ) {
+        event::emit(KeyRevoked {
+            did_id,
+            key_id,
+            timestamp,
+        });
+    }
+
+    public fun emit_service_added(
+        did_id: address,
+        service_id: vector<u8>,
+        service_type: vector<u8>,
+        endpoint: vector<u8>,
+        timestamp: u64
+    ) {
+        event::emit(ServiceAdded {
+            did_id,
+            service_id,
+            service_type,
+            endpoint,
             timestamp,
         });
     }
