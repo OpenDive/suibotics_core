@@ -603,9 +603,21 @@ module swarm_logistics::swarm_coordinator_tests {
             );
 
             // Add multiple drones
+            let drone_ids = vector[
+                object::id_from_address(@0x1001),
+                object::id_from_address(@0x1002),
+                object::id_from_address(@0x1003),
+                object::id_from_address(@0x1004),
+                object::id_from_address(@0x1005),
+                object::id_from_address(@0x1006),
+                object::id_from_address(@0x1007),
+                object::id_from_address(@0x1008),
+                object::id_from_address(@0x1009),
+                object::id_from_address(@0x1010)
+            ];
             let mut i = 0;
             while (i < 10) {
-                let drone_id = object::id_from_address(@0x1000 + i);
+                let drone_id = *vector::borrow(&drone_ids, i);
                 swarm_coordinator::add_drone_to_load_balancer(&mut load_balancer, drone_id);
                 i = i + 1;
             };
