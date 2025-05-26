@@ -106,6 +106,25 @@ module swarm_logistics::swarm {
 
     // ==================== CONSTRUCTOR FUNCTIONS ====================
 
+    /// Create new environment data
+    public fun new_environment_data(
+        weather_condition: u8,
+        visibility: u8,
+        wind_speed: u64,
+        temperature: u64,
+        air_traffic_density: u8,
+        no_fly_zones: vector<String>
+    ): EnvironmentData {
+        EnvironmentData {
+            weather_condition,
+            visibility,
+            wind_speed,
+            temperature,
+            air_traffic_density,
+            no_fly_zones,
+        }
+    }
+
     /// Create a new emergency request
     public fun new_emergency_request(
         requesting_drone: ID,
