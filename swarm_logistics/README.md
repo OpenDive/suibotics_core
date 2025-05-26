@@ -590,11 +590,11 @@ For support and questions:
 
 ### 📊 **System Statistics**
 
-- **Total Modules**: 10 smart contract modules
-- **Lines of Code**: 4,000+ lines of Move code
-- **Functions**: 200+ public and private functions
-- **Data Structures**: 50+ comprehensive structs
-- **Event Types**: 20+ event categories for monitoring
+- **Total Modules**: 12 smart contract modules
+- **Lines of Code**: 6,000+ lines of Move code
+- **Functions**: 300+ public and private functions
+- **Data Structures**: 80+ comprehensive structs
+- **Event Types**: 30+ event categories for monitoring
 - **Build Status**: ✅ Successfully compiling with zero errors
 
 ### 🏗️ **Architecture Highlights**
