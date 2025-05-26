@@ -38,16 +38,6 @@ module swarm_logistics::flight_controller_tests {
                 test_scenario::ctx(scenario)
             );
 
-            // Create environment data
-            let weather_data = swarm_mod::new_environment_data(
-                0, // Clear weather
-                80, // 80% visibility
-                15, // 15 km/h wind
-                2500, // 25°C temperature (25 * 100)
-                1, // Medium air traffic
-                vector::empty() // No no-fly zones
-            );
-
             // Create optimization parameters
             let optimization_params = flight_controller::default_optimization_params();
 
@@ -57,7 +47,14 @@ module swarm_logistics::flight_controller_tests {
                 string::utf8(b"37.7749,-122.4194"), // San Francisco
                 string::utf8(b"37.7849,-122.4094"), // Nearby destination
                 optimization_params,
-                weather_data,
+                swarm_mod::new_environment_data(
+                    0, // Clear weather
+                    80, // 80% visibility
+                    15, // 15 km/h wind
+                    2500, // 25°C temperature (25 * 100)
+                    1, // Medium air traffic
+                    vector::empty() // No no-fly zones
+                ),
                 &clock,
                 test_scenario::ctx(scenario)
             );
@@ -71,7 +68,6 @@ module swarm_logistics::flight_controller_tests {
 
             transfer::public_transfer(drone, DRONE_OWNER);
             transfer::public_transfer(route, DRONE_OWNER);
-            transfer::public_transfer(weather_data, ADMIN);
         };
 
         clock::destroy_for_testing(clock);
@@ -98,16 +94,6 @@ module swarm_logistics::flight_controller_tests {
                 test_scenario::ctx(scenario)
             );
 
-            // Create stormy weather data
-            let weather_data = swarm_mod::new_environment_data(
-                4, // Storm
-                30, // Low visibility
-                45, // High wind
-                1000, // 10°C temperature (10 * 100)
-                3, // Critical air traffic
-                vector::empty() // No no-fly zones
-            );
-
             let optimization_params = flight_controller::default_optimization_params();
 
             let route = flight_controller::calculate_optimal_route(
@@ -115,7 +101,14 @@ module swarm_logistics::flight_controller_tests {
                 string::utf8(b"37.7749,-122.4194"),
                 string::utf8(b"37.7849,-122.4094"),
                 optimization_params,
-                weather_data,
+                swarm_mod::new_environment_data(
+                    4, // Storm
+                    30, // Low visibility
+                    45, // High wind
+                    1000, // 10°C temperature (10 * 100)
+                    3, // Critical air traffic
+                    vector::empty() // No no-fly zones
+                ),
                 &clock,
                 test_scenario::ctx(scenario)
             );
@@ -125,7 +118,6 @@ module swarm_logistics::flight_controller_tests {
 
             transfer::public_transfer(drone, DRONE_OWNER);
             transfer::public_transfer(route, DRONE_OWNER);
-            transfer::public_transfer(weather_data, ADMIN);
         };
 
         clock::destroy_for_testing(clock);
@@ -152,15 +144,6 @@ module swarm_logistics::flight_controller_tests {
                 test_scenario::ctx(scenario)
             );
 
-            let weather_data = swarm_mod::new_environment_data(
-                1, // Light rain
-                70, // Good visibility
-                20, // Moderate wind
-                2000, // 20°C temperature (20 * 100)
-                1, // Medium air traffic
-                vector::empty() // No no-fly zones
-            );
-
             // Use emergency optimization parameters
             let emergency_params = flight_controller::emergency_optimization_params();
 
@@ -169,7 +152,14 @@ module swarm_logistics::flight_controller_tests {
                 string::utf8(b"37.7749,-122.4194"),
                 string::utf8(b"37.7849,-122.4094"),
                 emergency_params,
-                weather_data,
+                swarm_mod::new_environment_data(
+                    1, // Light rain
+                    70, // Good visibility
+                    20, // Moderate wind
+                    2000, // 20°C temperature (20 * 100)
+                    1, // Medium air traffic
+                    vector::empty() // No no-fly zones
+                ),
                 &clock,
                 test_scenario::ctx(scenario)
             );
@@ -179,7 +169,6 @@ module swarm_logistics::flight_controller_tests {
 
             transfer::public_transfer(drone, DRONE_OWNER);
             transfer::public_transfer(route, DRONE_OWNER);
-            transfer::public_transfer(weather_data, ADMIN);
         };
 
         clock::destroy_for_testing(clock);
@@ -208,15 +197,6 @@ module swarm_logistics::flight_controller_tests {
                 test_scenario::ctx(scenario)
             );
 
-            let weather_data = swarm_mod::new_environment_data(
-                0, // Clear weather
-                90, // Excellent visibility
-                15, // Light wind
-                2500, // 25°C temperature
-                1, // Medium air traffic
-                vector::empty()
-            );
-
             let optimization_params = flight_controller::default_optimization_params();
 
             let route = flight_controller::calculate_optimal_route(
@@ -224,7 +204,14 @@ module swarm_logistics::flight_controller_tests {
                 string::utf8(b"37.7749,-122.4194"),
                 string::utf8(b"37.7849,-122.4094"),
                 optimization_params,
-                weather_data,
+                swarm_mod::new_environment_data(
+                    0, // Clear weather
+                    90, // Excellent visibility
+                    15, // Light wind
+                    2500, // 25°C temperature
+                    1, // Medium air traffic
+                    vector::empty()
+                ),
                 &clock,
                 test_scenario::ctx(scenario)
             );
@@ -234,7 +221,14 @@ module swarm_logistics::flight_controller_tests {
                 &drone,
                 &route,
                 string::utf8(b"37.7749,-122.4194"),
-                weather_data,
+                swarm_mod::new_environment_data(
+                    0, // Clear weather
+                    90, // Excellent visibility
+                    15, // Light wind
+                    2500, // 25°C temperature
+                    1, // Medium air traffic
+                    vector::empty()
+                ),
                 &clock,
                 test_scenario::ctx(scenario)
             );
@@ -248,7 +242,6 @@ module swarm_logistics::flight_controller_tests {
             transfer::public_transfer(drone, DRONE_OWNER);
             transfer::public_transfer(route, DRONE_OWNER);
             transfer::public_transfer(nav_state, DRONE_OWNER);
-            transfer::public_transfer(weather_data, ADMIN);
         };
 
         clock::destroy_for_testing(clock);
@@ -275,15 +268,6 @@ module swarm_logistics::flight_controller_tests {
                 test_scenario::ctx(scenario)
             );
 
-            let weather_data = swarm_mod::new_environment_data(
-                0, // Clear weather
-                90, // Excellent visibility
-                15, // Light wind
-                2500, // 25°C temperature
-                1, // Medium air traffic
-                vector::empty()
-            );
-
             let optimization_params = flight_controller::default_optimization_params();
 
             let route = flight_controller::calculate_optimal_route(
@@ -291,7 +275,14 @@ module swarm_logistics::flight_controller_tests {
                 string::utf8(b"37.7749,-122.4194"),
                 string::utf8(b"37.7849,-122.4094"),
                 optimization_params,
-                weather_data,
+                swarm_mod::new_environment_data(
+                    0, // Clear weather
+                    90, // Excellent visibility
+                    15, // Light wind
+                    2500, // 25°C temperature
+                    1, // Medium air traffic
+                    vector::empty()
+                ),
                 &clock,
                 test_scenario::ctx(scenario)
             );
@@ -300,21 +291,19 @@ module swarm_logistics::flight_controller_tests {
                 &drone,
                 &route,
                 string::utf8(b"37.7749,-122.4194"),
-                weather_data,
+                swarm_mod::new_environment_data(
+                    0, // Clear weather
+                    90, // Excellent visibility
+                    15, // Light wind
+                    2500, // 25°C temperature
+                    1, // Medium air traffic
+                    vector::empty()
+                ),
                 &clock,
                 test_scenario::ctx(scenario)
             );
 
             // Update navigation state
-            let new_weather = swarm_mod::new_environment_data(
-                1, // Light rain
-                75, // Good visibility
-                25, // Moderate wind
-                2200, // 22°C temperature
-                2, // High air traffic
-                vector::empty()
-            );
-
             flight_controller::update_navigation_state(
                 &mut nav_state,
                 string::utf8(b"37.7799,-122.4144"), // New position
@@ -322,7 +311,14 @@ module swarm_logistics::flight_controller_tests {
                 45,  // New speed
                 90,  // New heading
                 vector::empty(), // No obstacles
-                new_weather,
+                swarm_mod::new_environment_data(
+                    1, // Light rain
+                    75, // Good visibility
+                    25, // Moderate wind
+                    2200, // 22°C temperature
+                    2, // High air traffic
+                    vector::empty()
+                ),
                 &clock
             );
 
@@ -332,8 +328,6 @@ module swarm_logistics::flight_controller_tests {
             transfer::public_transfer(drone, DRONE_OWNER);
             transfer::public_transfer(route, DRONE_OWNER);
             transfer::public_transfer(nav_state, DRONE_OWNER);
-            transfer::public_transfer(weather_data, ADMIN);
-            transfer::public_transfer(new_weather, ADMIN);
         };
 
         clock::destroy_for_testing(clock);
@@ -362,15 +356,6 @@ module swarm_logistics::flight_controller_tests {
                 test_scenario::ctx(scenario)
             );
 
-            let weather_data = swarm_mod::new_environment_data(
-                0, // Clear weather
-                90, // Excellent visibility
-                15, // Light wind
-                2500, // 25°C temperature
-                1, // Medium air traffic
-                vector::empty()
-            );
-
             let optimization_params = flight_controller::default_optimization_params();
 
             let mut route = flight_controller::calculate_optimal_route(
@@ -378,7 +363,14 @@ module swarm_logistics::flight_controller_tests {
                 string::utf8(b"37.7749,-122.4194"),
                 string::utf8(b"37.7849,-122.4094"),
                 optimization_params,
-                weather_data,
+                swarm_mod::new_environment_data(
+                    0, // Clear weather
+                    90, // Excellent visibility
+                    15, // Light wind
+                    2500, // 25°C temperature
+                    1, // Medium air traffic
+                    vector::empty()
+                ),
                 &clock,
                 test_scenario::ctx(scenario)
             );
@@ -387,7 +379,14 @@ module swarm_logistics::flight_controller_tests {
                 &drone,
                 &route,
                 string::utf8(b"37.7749,-122.4194"),
-                weather_data,
+                swarm_mod::new_environment_data(
+                    0, // Clear weather
+                    90, // Excellent visibility
+                    15, // Light wind
+                    2500, // 25°C temperature
+                    1, // Medium air traffic
+                    vector::empty()
+                ),
                 &clock,
                 test_scenario::ctx(scenario)
             );
@@ -405,7 +404,6 @@ module swarm_logistics::flight_controller_tests {
             transfer::public_transfer(drone, DRONE_OWNER);
             transfer::public_transfer(route, DRONE_OWNER);
             transfer::public_transfer(nav_state, DRONE_OWNER);
-            transfer::public_transfer(weather_data, ADMIN);
         };
 
         clock::destroy_for_testing(clock);
@@ -434,15 +432,6 @@ module swarm_logistics::flight_controller_tests {
                 test_scenario::ctx(scenario)
             );
 
-            let weather_data = swarm_mod::new_environment_data(
-                0, // Clear weather
-                90, // Excellent visibility
-                15, // Light wind
-                2500, // 25°C temperature
-                1, // Medium air traffic
-                vector::empty()
-            );
-
             let optimization_params = flight_controller::default_optimization_params();
 
             let mut route = flight_controller::calculate_optimal_route(
@@ -450,7 +439,14 @@ module swarm_logistics::flight_controller_tests {
                 string::utf8(b"37.7749,-122.4194"),
                 string::utf8(b"37.7849,-122.4094"),
                 optimization_params,
-                weather_data,
+                swarm_mod::new_environment_data(
+                    0, // Clear weather
+                    90, // Excellent visibility
+                    15, // Light wind
+                    2500, // 25°C temperature
+                    1, // Medium air traffic
+                    vector::empty()
+                ),
                 &clock,
                 test_scenario::ctx(scenario)
             );
@@ -459,7 +455,14 @@ module swarm_logistics::flight_controller_tests {
                 &drone,
                 &route,
                 string::utf8(b"37.7749,-122.4194"),
-                weather_data,
+                swarm_mod::new_environment_data(
+                    0, // Clear weather
+                    90, // Excellent visibility
+                    15, // Light wind
+                    2500, // 25°C temperature
+                    1, // Medium air traffic
+                    vector::empty()
+                ),
                 &clock,
                 test_scenario::ctx(scenario)
             );
@@ -480,7 +483,14 @@ module swarm_logistics::flight_controller_tests {
                 string::utf8(b"37.7749,-122.4194"),
                 100, 50, 0,
                 obstacles,
-                weather_data,
+                swarm_mod::new_environment_data(
+                    0, // Clear weather
+                    90, // Excellent visibility
+                    15, // Light wind
+                    2500, // 25°C temperature
+                    1, // Medium air traffic
+                    vector::empty()
+                ),
                 &clock
             );
 
@@ -506,7 +516,6 @@ module swarm_logistics::flight_controller_tests {
             transfer::public_transfer(drone, DRONE_OWNER);
             transfer::public_transfer(route, DRONE_OWNER);
             transfer::public_transfer(nav_state, DRONE_OWNER);
-            transfer::public_transfer(weather_data, ADMIN);
         };
 
         clock::destroy_for_testing(clock);
@@ -533,15 +542,6 @@ module swarm_logistics::flight_controller_tests {
                 test_scenario::ctx(scenario)
             );
 
-            let weather_data = swarm_mod::new_environment_data(
-                0, // Clear weather
-                90, // Excellent visibility
-                15, // Light wind
-                2500, // 25°C temperature
-                1, // Medium air traffic
-                vector::empty()
-            );
-
             let optimization_params = flight_controller::default_optimization_params();
 
             let mut route = flight_controller::calculate_optimal_route(
@@ -549,7 +549,14 @@ module swarm_logistics::flight_controller_tests {
                 string::utf8(b"37.7749,-122.4194"),
                 string::utf8(b"37.7849,-122.4094"),
                 optimization_params,
-                weather_data,
+                swarm_mod::new_environment_data(
+                    0, // Clear weather
+                    90, // Excellent visibility
+                    15, // Light wind
+                    2500, // 25°C temperature
+                    1, // Medium air traffic
+                    vector::empty()
+                ),
                 &clock,
                 test_scenario::ctx(scenario)
             );
@@ -558,7 +565,14 @@ module swarm_logistics::flight_controller_tests {
                 &drone,
                 &route,
                 string::utf8(b"37.7749,-122.4194"),
-                weather_data,
+                swarm_mod::new_environment_data(
+                    0, // Clear weather
+                    90, // Excellent visibility
+                    15, // Light wind
+                    2500, // 25°C temperature
+                    1, // Medium air traffic
+                    vector::empty()
+                ),
                 &clock,
                 test_scenario::ctx(scenario)
             );
@@ -586,7 +600,6 @@ module swarm_logistics::flight_controller_tests {
             transfer::public_transfer(drone, DRONE_OWNER);
             transfer::public_transfer(route, DRONE_OWNER);
             transfer::public_transfer(nav_state, DRONE_OWNER);
-            transfer::public_transfer(weather_data, ADMIN);
         };
 
         clock::destroy_for_testing(clock);
@@ -615,15 +628,6 @@ module swarm_logistics::flight_controller_tests {
                 test_scenario::ctx(scenario)
             );
 
-            let weather_data = swarm_mod::new_environment_data(
-                0, // Clear weather
-                90, // Excellent visibility
-                15, // Light wind
-                2500, // 25°C temperature
-                1, // Medium air traffic
-                vector::empty()
-            );
-
             let optimization_params = flight_controller::default_optimization_params();
 
             let mut route = flight_controller::calculate_optimal_route(
@@ -631,7 +635,14 @@ module swarm_logistics::flight_controller_tests {
                 string::utf8(b"37.7749,-122.4194"),
                 string::utf8(b"37.7849,-122.4094"),
                 optimization_params,
-                weather_data,
+                swarm_mod::new_environment_data(
+                    0, // Clear weather
+                    90, // Excellent visibility
+                    15, // Light wind
+                    2500, // 25°C temperature
+                    1, // Medium air traffic
+                    vector::empty()
+                ),
                 &clock,
                 test_scenario::ctx(scenario)
             );
@@ -649,7 +660,6 @@ module swarm_logistics::flight_controller_tests {
 
             transfer::public_transfer(drone, DRONE_OWNER);
             transfer::public_transfer(route, DRONE_OWNER);
-            transfer::public_transfer(weather_data, ADMIN);
         };
 
         clock::destroy_for_testing(clock);
@@ -679,16 +689,6 @@ module swarm_logistics::flight_controller_tests {
                 test_scenario::ctx(scenario)
             );
 
-            // Create weather conditions
-            let weather_data = swarm_mod::new_environment_data(
-                1, // Light rain
-                70, // Good visibility
-                20, // Moderate wind
-                2200, // 22°C temperature
-                2, // High air traffic
-                vector::empty()
-            );
-
             // Calculate route
             let optimization_params = flight_controller::default_optimization_params();
             let mut route = flight_controller::calculate_optimal_route(
@@ -696,7 +696,14 @@ module swarm_logistics::flight_controller_tests {
                 string::utf8(b"37.7749,-122.4194"),
                 string::utf8(b"37.7849,-122.4094"),
                 optimization_params,
-                weather_data,
+                swarm_mod::new_environment_data(
+                    1, // Light rain
+                    70, // Good visibility
+                    20, // Moderate wind
+                    2200, // 22°C temperature
+                    2, // High air traffic
+                    vector::empty()
+                ),
                 &clock,
                 test_scenario::ctx(scenario)
             );
@@ -706,7 +713,14 @@ module swarm_logistics::flight_controller_tests {
                 &drone,
                 &route,
                 string::utf8(b"37.7749,-122.4194"),
-                weather_data,
+                swarm_mod::new_environment_data(
+                    1, // Light rain
+                    70, // Good visibility
+                    20, // Moderate wind
+                    2200, // 22°C temperature
+                    2, // High air traffic
+                    vector::empty()
+                ),
                 &clock,
                 test_scenario::ctx(scenario)
             );
@@ -715,21 +729,19 @@ module swarm_logistics::flight_controller_tests {
             flight_controller::set_route_status(&mut route, 1); // ROUTE_ACTIVE
 
             // Simulate flight progress with updates
-            let updated_weather = swarm_mod::new_environment_data(
-                2, // Snow
-                50, // Reduced visibility
-                35, // Higher wind
-                2000, // 20°C temperature
-                3, // Critical air traffic
-                vector::empty()
-            );
-
             flight_controller::update_navigation_state(
                 &mut nav_state,
                 string::utf8(b"37.7799,-122.4144"), // Midway position
                 110, 40, 45,
                 vector::empty(),
-                updated_weather,
+                swarm_mod::new_environment_data(
+                    2, // Snow
+                    50, // Reduced visibility
+                    35, // Higher wind
+                    2000, // 20°C temperature
+                    3, // Critical air traffic
+                    vector::empty()
+                ),
                 &clock
             );
 
@@ -751,8 +763,6 @@ module swarm_logistics::flight_controller_tests {
             transfer::public_transfer(drone, DRONE_OWNER);
             transfer::public_transfer(route, DRONE_OWNER);
             transfer::public_transfer(nav_state, DRONE_OWNER);
-            transfer::public_transfer(weather_data, ADMIN);
-            transfer::public_transfer(updated_weather, ADMIN);
         };
 
         clock::destroy_for_testing(clock);
@@ -786,30 +796,28 @@ module swarm_logistics::flight_controller_tests {
             // Set battery to low level
             drone_mod::set_drone_battery_level(&mut drone, 25); // Below 30% threshold
 
-            let weather_data = swarm_mod::new_environment_data(
-                0, // Clear weather
-                90, // Excellent visibility
-                15, // Light wind
-                2500, // 25°C temperature
-                1, // Medium air traffic
-                vector::empty()
-            );
-
             let optimization_params = flight_controller::default_optimization_params();
 
             // This should fail due to insufficient battery
-            let _route = flight_controller::calculate_optimal_route(
+            let route = flight_controller::calculate_optimal_route(
                 &drone,
                 string::utf8(b"37.7749,-122.4194"),
                 string::utf8(b"37.7849,-122.4094"),
                 optimization_params,
-                weather_data,
+                swarm_mod::new_environment_data(
+                    0, // Clear weather
+                    90, // Excellent visibility
+                    15, // Light wind
+                    2500, // 25°C temperature
+                    1, // Medium air traffic
+                    vector::empty()
+                ),
                 &clock,
                 test_scenario::ctx(scenario)
             );
 
             transfer::public_transfer(drone, DRONE_OWNER);
-            transfer::public_transfer(weather_data, ADMIN);
+            transfer::public_transfer(route, DRONE_OWNER);
         };
 
         clock::destroy_for_testing(clock);
@@ -837,54 +845,31 @@ module swarm_logistics::flight_controller_tests {
                 test_scenario::ctx(scenario)
             );
 
-            let weather_data = swarm_mod::new_environment_data(
-                0, // Clear weather
-                90, // Excellent visibility
-                15, // Light wind
-                2500, // 25°C temperature
-                1, // Medium air traffic
-                vector::empty()
-            );
-
             let optimization_params = flight_controller::default_optimization_params();
 
             // This should fail due to empty coordinates
-            let _route = flight_controller::calculate_optimal_route(
+            let route = flight_controller::calculate_optimal_route(
                 &drone,
                 string::utf8(b""), // Empty origin
                 string::utf8(b"37.7849,-122.4094"),
                 optimization_params,
-                weather_data,
+                swarm_mod::new_environment_data(
+                    0, // Clear weather
+                    90, // Excellent visibility
+                    15, // Light wind
+                    2500, // 25°C temperature
+                    1, // Medium air traffic
+                    vector::empty()
+                ),
                 &clock,
                 test_scenario::ctx(scenario)
             );
 
             transfer::public_transfer(drone, DRONE_OWNER);
-            transfer::public_transfer(weather_data, ADMIN);
+            transfer::public_transfer(route, DRONE_OWNER);
         };
 
         clock::destroy_for_testing(clock);
         test_scenario::end(scenario_val);
-    }
-
-    // ==================== HELPER FUNCTIONS ====================
-
-    /// Create a test obstacle for testing purposes
-    fun create_test_obstacle(
-        obstacle_type: u8,
-        location: string::String,
-        size_estimate: u64,
-        threat_level: u8,
-        detection_time: u64
-    ): Obstacle {
-        Obstacle {
-            obstacle_type,
-            location,
-            size_estimate,
-            movement_vector: string::utf8(b"0,0"), // Stationary
-            threat_level,
-            detection_time,
-            avoidance_action: 0, // Will be determined by avoidance logic
-        }
     }
 } 
