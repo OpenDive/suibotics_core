@@ -2,6 +2,69 @@ module suibotics_core::identity_types {
     use sui::object::{UID, new};
     use sui::tx_context::TxContext;
     use sui::transfer::{transfer, public_transfer};
+    use sui::event;
+    use std::vector;
+
+    // Error constants
+    const E_INVALID_CONTROLLER: u64 = 1;
+    const E_KEY_NOT_FOUND: u64 = 2;
+    const E_KEY_ALREADY_EXISTS: u64 = 3;
+    const E_NAME_ALREADY_EXISTS: u64 = 4;
+    const E_INVALID_PUBLIC_KEY: u64 = 5;
+    const E_INVALID_DATA_HASH: u64 = 6;
+    const E_EMPTY_FIELD: u64 = 7;
+    const E_FIELD_TOO_LONG: u64 = 8;
+    const E_INVALID_ADDRESS: u64 = 9;
+
+    // Constants for validation
+    const MAX_NAME_LENGTH: u64 = 255;
+    const MAX_SCHEMA_LENGTH: u64 = 1000;
+    const MAX_ENDPOINT_LENGTH: u64 = 2000;
+    const ED25519_PUBLIC_KEY_LENGTH: u64 = 32;
+    const SHA256_HASH_LENGTH: u64 = 32;
+
+    // Events
+    public struct DIDRegistered has copy, drop {
+        did_id: address,
+        controller: address,
+        name: vector<u8>,
+        timestamp: u64,
+    }
+
+    public struct KeyAdded has copy, drop {
+        did_id: address,
+        key_id: vector<u8>,
+        purpose: vector<u8>,
+        timestamp: u64,
+    }
+
+    public struct KeyRevoked has copy, drop {
+        did_id: address,
+        key_id: vector<u8>,
+        timestamp: u64,
+    }
+
+    public struct ServiceAdded has copy, drop {
+        did_id: address,
+        service_id: vector<u8>,
+        service_type: vector<u8>,
+        endpoint: vector<u8>,
+        timestamp: u64,
+    }
+
+    public struct CredentialIssued has copy, drop {
+        credential_id: address,
+        subject: address,
+        issuer: address,
+        schema: vector<u8>,
+        timestamp: u64,
+    }
+
+    public struct CredentialRevoked has copy, drop {
+        credential_id: address,
+        issuer: address,
+        timestamp: u64,
+    }
 
     /// A DID object resource. Owned by its controller.
     public struct DIDInfo has key {
@@ -33,6 +96,44 @@ module suibotics_core::identity_types {
         data_hash: vector<u8>,  // SHA-256 hash of the off-chain VC JSON
         revoked: bool,          // revocation flag
         issued_at: u64,         // issuance timestamp
+    }
+
+    // Validation helper functions
+    public fun validate_address(addr: address) {
+        assert!(addr != @0x0, E_INVALID_ADDRESS);
+    }
+
+    public fun validate_name(name: &vector<u8>) {
+        assert!(!std::vector::is_empty(name), E_EMPTY_FIELD);
+        assert!(std::vector::length(name) <= MAX_NAME_LENGTH, E_FIELD_TOO_LONG);
+    }
+
+    public fun validate_public_key(pubkey: &vector<u8>) {
+        assert!(!std::vector::is_empty(pubkey), E_EMPTY_FIELD);
+        assert!(std::vector::length(pubkey) == ED25519_PUBLIC_KEY_LENGTH, E_INVALID_PUBLIC_KEY);
+    }
+
+    public fun validate_schema(schema: &vector<u8>) {
+        assert!(!std::vector::is_empty(schema), E_EMPTY_FIELD);
+        assert!(std::vector::length(schema) <= MAX_SCHEMA_LENGTH, E_FIELD_TOO_LONG);
+    }
+
+    public fun validate_data_hash(data_hash: &vector<u8>) {
+        assert!(!std::vector::is_empty(data_hash), E_EMPTY_FIELD);
+        assert!(std::vector::length(data_hash) == SHA256_HASH_LENGTH, E_INVALID_DATA_HASH);
+    }
+
+    public fun validate_purpose(purpose: &vector<u8>) {
+        assert!(!std::vector::is_empty(purpose), E_EMPTY_FIELD);
+    }
+
+    public fun validate_endpoint(endpoint: &vector<u8>) {
+        assert!(!std::vector::is_empty(endpoint), E_EMPTY_FIELD);
+        assert!(std::vector::length(endpoint) <= MAX_ENDPOINT_LENGTH, E_FIELD_TOO_LONG);
+    }
+
+    public fun validate_key_id(key_id: &vector<u8>) {
+        assert!(!std::vector::is_empty(key_id), E_EMPTY_FIELD);
     }
 
     // Constructor functions for DIDInfo
@@ -75,7 +176,13 @@ module suibotics_core::identity_types {
         issued_at: u64,
         ctx: &mut TxContext
     ): CredentialInfo {
-        CredentialInfo {
+        // Validate inputs
+        validate_address(subject);
+        validate_address(issuer);
+        validate_schema(&schema);
+        validate_data_hash(&data_hash);
+
+        let cred = CredentialInfo {
             id: new(ctx),
             subject,
             issuer,
@@ -83,7 +190,18 @@ module suibotics_core::identity_types {
             data_hash,
             revoked: false,
             issued_at,
-        }
+        };
+
+        // Emit event
+        event::emit(CredentialIssued {
+            credential_id: sui::object::uid_to_address(&cred.id),
+            subject,
+            issuer,
+            schema,
+            timestamp: issued_at,
+        });
+
+        cred
     }
 
     public fun transfer_credential_info(cred: CredentialInfo, recipient: address) {
@@ -162,7 +280,14 @@ module suibotics_core::identity_types {
         cred.issued_at
     }
 
-    public fun revoke_credential_info(cred: &mut CredentialInfo) {
+    public fun revoke_credential_info(cred: &mut CredentialInfo, timestamp: u64) {
         cred.revoked = true;
+        
+        // Emit event
+        event::emit(CredentialRevoked {
+            credential_id: sui::object::uid_to_address(&cred.id),
+            issuer: cred.issuer,
+            timestamp,
+        });
     }
 }

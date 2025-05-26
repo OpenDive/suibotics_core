@@ -4,7 +4,8 @@ module suibotics_core::credential_registry {
         CredentialInfo, new_credential_info, transfer_credential_info,
         credential_info_issuer, revoke_credential_info, credential_info_revoked,
         credential_info_subject, credential_info_schema, credential_info_data_hash,
-        credential_info_issued_at
+        credential_info_issued_at, validate_address, validate_schema, validate_data_hash,
+        E_INVALID_CONTROLLER
     };
 
     /// Issue a new credential: creates a credential object and transfers it to the subject
@@ -17,6 +18,7 @@ module suibotics_core::credential_registry {
         let issuer = sender(ctx);
         let ts = sui::tx_context::epoch_timestamp_ms(ctx);
         
+        // Validation is handled in new_credential_info
         let cred = new_credential_info(subject, issuer, schema, data_hash, ts, ctx);
         
         // Transfer credential to the subject
@@ -29,8 +31,10 @@ module suibotics_core::credential_registry {
         ctx: &mut TxContext
     ) {
         let caller = sender(ctx);
-        assert!(caller == credential_info_issuer(cred), 4);
-        revoke_credential_info(cred);
+        let ts = sui::tx_context::epoch_timestamp_ms(ctx);
+        
+        assert!(caller == credential_info_issuer(cred), E_INVALID_CONTROLLER);
+        revoke_credential_info(cred, ts);
     }
 
     /// Check if a credential is revoked
