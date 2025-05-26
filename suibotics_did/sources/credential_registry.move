@@ -1,6 +1,6 @@
-module suibotics_core::credential_registry {
+module suibotics_did::credential_registry {
     use sui::tx_context::{TxContext, sender};
-    use suibotics_core::identity_types::{
+    use suibotics_did::identity_types::{
         CredentialInfo, new_credential_info, transfer_credential_info,
         credential_info_issuer, revoke_credential_info, credential_info_revoked,
         credential_info_subject, credential_info_schema, credential_info_data_hash,

@@ -57,7 +57,7 @@ sui --version
 1. **Clone the repository**:
    ```bash
    git clone <repository-url>
-   cd suibotics_core
+   cd suibotics_did
    ```
 
 2. **Build the project**:
@@ -77,7 +77,7 @@ The project includes comprehensive test suites covering all major functionality:
 ### Test Files
 - `tests/did_registry_tests.move`: 13 tests covering DID registration, key management, and service endpoints
 - `tests/simple_test.move`: 6 integration tests covering basic workflows
-- `tests/suibotics_core_tests.move`: End-to-end scenario tests
+- `tests/suibotics_did_tests.move`: End-to-end scenario tests
 
 ### Running Tests
 
@@ -191,7 +191,7 @@ The system emits events for all major operations:
 ### Project Structure
 
 ```
-suibotics_core/
+suibotics_did/
 ├── sources/
 │   ├── IdentityTypes.move      # Core data structures
 │   ├── DidRegistry.move        # DID management
@@ -199,7 +199,7 @@ suibotics_core/
 ├── tests/
 │   ├── did_registry_tests.move # DID functionality tests
 │   ├── simple_test.move        # Integration tests
-│   └── suibotics_core_tests.move # End-to-end tests
+│   └── suibotics_did_tests.move # End-to-end tests
 ├── Move.toml                   # Project configuration
 ├── deploy_testnet.sh           # Comprehensive testnet deployment script
 ├── deploy_simple.sh            # Simple testnet deployment script

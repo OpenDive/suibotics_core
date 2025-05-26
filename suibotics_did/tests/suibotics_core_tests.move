@@ -1,30 +1,30 @@
 /*
 #[test_only]
-module suibotics_core::suibotics_core_tests;
+module suibotics_did::suibotics_did_tests;
 // uncomment this line to import the module
-// use suibotics_core::suibotics_core;
+// use suibotics_did::suibotics_did;
 
 const ENotImplemented: u64 = 0;
 
 #[test]
-fun test_suibotics_core() {
+fun test_suibotics_did() {
     // pass
 }
 
-#[test, expected_failure(abort_code = ::suibotics_core::suibotics_core_tests::ENotImplemented)]
-fun test_suibotics_core_fail() {
+#[test, expected_failure(abort_code = ::suibotics_did::suibotics_did_tests::ENotImplemented)]
+fun test_suibotics_did_fail() {
     abort ENotImplemented
 }
 */
 
 #[test_only]
-module suibotics_core::integration_tests {
+module suibotics_did::integration_tests {
     use sui::test_scenario::{Self as ts};
     use std::vector;
     
-    use suibotics_core::did_registry::{Self, DIDRegistry};
-    use suibotics_core::credential_registry;
-    use suibotics_core::identity_types::{DIDInfo, CredentialInfo, did_info_controller};
+    use suibotics_did::did_registry::{Self, DIDRegistry};
+    use suibotics_did::credential_registry;
+    use suibotics_did::identity_types::{DIDInfo, CredentialInfo, did_info_controller};
 
     // Test addresses
     const ALICE: address = @0xa11ce;

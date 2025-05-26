@@ -1,11 +1,11 @@
-module suibotics_core::did_registry {
+module suibotics_did::did_registry {
     use sui::object::{UID, new};
     use sui::dynamic_field;
     use sui::tx_context::{TxContext, sender};
     use sui::transfer::share_object;
     use sui::event;
     use std::option;
-    use suibotics_core::identity_types::{
+    use suibotics_did::identity_types::{
         DIDInfo, KeyInfo, 
         new_did_info, transfer_did_info, new_key_info, new_service_info,
         did_info_id_mut, did_info_controller, revoke_key_info,

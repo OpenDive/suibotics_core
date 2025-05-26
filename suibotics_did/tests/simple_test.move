@@ -1,11 +1,11 @@
 #[test_only]
-module suibotics_core::simple_test {
+module suibotics_did::simple_test {
     use sui::test_scenario::{Self as ts};
     use std::vector;
     
-    use suibotics_core::did_registry::{Self, DIDRegistry};
-    use suibotics_core::credential_registry;
-    use suibotics_core::identity_types::{
+    use suibotics_did::did_registry::{Self, DIDRegistry};
+    use suibotics_did::credential_registry;
+    use suibotics_did::identity_types::{
         DIDInfo, CredentialInfo, did_info_controller,
         validate_address, validate_name, validate_public_key, validate_schema,
         validate_data_hash, validate_purpose, validate_endpoint, validate_key_id

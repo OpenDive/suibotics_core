@@ -3,7 +3,7 @@
   "transaction_digest": "G7yaXVzwDGK1BWb6zZoAQNdAqE4hV2ESsi3EgPLRpAFL",
   "network": "testnet",
   "timestamp": "2025-01-25T22:50:31Z",
-  "package_name": "suibotics_core",
+  "package_name": "suibotics_did",
   "gas_budget": 100000000,
   "modules": [
     "credential_registry",

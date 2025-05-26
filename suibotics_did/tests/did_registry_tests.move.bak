@@ -1,5 +1,5 @@
 #[test_only]
-module suibotics_core::did_registry_tests {
+module suibotics_did::did_registry_tests {
     use sui::test_scenario::{Self as ts, Scenario};
     use sui::tx_context::{Self, TxContext};
     use sui::object;
@@ -7,8 +7,8 @@ module suibotics_core::did_registry_tests {
     use std::option;
     use std::vector;
     
-    use suibotics_core::did_registry::{Self, DIDRegistry};
-    use suibotics_core::identity_types::{
+    use suibotics_did::did_registry::{Self, DIDRegistry};
+    use suibotics_did::identity_types::{
         DIDInfo, KeyInfo, ServiceInfo,
         did_info_controller, key_info_pubkey, key_info_purpose, key_info_revoked,
         service_info_id, service_info_type, service_info_endpoint,

@@ -1,6 +1,6 @@
 /*
-/// Module: suibotics_core
-module suibotics_core::suibotics_core;
+/// Module: suibotics_did
+module suibotics_did::suibotics_did;
 */
 
 // For Move coding conventions, see

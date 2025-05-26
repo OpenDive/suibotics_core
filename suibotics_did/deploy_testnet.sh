@@ -13,7 +13,7 @@ BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
 # Configuration
-PACKAGE_NAME="suibotics_core"
+PACKAGE_NAME="suibotics_did"
 GAS_BUDGET=100000000
 DEPLOYMENT_LOG="deployment_$(date +%Y%m%d_%H%M%S).log"
 

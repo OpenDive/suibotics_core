@@ -1,0 +1,776 @@
+Deployment started at: Sun May 25 22:50:20 AST 2025
+[note] Dependencies on Bridge, MoveStdlib, Sui, and SuiSystem are automatically added, but this feature is disabled for your package because you have explicitly included dependencies on Sui. Consider removing these dependencies from Move.toml.
+UPDATING GIT DEPENDENCY https://github.com/MystenLabs/sui.git
+INCLUDING DEPENDENCY Sui
+INCLUDING DEPENDENCY MoveStdlib
+BUILDING suibotics_did
+[0m[1m[38;5;11mwarning[W02021][0m[1m: duplicate alias[0m
+  [0m[34m┌─[0m ./sources/identity_types.move:2:23
+  [0m[34m│[0m
+[0m[34m2[0m [0m[34m│[0m     use sui::object::{[0m[33mUID[0m, new};
+  [0m[34m│[0m                       [0m[33m^^^[0m [0m[33mUnnecessary alias 'UID' for module member 'sui::object::UID'. This alias is provided by default[0m
+  [0m[34m│[0m
+  [0m[34m=[0m This warning can be suppressed with '#[allow(duplicate_alias)]' applied to the 'module' or module member ('const', 'fun', or 'struct')
+
+[0m[1m[38;5;11mwarning[W02021][0m[1m: duplicate alias[0m
+  [0m[34m┌─[0m ./sources/identity_types.move:3:26
+  [0m[34m│[0m
+[0m[34m3[0m [0m[34m│[0m     use sui::tx_context::[0m[33mTxContext[0m;
+  [0m[34m│[0m                          [0m[33m^^^^^^^^^[0m [0m[33mUnnecessary alias 'TxContext' for module member 'sui::tx_context::TxContext'. This alias is provided by default[0m
+  [0m[34m│[0m
+  [0m[34m=[0m This warning can be suppressed with '#[allow(duplicate_alias)]' applied to the 'module' or module member ('const', 'fun', or 'struct')
+
+[0m[1m[38;5;11mwarning[W02021][0m[1m: duplicate alias[0m
+  [0m[34m┌─[0m ./sources/identity_types.move:6:14
+  [0m[34m│[0m
+[0m[34m6[0m [0m[34m│[0m     use std::[0m[33mvector[0m;
+  [0m[34m│[0m              [0m[33m^^^^^^[0m [0m[33mUnnecessary alias 'vector' for module 'std::vector'. This alias is provided by default[0m
+  [0m[34m│[0m
+  [0m[34m=[0m This warning can be suppressed with '#[allow(duplicate_alias)]' applied to the 'module' or module member ('const', 'fun', or 'struct')
+
+[0m[1m[38;5;11mwarning[W09001][0m[1m: unused alias[0m
+  [0m[34m┌─[0m ./sources/identity_types.move:6:14
+  [0m[34m│[0m
+[0m[34m6[0m [0m[34m│[0m     use std::[0m[33mvector[0m;
+  [0m[34m│[0m              [0m[33m^^^^^^[0m [0m[33mUnused 'use' of alias 'vector'. Consider removing it[0m
+  [0m[34m│[0m
+  [0m[34m=[0m This alias does not shadow the built-in type 'vector' in type annotations.
+  [0m[34m=[0m This warning can be suppressed with '#[allow(unused_use)]' applied to the 'module' or module member ('const', 'fun', or 'struct')
+
+[0m[1m[38;5;11mwarning[W02021][0m[1m: duplicate alias[0m
+  [0m[34m┌─[0m ./sources/credential_registry.move:2:27
+  [0m[34m│[0m
+[0m[34m2[0m [0m[34m│[0m     use sui::tx_context::{[0m[33mTxContext[0m, sender};
+  [0m[34m│[0m                           [0m[33m^^^^^^^^^[0m [0m[33mUnnecessary alias 'TxContext' for module member 'sui::tx_context::TxContext'. This alias is provided by default[0m
+  [0m[34m│[0m
+  [0m[34m=[0m This warning can be suppressed with '#[allow(duplicate_alias)]' applied to the 'module' or module member ('const', 'fun', or 'struct')
+
+[0m[1m[38;5;11mwarning[W09001][0m[1m: unused alias[0m
+  [0m[34m┌─[0m ./sources/credential_registry.move:7:36
+  [0m[34m│[0m
+[0m[34m7[0m [0m[34m│[0m         credential_info_issued_at, [0m[33mvalidate_address[0m, validate_schema, validate_data_hash,
+  [0m[34m│[0m                                    [0m[33m^^^^^^^^^^^^^^^^[0m [0m[33mUnused 'use' of alias 'validate_address'. Consider removing it[0m
+  [0m[34m│[0m
+  [0m[34m=[0m This warning can be suppressed with '#[allow(unused_use)]' applied to the 'module' or module member ('const', 'fun', or 'struct')
+
+[0m[1m[38;5;11mwarning[W09001][0m[1m: unused alias[0m
+  [0m[34m┌─[0m ./sources/credential_registry.move:7:54
+  [0m[34m│[0m
+[0m[34m7[0m [0m[34m│[0m         credential_info_issued_at, validate_address, [0m[33mvalidate_schema[0m, validate_data_hash,
+  [0m[34m│[0m                                                      [0m[33m^^^^^^^^^^^^^^^[0m [0m[33mUnused 'use' of alias 'validate_schema'. Consider removing it[0m
+  [0m[34m│[0m
+  [0m[34m=[0m This warning can be suppressed with '#[allow(unused_use)]' applied to the 'module' or module member ('const', 'fun', or 'struct')
+
+[0m[1m[38;5;11mwarning[W09001][0m[1m: unused alias[0m
+  [0m[34m┌─[0m ./sources/credential_registry.move:7:71
+  [0m[34m│[0m
+[0m[34m7[0m [0m[34m│[0m         credential_info_issued_at, validate_address, validate_schema, [0m[33mvalidate_data_hash[0m,
+  [0m[34m│[0m                                                                       [0m[33m^^^^^^^^^^^^^^^^^^[0m [0m[33mUnused 'use' of alias 'validate_data_hash'. Consider removing it[0m
+  [0m[34m│[0m
+  [0m[34m=[0m This warning can be suppressed with '#[allow(unused_use)]' applied to the 'module' or module member ('const', 'fun', or 'struct')
+
+[0m[1m[38;5;11mwarning[W02021][0m[1m: duplicate alias[0m
+  [0m[34m┌─[0m ./sources/did_registry.move:2:23
+  [0m[34m│[0m
+[0m[34m2[0m [0m[34m│[0m     use sui::object::{[0m[33mUID[0m, new};
+  [0m[34m│[0m                       [0m[33m^^^[0m [0m[33mUnnecessary alias 'UID' for module member 'sui::object::UID'. This alias is provided by default[0m
+  [0m[34m│[0m
+  [0m[34m=[0m This warning can be suppressed with '#[allow(duplicate_alias)]' applied to the 'module' or module member ('const', 'fun', or 'struct')
+
+[0m[1m[38;5;11mwarning[W02021][0m[1m: duplicate alias[0m
+  [0m[34m┌─[0m ./sources/did_registry.move:4:27
+  [0m[34m│[0m
+[0m[34m4[0m [0m[34m│[0m     use sui::tx_context::{[0m[33mTxContext[0m, sender};
+  [0m[34m│[0m                           [0m[33m^^^^^^^^^[0m [0m[33mUnnecessary alias 'TxContext' for module member 'sui::tx_context::TxContext'. This alias is provided by default[0m
+  [0m[34m│[0m
+  [0m[34m=[0m This warning can be suppressed with '#[allow(duplicate_alias)]' applied to the 'module' or module member ('const', 'fun', or 'struct')
+
+[0m[1m[38;5;11mwarning[W09001][0m[1m: unused alias[0m
+  [0m[34m┌─[0m ./sources/did_registry.move:6:14
+  [0m[34m│[0m
+[0m[34m6[0m [0m[34m│[0m     use sui::[0m[33mevent[0m;
+  [0m[34m│[0m              [0m[33m^^^^^[0m [0m[33mUnused 'use' of alias 'event'. Consider removing it[0m
+  [0m[34m│[0m
+  [0m[34m=[0m This warning can be suppressed with '#[allow(unused_use)]' applied to the 'module' or module member ('const', 'fun', or 'struct')
+
+[0m[1m[38;5;11mwarning[W02021][0m[1m: duplicate alias[0m
+  [0m[34m┌─[0m ./sources/did_registry.move:7:14
+  [0m[34m│[0m
+[0m[34m7[0m [0m[34m│[0m     use std::[0m[33moption[0m;
+  [0m[34m│[0m              [0m[33m^^^^^^[0m [0m[33mUnnecessary alias 'option' for module 'std::option'. This alias is provided by default[0m
+  [0m[34m│[0m
+  [0m[34m=[0m This warning can be suppressed with '#[allow(duplicate_alias)]' applied to the 'module' or module member ('const', 'fun', or 'struct')
+
+[note] Dependencies on Bridge, MoveStdlib, Sui, and SuiSystem are automatically added, but this feature is disabled for your package because you have explicitly included dependencies on Sui. Consider removing these dependencies from Move.toml.
+INCLUDING DEPENDENCY Sui
+INCLUDING DEPENDENCY MoveStdlib
+BUILDING suibotics_did
+[0m[1m[38;5;11mwarning[W02021][0m[1m: duplicate alias[0m
+  [0m[34m┌─[0m ./tests/simple_test.move:4:14
+  [0m[34m│[0m
+[0m[34m4[0m [0m[34m│[0m     use std::[0m[33mvector[0m;
+  [0m[34m│[0m              [0m[33m^^^^^^[0m [0m[33mUnnecessary alias 'vector' for module 'std::vector'. This alias is provided by default[0m
+  [0m[34m│[0m
+  [0m[34m=[0m This warning can be suppressed with '#[allow(duplicate_alias)]' applied to the 'module' or module member ('const', 'fun', or 'struct')
+
+[0m[1m[38;5;11mwarning[W02021][0m[1m: duplicate alias[0m
+  [0m[34m┌─[0m ./sources/identity_types.move:2:23
+  [0m[34m│[0m
+[0m[34m2[0m [0m[34m│[0m     use sui::object::{[0m[33mUID[0m, new};
+  [0m[34m│[0m                       [0m[33m^^^[0m [0m[33mUnnecessary alias 'UID' for module member 'sui::object::UID'. This alias is provided by default[0m
+  [0m[34m│[0m
+  [0m[34m=[0m This warning can be suppressed with '#[allow(duplicate_alias)]' applied to the 'module' or module member ('const', 'fun', or 'struct')
+
+[0m[1m[38;5;11mwarning[W02021][0m[1m: duplicate alias[0m
+  [0m[34m┌─[0m ./sources/identity_types.move:3:26
+  [0m[34m│[0m
+[0m[34m3[0m [0m[34m│[0m     use sui::tx_context::[0m[33mTxContext[0m;
+  [0m[34m│[0m                          [0m[33m^^^^^^^^^[0m [0m[33mUnnecessary alias 'TxContext' for module member 'sui::tx_context::TxContext'. This alias is provided by default[0m
+  [0m[34m│[0m
+  [0m[34m=[0m This warning can be suppressed with '#[allow(duplicate_alias)]' applied to the 'module' or module member ('const', 'fun', or 'struct')
+
+[0m[1m[38;5;11mwarning[W02021][0m[1m: duplicate alias[0m
+  [0m[34m┌─[0m ./sources/identity_types.move:6:14
+  [0m[34m│[0m
+[0m[34m6[0m [0m[34m│[0m     use std::[0m[33mvector[0m;
+  [0m[34m│[0m              [0m[33m^^^^^^[0m [0m[33mUnnecessary alias 'vector' for module 'std::vector'. This alias is provided by default[0m
+  [0m[34m│[0m
+  [0m[34m=[0m This warning can be suppressed with '#[allow(duplicate_alias)]' applied to the 'module' or module member ('const', 'fun', or 'struct')
+
+[0m[1m[38;5;11mwarning[W09001][0m[1m: unused alias[0m
+  [0m[34m┌─[0m ./sources/identity_types.move:6:14
+  [0m[34m│[0m
+[0m[34m6[0m [0m[34m│[0m     use std::[0m[33mvector[0m;
+  [0m[34m│[0m              [0m[33m^^^^^^[0m [0m[33mUnused 'use' of alias 'vector'. Consider removing it[0m
+  [0m[34m│[0m
+  [0m[34m=[0m This alias does not shadow the built-in type 'vector' in type annotations.
+  [0m[34m=[0m This warning can be suppressed with '#[allow(unused_use)]' applied to the 'module' or module member ('const', 'fun', or 'struct')
+
+[0m[1m[38;5;11mwarning[W02021][0m[1m: duplicate alias[0m
+  [0m[34m┌─[0m ./sources/credential_registry.move:2:27
+  [0m[34m│[0m
+[0m[34m2[0m [0m[34m│[0m     use sui::tx_context::{[0m[33mTxContext[0m, sender};
+  [0m[34m│[0m                           [0m[33m^^^^^^^^^[0m [0m[33mUnnecessary alias 'TxContext' for module member 'sui::tx_context::TxContext'. This alias is provided by default[0m
+  [0m[34m│[0m
+  [0m[34m=[0m This warning can be suppressed with '#[allow(duplicate_alias)]' applied to the 'module' or module member ('const', 'fun', or 'struct')
+
+[0m[1m[38;5;11mwarning[W09001][0m[1m: unused alias[0m
+  [0m[34m┌─[0m ./sources/credential_registry.move:7:36
+  [0m[34m│[0m
+[0m[34m7[0m [0m[34m│[0m         credential_info_issued_at, [0m[33mvalidate_address[0m, validate_schema, validate_data_hash,
+  [0m[34m│[0m                                    [0m[33m^^^^^^^^^^^^^^^^[0m [0m[33mUnused 'use' of alias 'validate_address'. Consider removing it[0m
+  [0m[34m│[0m
+  [0m[34m=[0m This warning can be suppressed with '#[allow(unused_use)]' applied to the 'module' or module member ('const', 'fun', or 'struct')
+
+[0m[1m[38;5;11mwarning[W09001][0m[1m: unused alias[0m
+  [0m[34m┌─[0m ./sources/credential_registry.move:7:54
+  [0m[34m│[0m
+[0m[34m7[0m [0m[34m│[0m         credential_info_issued_at, validate_address, [0m[33mvalidate_schema[0m, validate_data_hash,
+  [0m[34m│[0m                                                      [0m[33m^^^^^^^^^^^^^^^[0m [0m[33mUnused 'use' of alias 'validate_schema'. Consider removing it[0m
+  [0m[34m│[0m
+  [0m[34m=[0m This warning can be suppressed with '#[allow(unused_use)]' applied to the 'module' or module member ('const', 'fun', or 'struct')
+
+[0m[1m[38;5;11mwarning[W09001][0m[1m: unused alias[0m
+  [0m[34m┌─[0m ./sources/credential_registry.move:7:71
+  [0m[34m│[0m
+[0m[34m7[0m [0m[34m│[0m         credential_info_issued_at, validate_address, validate_schema, [0m[33mvalidate_data_hash[0m,
+  [0m[34m│[0m                                                                       [0m[33m^^^^^^^^^^^^^^^^^^[0m [0m[33mUnused 'use' of alias 'validate_data_hash'. Consider removing it[0m
+  [0m[34m│[0m
+  [0m[34m=[0m This warning can be suppressed with '#[allow(unused_use)]' applied to the 'module' or module member ('const', 'fun', or 'struct')
+
+[0m[1m[38;5;11mwarning[W02021][0m[1m: duplicate alias[0m
+  [0m[34m┌─[0m ./sources/did_registry.move:2:23
+  [0m[34m│[0m
+[0m[34m2[0m [0m[34m│[0m     use sui::object::{[0m[33mUID[0m, new};
+  [0m[34m│[0m                       [0m[33m^^^[0m [0m[33mUnnecessary alias 'UID' for module member 'sui::object::UID'. This alias is provided by default[0m
+  [0m[34m│[0m
+  [0m[34m=[0m This warning can be suppressed with '#[allow(duplicate_alias)]' applied to the 'module' or module member ('const', 'fun', or 'struct')
+
+[0m[1m[38;5;11mwarning[W02021][0m[1m: duplicate alias[0m
+  [0m[34m┌─[0m ./sources/did_registry.move:4:27
+  [0m[34m│[0m
+[0m[34m4[0m [0m[34m│[0m     use sui::tx_context::{[0m[33mTxContext[0m, sender};
+  [0m[34m│[0m                           [0m[33m^^^^^^^^^[0m [0m[33mUnnecessary alias 'TxContext' for module member 'sui::tx_context::TxContext'. This alias is provided by default[0m
+  [0m[34m│[0m
+  [0m[34m=[0m This warning can be suppressed with '#[allow(duplicate_alias)]' applied to the 'module' or module member ('const', 'fun', or 'struct')
+
+[0m[1m[38;5;11mwarning[W09001][0m[1m: unused alias[0m
+  [0m[34m┌─[0m ./sources/did_registry.move:6:14
+  [0m[34m│[0m
+[0m[34m6[0m [0m[34m│[0m     use sui::[0m[33mevent[0m;
+  [0m[34m│[0m              [0m[33m^^^^^[0m [0m[33mUnused 'use' of alias 'event'. Consider removing it[0m
+  [0m[34m│[0m
+  [0m[34m=[0m This warning can be suppressed with '#[allow(unused_use)]' applied to the 'module' or module member ('const', 'fun', or 'struct')
+
+[0m[1m[38;5;11mwarning[W02021][0m[1m: duplicate alias[0m
+  [0m[34m┌─[0m ./sources/did_registry.move:7:14
+  [0m[34m│[0m
+[0m[34m7[0m [0m[34m│[0m     use std::[0m[33moption[0m;
+  [0m[34m│[0m              [0m[33m^^^^^^[0m [0m[33mUnnecessary alias 'option' for module 'std::option'. This alias is provided by default[0m
+  [0m[34m│[0m
+  [0m[34m=[0m This warning can be suppressed with '#[allow(duplicate_alias)]' applied to the 'module' or module member ('const', 'fun', or 'struct')
+
+[0m[1m[38;5;11mwarning[W09001][0m[1m: unused alias[0m
+  [0m[34m┌─[0m ./tests/did_registry_tests.move:3:42
+  [0m[34m│[0m
+[0m[34m3[0m [0m[34m│[0m     use sui::test_scenario::{Self as ts, [0m[33mScenario[0m};
+  [0m[34m│[0m                                          [0m[33m^^^^^^^^[0m [0m[33mUnused 'use' of alias 'Scenario'. Consider removing it[0m
+  [0m[34m│[0m
+  [0m[34m=[0m This warning can be suppressed with '#[allow(unused_use)]' applied to the 'module' or module member ('const', 'fun', or 'struct')
+
+[0m[1m[38;5;11mwarning[W02021][0m[1m: duplicate alias[0m
+  [0m[34m┌─[0m ./tests/did_registry_tests.move:4:27
+  [0m[34m│[0m
+[0m[34m4[0m [0m[34m│[0m     use sui::tx_context::{[0m[33mSelf[0m, TxContext};
+  [0m[34m│[0m                           [0m[33m^^^^[0m [0m[33mUnnecessary alias 'tx_context' for module 'sui::tx_context'. This alias is provided by default[0m
+  [0m[34m│[0m
+  [0m[34m=[0m This warning can be suppressed with '#[allow(duplicate_alias)]' applied to the 'module' or module member ('const', 'fun', or 'struct')
+
+[0m[1m[38;5;11mwarning[W09001][0m[1m: unused alias[0m
+  [0m[34m┌─[0m ./tests/did_registry_tests.move:4:27
+  [0m[34m│[0m
+[0m[34m4[0m [0m[34m│[0m     use sui::tx_context::{[0m[33mSelf[0m, TxContext};
+  [0m[34m│[0m                           [0m[33m^^^^[0m [0m[33mUnused 'use' of alias 'tx_context'. Consider removing it[0m
+  [0m[34m│[0m
+  [0m[34m=[0m This warning can be suppressed with '#[allow(unused_use)]' applied to the 'module' or module member ('const', 'fun', or 'struct')
+
+[0m[1m[38;5;11mwarning[W02021][0m[1m: duplicate alias[0m
+  [0m[34m┌─[0m ./tests/did_registry_tests.move:4:33
+  [0m[34m│[0m
+[0m[34m4[0m [0m[34m│[0m     use sui::tx_context::{Self, [0m[33mTxContext[0m};
+  [0m[34m│[0m                                 [0m[33m^^^^^^^^^[0m [0m[33mUnnecessary alias 'TxContext' for module member 'sui::tx_context::TxContext'. This alias is provided by default[0m
+  [0m[34m│[0m
+  [0m[34m=[0m This warning can be suppressed with '#[allow(duplicate_alias)]' applied to the 'module' or module member ('const', 'fun', or 'struct')
+
+[0m[1m[38;5;11mwarning[W09001][0m[1m: unused alias[0m
+  [0m[34m┌─[0m ./tests/did_registry_tests.move:4:33
+  [0m[34m│[0m
+[0m[34m4[0m [0m[34m│[0m     use sui::tx_context::{Self, [0m[33mTxContext[0m};
+  [0m[34m│[0m                                 [0m[33m^^^^^^^^^[0m [0m[33mUnused 'use' of alias 'TxContext'. Consider removing it[0m
+  [0m[34m│[0m
+  [0m[34m=[0m This warning can be suppressed with '#[allow(unused_use)]' applied to the 'module' or module member ('const', 'fun', or 'struct')
+
+[0m[1m[38;5;11mwarning[W02021][0m[1m: duplicate alias[0m
+  [0m[34m┌─[0m ./tests/did_registry_tests.move:5:14
+  [0m[34m│[0m
+[0m[34m5[0m [0m[34m│[0m     use sui::[0m[33mobject[0m;
+  [0m[34m│[0m              [0m[33m^^^^^^[0m [0m[33mUnnecessary alias 'object' for module 'sui::object'. This alias is provided by default[0m
+  [0m[34m│[0m
+  [0m[34m=[0m This warning can be suppressed with '#[allow(duplicate_alias)]' applied to the 'module' or module member ('const', 'fun', or 'struct')
+
+[0m[1m[38;5;11mwarning[W09001][0m[1m: unused alias[0m
+  [0m[34m┌─[0m ./tests/did_registry_tests.move:5:14
+  [0m[34m│[0m
+[0m[34m5[0m [0m[34m│[0m     use sui::[0m[33mobject[0m;
+  [0m[34m│[0m              [0m[33m^^^^^^[0m [0m[33mUnused 'use' of alias 'object'. Consider removing it[0m
+  [0m[34m│[0m
+  [0m[34m=[0m This warning can be suppressed with '#[allow(unused_use)]' applied to the 'module' or module member ('const', 'fun', or 'struct')
+
+[0m[1m[38;5;11mwarning[W09001][0m[1m: unused alias[0m
+  [0m[34m┌─[0m ./tests/did_registry_tests.move:6:14
+  [0m[34m│[0m
+[0m[34m6[0m [0m[34m│[0m     use sui::[0m[33mdynamic_field[0m;
+  [0m[34m│[0m              [0m[33m^^^^^^^^^^^^^[0m [0m[33mUnused 'use' of alias 'dynamic_field'. Consider removing it[0m
+  [0m[34m│[0m
+  [0m[34m=[0m This warning can be suppressed with '#[allow(unused_use)]' applied to the 'module' or module member ('const', 'fun', or 'struct')
+
+[0m[1m[38;5;11mwarning[W02021][0m[1m: duplicate alias[0m
+  [0m[34m┌─[0m ./tests/did_registry_tests.move:7:14
+  [0m[34m│[0m
+[0m[34m7[0m [0m[34m│[0m     use std::[0m[33moption[0m;
+  [0m[34m│[0m              [0m[33m^^^^^^[0m [0m[33mUnnecessary alias 'option' for module 'std::option'. This alias is provided by default[0m
+  [0m[34m│[0m
+  [0m[34m=[0m This warning can be suppressed with '#[allow(duplicate_alias)]' applied to the 'module' or module member ('const', 'fun', or 'struct')
+
+[0m[1m[38;5;11mwarning[W02021][0m[1m: duplicate alias[0m
+  [0m[34m┌─[0m ./tests/did_registry_tests.move:8:14
+  [0m[34m│[0m
+[0m[34m8[0m [0m[34m│[0m     use std::[0m[33mvector[0m;
+  [0m[34m│[0m              [0m[33m^^^^^^[0m [0m[33mUnnecessary alias 'vector' for module 'std::vector'. This alias is provided by default[0m
+  [0m[34m│[0m
+  [0m[34m=[0m This warning can be suppressed with '#[allow(duplicate_alias)]' applied to the 'module' or module member ('const', 'fun', or 'struct')
+
+[0m[1m[38;5;11mwarning[W09001][0m[1m: unused alias[0m
+   [0m[34m┌─[0m ./tests/did_registry_tests.move:12:18
+   [0m[34m│[0m
+[0m[34m12[0m [0m[34m│[0m         DIDInfo, [0m[33mKeyInfo[0m, ServiceInfo,
+   [0m[34m│[0m                  [0m[33m^^^^^^^[0m [0m[33mUnused 'use' of alias 'KeyInfo'. Consider removing it[0m
+   [0m[34m│[0m
+   [0m[34m=[0m This warning can be suppressed with '#[allow(unused_use)]' applied to the 'module' or module member ('const', 'fun', or 'struct')
+
+[0m[1m[38;5;11mwarning[W09001][0m[1m: unused alias[0m
+   [0m[34m┌─[0m ./tests/did_registry_tests.move:12:27
+   [0m[34m│[0m
+[0m[34m12[0m [0m[34m│[0m         DIDInfo, KeyInfo, [0m[33mServiceInfo[0m,
+   [0m[34m│[0m                           [0m[33m^^^^^^^^^^^[0m [0m[33mUnused 'use' of alias 'ServiceInfo'. Consider removing it[0m
+   [0m[34m│[0m
+   [0m[34m=[0m This warning can be suppressed with '#[allow(unused_use)]' applied to the 'module' or module member ('const', 'fun', or 'struct')
+
+[0m[1m[38;5;11mwarning[W09001][0m[1m: unused alias[0m
+   [0m[34m┌─[0m ./tests/did_registry_tests.move:13:30
+   [0m[34m│[0m
+[0m[34m13[0m [0m[34m│[0m         did_info_controller, [0m[33mkey_info_pubkey[0m, key_info_purpose, key_info_revoked,
+   [0m[34m│[0m                              [0m[33m^^^^^^^^^^^^^^^[0m [0m[33mUnused 'use' of alias 'key_info_pubkey'. Consider removing it[0m
+   [0m[34m│[0m
+   [0m[34m=[0m This warning can be suppressed with '#[allow(unused_use)]' applied to the 'module' or module member ('const', 'fun', or 'struct')
+
+[0m[1m[38;5;11mwarning[W09001][0m[1m: unused alias[0m
+   [0m[34m┌─[0m ./tests/did_registry_tests.move:13:47
+   [0m[34m│[0m
+[0m[34m13[0m [0m[34m│[0m         did_info_controller, key_info_pubkey, [0m[33mkey_info_purpose[0m, key_info_revoked,
+   [0m[34m│[0m                                               [0m[33m^^^^^^^^^^^^^^^^[0m [0m[33mUnused 'use' of alias 'key_info_purpose'. Consider removing it[0m
+   [0m[34m│[0m
+   [0m[34m=[0m This warning can be suppressed with '#[allow(unused_use)]' applied to the 'module' or module member ('const', 'fun', or 'struct')
+
+[0m[1m[38;5;11mwarning[W09001][0m[1m: unused alias[0m
+   [0m[34m┌─[0m ./tests/did_registry_tests.move:13:65
+   [0m[34m│[0m
+[0m[34m13[0m [0m[34m│[0m         did_info_controller, key_info_pubkey, key_info_purpose, [0m[33mkey_info_revoked[0m,
+   [0m[34m│[0m                                                                 [0m[33m^^^^^^^^^^^^^^^^[0m [0m[33mUnused 'use' of alias 'key_info_revoked'. Consider removing it[0m
+   [0m[34m│[0m
+   [0m[34m=[0m This warning can be suppressed with '#[allow(unused_use)]' applied to the 'module' or module member ('const', 'fun', or 'struct')
+
+[0m[1m[38;5;11mwarning[W09001][0m[1m: unused alias[0m
+   [0m[34m┌─[0m ./tests/did_registry_tests.move:14:9
+   [0m[34m│[0m
+[0m[34m14[0m [0m[34m│[0m         [0m[33mservice_info_id[0m, service_info_type, service_info_endpoint,
+   [0m[34m│[0m         [0m[33m^^^^^^^^^^^^^^^[0m [0m[33mUnused 'use' of alias 'service_info_id'. Consider removing it[0m
+   [0m[34m│[0m
+   [0m[34m=[0m This warning can be suppressed with '#[allow(unused_use)]' applied to the 'module' or module member ('const', 'fun', or 'struct')
+
+[0m[1m[38;5;11mwarning[W09001][0m[1m: unused alias[0m
+   [0m[34m┌─[0m ./tests/did_registry_tests.move:14:26
+   [0m[34m│[0m
+[0m[34m14[0m [0m[34m│[0m         service_info_id, [0m[33mservice_info_type[0m, service_info_endpoint,
+   [0m[34m│[0m                          [0m[33m^^^^^^^^^^^^^^^^^[0m [0m[33mUnused 'use' of alias 'service_info_type'. Consider removing it[0m
+   [0m[34m│[0m
+   [0m[34m=[0m This warning can be suppressed with '#[allow(unused_use)]' applied to the 'module' or module member ('const', 'fun', or 'struct')
+
+[0m[1m[38;5;11mwarning[W09001][0m[1m: unused alias[0m
+   [0m[34m┌─[0m ./tests/did_registry_tests.move:14:45
+   [0m[34m│[0m
+[0m[34m14[0m [0m[34m│[0m         service_info_id, service_info_type, [0m[33mservice_info_endpoint[0m,
+   [0m[34m│[0m                                             [0m[33m^^^^^^^^^^^^^^^^^^^^^[0m [0m[33mUnused 'use' of alias 'service_info_endpoint'. Consider removing it[0m
+   [0m[34m│[0m
+   [0m[34m=[0m This warning can be suppressed with '#[allow(unused_use)]' applied to the 'module' or module member ('const', 'fun', or 'struct')
+
+[0m[1m[38;5;11mwarning[W09001][0m[1m: unused alias[0m
+   [0m[34m┌─[0m ./tests/did_registry_tests.move:15:9
+   [0m[34m│[0m
+[0m[34m15[0m [0m[34m│[0m         [0m[33me_name_already_exists[0m, e_key_already_exists, e_key_not_found, e_invalid_controller
+   [0m[34m│[0m         [0m[33m^^^^^^^^^^^^^^^^^^^^^[0m [0m[33mUnused 'use' of alias 'e_name_already_exists'. Consider removing it[0m
+   [0m[34m│[0m
+   [0m[34m=[0m This warning can be suppressed with '#[allow(unused_use)]' applied to the 'module' or module member ('const', 'fun', or 'struct')
+
+[0m[1m[38;5;11mwarning[W09001][0m[1m: unused alias[0m
+   [0m[34m┌─[0m ./tests/did_registry_tests.move:15:32
+   [0m[34m│[0m
+[0m[34m15[0m [0m[34m│[0m         e_name_already_exists, [0m[33me_key_already_exists[0m, e_key_not_found, e_invalid_controller
+   [0m[34m│[0m                                [0m[33m^^^^^^^^^^^^^^^^^^^^[0m [0m[33mUnused 'use' of alias 'e_key_already_exists'. Consider removing it[0m
+   [0m[34m│[0m
+   [0m[34m=[0m This warning can be suppressed with '#[allow(unused_use)]' applied to the 'module' or module member ('const', 'fun', or 'struct')
+
+[0m[1m[38;5;11mwarning[W09001][0m[1m: unused alias[0m
+   [0m[34m┌─[0m ./tests/did_registry_tests.move:15:54
+   [0m[34m│[0m
+[0m[34m15[0m [0m[34m│[0m         e_name_already_exists, e_key_already_exists, [0m[33me_key_not_found[0m, e_invalid_controller
+   [0m[34m│[0m                                                      [0m[33m^^^^^^^^^^^^^^^[0m [0m[33mUnused 'use' of alias 'e_key_not_found'. Consider removing it[0m
+   [0m[34m│[0m
+   [0m[34m=[0m This warning can be suppressed with '#[allow(unused_use)]' applied to the 'module' or module member ('const', 'fun', or 'struct')
+
+[0m[1m[38;5;11mwarning[W09001][0m[1m: unused alias[0m
+   [0m[34m┌─[0m ./tests/did_registry_tests.move:15:71
+   [0m[34m│[0m
+[0m[34m15[0m [0m[34m│[0m         e_name_already_exists, e_key_already_exists, e_key_not_found, [0m[33me_invalid_controller[0m
+   [0m[34m│[0m                                                                       [0m[33m^^^^^^^^^^^^^^^^^^^^[0m [0m[33mUnused 'use' of alias 'e_invalid_controller'. Consider removing it[0m
+   [0m[34m│[0m
+   [0m[34m=[0m This warning can be suppressed with '#[allow(unused_use)]' applied to the 'module' or module member ('const', 'fun', or 'struct')
+
+[0m[1m[38;5;11mwarning[W09011][0m[1m: unused constant[0m
+   [0m[34m┌─[0m ./tests/did_registry_tests.move:21:11
+   [0m[34m│[0m
+[0m[34m21[0m [0m[34m│[0m     const [0m[33mCHARLIE[0m: address = @0xc4a12;
+   [0m[34m│[0m           [0m[33m^^^^^^^[0m [0m[33mThe constant 'CHARLIE' is never used. Consider removing it.[0m
+   [0m[34m│[0m
+   [0m[34m=[0m This warning can be suppressed with '#[allow(unused_const)]' applied to the 'module' or module member ('const', 'fun', or 'struct')
+
+[0m[1m[38;5;11mwarning[W09008][0m[1m: unused function[0m
+   [0m[34m┌─[0m ./tests/did_registry_tests.move:46:9
+   [0m[34m│[0m
+[0m[34m46[0m [0m[34m│[0m     fun [0m[33mstring_to_vector[0m(s: vector<u8>): vector<u8> {
+   [0m[34m│[0m         [0m[33m^^^^^^^^^^^^^^^^[0m [0m[33mThe non-'public', non-'entry' function 'string_to_vector' is never called. Consider removing it.[0m
+   [0m[34m│[0m
+   [0m[34m=[0m This warning can be suppressed with '#[allow(unused_function)]' applied to the 'module' or module member ('const', 'fun', or 'struct')
+
+[0m[1m[38;5;11mwarning[W10007][0m[1m: issue with attribute value[0m
+    [0m[34m┌─[0m ./tests/did_registry_tests.move:115:30
+    [0m[34m│[0m
+[0m[34m115[0m [0m[34m│[0m     #[test, expected_failure([0m[33mabort_code = 4[0m)]
+    [0m[34m│[0m                              [0m[33m^^^^^^^^^^^^^^[0m
+    [0m[34m│[0m                              [0m[33m│[0m            [0m[34m│[0m
+    [0m[34m│[0m                              [0m[33m│[0m            [0m[34mReplace value with a constant from expected module or add 'location=...'[0m
+    [0m[34m│[0m                              [0m[33mWARNING: passes for an abort from any module[0m
+
+[0m[1m[38;5;11mwarning[W10007][0m[1m: issue with attribute value[0m
+    [0m[34m┌─[0m ./tests/did_registry_tests.move:186:30
+    [0m[34m│[0m
+[0m[34m186[0m [0m[34m│[0m     #[test, expected_failure([0m[33mabort_code = 1[0m)]
+    [0m[34m│[0m                              [0m[33m^^^^^^^^^^^^^^[0m
+    [0m[34m│[0m                              [0m[33m│[0m            [0m[34m│[0m
+    [0m[34m│[0m                              [0m[33m│[0m            [0m[34mReplace value with a constant from expected module or add 'location=...'[0m
+    [0m[34m│[0m                              [0m[33mWARNING: passes for an abort from any module[0m
+
+[0m[1m[38;5;11mwarning[W10007][0m[1m: issue with attribute value[0m
+    [0m[34m┌─[0m ./tests/did_registry_tests.move:223:30
+    [0m[34m│[0m
+[0m[34m223[0m [0m[34m│[0m     #[test, expected_failure([0m[33mabort_code = 3[0m)]
+    [0m[34m│[0m                              [0m[33m^^^^^^^^^^^^^^[0m
+    [0m[34m│[0m                              [0m[33m│[0m            [0m[34m│[0m
+    [0m[34m│[0m                              [0m[33m│[0m            [0m[34mReplace value with a constant from expected module or add 'location=...'[0m
+    [0m[34m│[0m                              [0m[33mWARNING: passes for an abort from any module[0m
+
+[0m[1m[38;5;11mwarning[W10007][0m[1m: issue with attribute value[0m
+    [0m[34m┌─[0m ./tests/did_registry_tests.move:313:30
+    [0m[34m│[0m
+[0m[34m313[0m [0m[34m│[0m     #[test, expected_failure([0m[33mabort_code = 2[0m)]
+    [0m[34m│[0m                              [0m[33m^^^^^^^^^^^^^^[0m
+    [0m[34m│[0m                              [0m[33m│[0m            [0m[34m│[0m
+    [0m[34m│[0m                              [0m[33m│[0m            [0m[34mReplace value with a constant from expected module or add 'location=...'[0m
+    [0m[34m│[0m                              [0m[33mWARNING: passes for an abort from any module[0m
+
+[0m[1m[38;5;11mwarning[W10007][0m[1m: issue with attribute value[0m
+    [0m[34m┌─[0m ./tests/did_registry_tests.move:385:30
+    [0m[34m│[0m
+[0m[34m385[0m [0m[34m│[0m     #[test, expected_failure([0m[33mabort_code = 1[0m)]
+    [0m[34m│[0m                              [0m[33m^^^^^^^^^^^^^^[0m
+    [0m[34m│[0m                              [0m[33m│[0m            [0m[34m│[0m
+    [0m[34m│[0m                              [0m[33m│[0m            [0m[34mReplace value with a constant from expected module or add 'location=...'[0m
+    [0m[34m│[0m                              [0m[33mWARNING: passes for an abort from any module[0m
+
+[0m[1m[38;5;11mwarning[W02021][0m[1m: duplicate alias[0m
+   [0m[34m┌─[0m ./tests/suibotics_did_tests.move:23:14
+   [0m[34m│[0m
+[0m[34m23[0m [0m[34m│[0m     use std::[0m[33mvector[0m;
+   [0m[34m│[0m              [0m[33m^^^^^^[0m [0m[33mUnnecessary alias 'vector' for module 'std::vector'. This alias is provided by default[0m
+   [0m[34m│[0m
+   [0m[34m=[0m This warning can be suppressed with '#[allow(duplicate_alias)]' applied to the 'module' or module member ('const', 'fun', or 'struct')
+
+Running Move unit tests
+[ PASS    ] suibotics_did::did_registry_tests::test_add_key_already_exists
+[ PASS    ] suibotics_did::simple_test::test_add_key_to_did
+[ PASS    ] suibotics_did::integration_tests::test_full_identity_workflow
+[ PASS    ] suibotics_did::simple_test::test_add_service_to_did
+[ PASS    ] suibotics_did::did_registry_tests::test_add_key_invalid_controller
+[ PASS    ] suibotics_did::integration_tests::test_multi_party_scenario
+[ PASS    ] suibotics_did::simple_test::test_basic_validation
+[ PASS    ] suibotics_did::did_registry_tests::test_add_key_success
+[ PASS    ] suibotics_did::simple_test::test_credential_issuance
+[ PASS    ] suibotics_did::did_registry_tests::test_add_service_invalid_controller
+[ PASS    ] suibotics_did::simple_test::test_credential_revocation
+[ PASS    ] suibotics_did::did_registry_tests::test_add_service_success
+[ PASS    ] suibotics_did::simple_test::test_did_registration
+[ PASS    ] suibotics_did::did_registry_tests::test_get_did_controller
+[ PASS    ] suibotics_did::did_registry_tests::test_register_did_name_already_exists
+[ PASS    ] suibotics_did::did_registry_tests::test_register_did_success
+[ PASS    ] suibotics_did::did_registry_tests::test_revoke_key_not_found
+[ PASS    ] suibotics_did::did_registry_tests::test_revoke_key_success
+Test result: OK. Total tests: 18; passed: 18; failed: 0
+[Note]: Dependency sources are no longer verified automatically during publication and upgrade. You can pass the `--verify-deps` option if you would like to verify them as part of publication or upgrade.
+[note] Dependencies on Bridge, MoveStdlib, Sui, and SuiSystem are automatically added, but this feature is disabled for your package because you have explicitly included dependencies on Sui. Consider removing these dependencies from Move.toml.
+UPDATING GIT DEPENDENCY https://github.com/MystenLabs/sui.git
+INCLUDING DEPENDENCY Sui
+INCLUDING DEPENDENCY MoveStdlib
+BUILDING suibotics_did
+[0m[1m[38;5;11mwarning[W02021][0m[1m: duplicate alias[0m
+  [0m[34m┌─[0m /Users/kpatch/startup/opendive/products/suibotics_did/sources/identity_types.move:2:23
+  [0m[34m│[0m
+[0m[34m2[0m [0m[34m│[0m     use sui::object::{[0m[33mUID[0m, new};
+  [0m[34m│[0m                       [0m[33m^^^[0m [0m[33mUnnecessary alias 'UID' for module member 'sui::object::UID'. This alias is provided by default[0m
+  [0m[34m│[0m
+  [0m[34m=[0m This warning can be suppressed with '#[allow(duplicate_alias)]' applied to the 'module' or module member ('const', 'fun', or 'struct')
+
+[0m[1m[38;5;11mwarning[W02021][0m[1m: duplicate alias[0m
+  [0m[34m┌─[0m /Users/kpatch/startup/opendive/products/suibotics_did/sources/identity_types.move:3:26
+  [0m[34m│[0m
+[0m[34m3[0m [0m[34m│[0m     use sui::tx_context::[0m[33mTxContext[0m;
+  [0m[34m│[0m                          [0m[33m^^^^^^^^^[0m [0m[33mUnnecessary alias 'TxContext' for module member 'sui::tx_context::TxContext'. This alias is provided by default[0m
+  [0m[34m│[0m
+  [0m[34m=[0m This warning can be suppressed with '#[allow(duplicate_alias)]' applied to the 'module' or module member ('const', 'fun', or 'struct')
+
+[0m[1m[38;5;11mwarning[W02021][0m[1m: duplicate alias[0m
+  [0m[34m┌─[0m /Users/kpatch/startup/opendive/products/suibotics_did/sources/identity_types.move:6:14
+  [0m[34m│[0m
+[0m[34m6[0m [0m[34m│[0m     use std::[0m[33mvector[0m;
+  [0m[34m│[0m              [0m[33m^^^^^^[0m [0m[33mUnnecessary alias 'vector' for module 'std::vector'. This alias is provided by default[0m
+  [0m[34m│[0m
+  [0m[34m=[0m This warning can be suppressed with '#[allow(duplicate_alias)]' applied to the 'module' or module member ('const', 'fun', or 'struct')
+
+[0m[1m[38;5;11mwarning[W09001][0m[1m: unused alias[0m
+  [0m[34m┌─[0m /Users/kpatch/startup/opendive/products/suibotics_did/sources/identity_types.move:6:14
+  [0m[34m│[0m
+[0m[34m6[0m [0m[34m│[0m     use std::[0m[33mvector[0m;
+  [0m[34m│[0m              [0m[33m^^^^^^[0m [0m[33mUnused 'use' of alias 'vector'. Consider removing it[0m
+  [0m[34m│[0m
+  [0m[34m=[0m This alias does not shadow the built-in type 'vector' in type annotations.
+  [0m[34m=[0m This warning can be suppressed with '#[allow(unused_use)]' applied to the 'module' or module member ('const', 'fun', or 'struct')
+
+[0m[1m[38;5;11mwarning[W02021][0m[1m: duplicate alias[0m
+  [0m[34m┌─[0m /Users/kpatch/startup/opendive/products/suibotics_did/sources/credential_registry.move:2:27
+  [0m[34m│[0m
+[0m[34m2[0m [0m[34m│[0m     use sui::tx_context::{[0m[33mTxContext[0m, sender};
+  [0m[34m│[0m                           [0m[33m^^^^^^^^^[0m [0m[33mUnnecessary alias 'TxContext' for module member 'sui::tx_context::TxContext'. This alias is provided by default[0m
+  [0m[34m│[0m
+  [0m[34m=[0m This warning can be suppressed with '#[allow(duplicate_alias)]' applied to the 'module' or module member ('const', 'fun', or 'struct')
+
+[0m[1m[38;5;11mwarning[W09001][0m[1m: unused alias[0m
+  [0m[34m┌─[0m /Users/kpatch/startup/opendive/products/suibotics_did/sources/credential_registry.move:7:36
+  [0m[34m│[0m
+[0m[34m7[0m [0m[34m│[0m         credential_info_issued_at, [0m[33mvalidate_address[0m, validate_schema, validate_data_hash,
+  [0m[34m│[0m                                    [0m[33m^^^^^^^^^^^^^^^^[0m [0m[33mUnused 'use' of alias 'validate_address'. Consider removing it[0m
+  [0m[34m│[0m
+  [0m[34m=[0m This warning can be suppressed with '#[allow(unused_use)]' applied to the 'module' or module member ('const', 'fun', or 'struct')
+
+[0m[1m[38;5;11mwarning[W09001][0m[1m: unused alias[0m
+  [0m[34m┌─[0m /Users/kpatch/startup/opendive/products/suibotics_did/sources/credential_registry.move:7:54
+  [0m[34m│[0m
+[0m[34m7[0m [0m[34m│[0m         credential_info_issued_at, validate_address, [0m[33mvalidate_schema[0m, validate_data_hash,
+  [0m[34m│[0m                                                      [0m[33m^^^^^^^^^^^^^^^[0m [0m[33mUnused 'use' of alias 'validate_schema'. Consider removing it[0m
+  [0m[34m│[0m
+  [0m[34m=[0m This warning can be suppressed with '#[allow(unused_use)]' applied to the 'module' or module member ('const', 'fun', or 'struct')
+
+[0m[1m[38;5;11mwarning[W09001][0m[1m: unused alias[0m
+  [0m[34m┌─[0m /Users/kpatch/startup/opendive/products/suibotics_did/sources/credential_registry.move:7:71
+  [0m[34m│[0m
+[0m[34m7[0m [0m[34m│[0m         credential_info_issued_at, validate_address, validate_schema, [0m[33mvalidate_data_hash[0m,
+  [0m[34m│[0m                                                                       [0m[33m^^^^^^^^^^^^^^^^^^[0m [0m[33mUnused 'use' of alias 'validate_data_hash'. Consider removing it[0m
+  [0m[34m│[0m
+  [0m[34m=[0m This warning can be suppressed with '#[allow(unused_use)]' applied to the 'module' or module member ('const', 'fun', or 'struct')
+
+[0m[1m[38;5;11mwarning[W02021][0m[1m: duplicate alias[0m
+  [0m[34m┌─[0m /Users/kpatch/startup/opendive/products/suibotics_did/sources/did_registry.move:2:23
+  [0m[34m│[0m
+[0m[34m2[0m [0m[34m│[0m     use sui::object::{[0m[33mUID[0m, new};
+  [0m[34m│[0m                       [0m[33m^^^[0m [0m[33mUnnecessary alias 'UID' for module member 'sui::object::UID'. This alias is provided by default[0m
+  [0m[34m│[0m
+  [0m[34m=[0m This warning can be suppressed with '#[allow(duplicate_alias)]' applied to the 'module' or module member ('const', 'fun', or 'struct')
+
+[0m[1m[38;5;11mwarning[W02021][0m[1m: duplicate alias[0m
+  [0m[34m┌─[0m /Users/kpatch/startup/opendive/products/suibotics_did/sources/did_registry.move:4:27
+  [0m[34m│[0m
+[0m[34m4[0m [0m[34m│[0m     use sui::tx_context::{[0m[33mTxContext[0m, sender};
+  [0m[34m│[0m                           [0m[33m^^^^^^^^^[0m [0m[33mUnnecessary alias 'TxContext' for module member 'sui::tx_context::TxContext'. This alias is provided by default[0m
+  [0m[34m│[0m
+  [0m[34m=[0m This warning can be suppressed with '#[allow(duplicate_alias)]' applied to the 'module' or module member ('const', 'fun', or 'struct')
+
+[0m[1m[38;5;11mwarning[W09001][0m[1m: unused alias[0m
+  [0m[34m┌─[0m /Users/kpatch/startup/opendive/products/suibotics_did/sources/did_registry.move:6:14
+  [0m[34m│[0m
+[0m[34m6[0m [0m[34m│[0m     use sui::[0m[33mevent[0m;
+  [0m[34m│[0m              [0m[33m^^^^^[0m [0m[33mUnused 'use' of alias 'event'. Consider removing it[0m
+  [0m[34m│[0m
+  [0m[34m=[0m This warning can be suppressed with '#[allow(unused_use)]' applied to the 'module' or module member ('const', 'fun', or 'struct')
+
+[0m[1m[38;5;11mwarning[W02021][0m[1m: duplicate alias[0m
+  [0m[34m┌─[0m /Users/kpatch/startup/opendive/products/suibotics_did/sources/did_registry.move:7:14
+  [0m[34m│[0m
+[0m[34m7[0m [0m[34m│[0m     use std::[0m[33moption[0m;
+  [0m[34m│[0m              [0m[33m^^^^^^[0m [0m[33mUnnecessary alias 'option' for module 'std::option'. This alias is provided by default[0m
+  [0m[34m│[0m
+  [0m[34m=[0m This warning can be suppressed with '#[allow(duplicate_alias)]' applied to the 'module' or module member ('const', 'fun', or 'struct')
+
+Skipping dependency verification
+{
+  "digest": "G7yaXVzwDGK1BWb6zZoAQNdAqE4hV2ESsi3EgPLRpAFL",
+  "transaction": {
+    "data": {
+      "messageVersion": "v1",
+      "transaction": {
+        "kind": "ProgrammableTransaction",
+        "inputs": [
+          {
+            "type": "pure",
+            "valueType": "address",
+            "value": "0x3783e5d43d5494fc73bd8d1d1aa119ce1b142978dc722a3ae6deab5bef9e3079"
+          }
+        ],
+        "transactions": [
+          {
+            "Publish": [
+              "0x0000000000000000000000000000000000000000000000000000000000000001",
+              "0x0000000000000000000000000000000000000000000000000000000000000002"
+            ]
+          },
+          {
+            "TransferObjects": [
+              [
+                {
+                  "Result": 0
+                }
+              ],
+              {
+                "Input": 0
+              }
+            ]
+          }
+        ]
+      },
+      "sender": "0x3783e5d43d5494fc73bd8d1d1aa119ce1b142978dc722a3ae6deab5bef9e3079",
+      "gasData": {
+        "payment": [
+          {
+            "objectId": "0x0ba1fb429dc345a11f5d0ad6af78e694a4fc1d87f1dca149a2deee003697c673",
+            "version": 349179594,
+            "digest": "EsBAkGdbcYtGvkY5o5mw2LZDS7UCRpjYwDttexjX5wJY"
+          }
+        ],
+        "owner": "0x3783e5d43d5494fc73bd8d1d1aa119ce1b142978dc722a3ae6deab5bef9e3079",
+        "price": "1000",
+        "budget": "100000000"
+      }
+    },
+    "txSignatures": [
+      "ANtCf1u6jcdZBod2/07jDEzHrPjdJfWiG33t8XQQ80p1zxACC9D22F41WECvD2h6y0i11J6pAGV3W5aONATbrgZTG+GgmhrfxIGjn1xTgul1ZbXBeOKFD6vrFlfwQJPH6g=="
+    ]
+  },
+  "effects": {
+    "messageVersion": "v1",
+    "status": {
+      "status": "success"
+    },
+    "executedEpoch": "746",
+    "gasUsed": {
+      "computationCost": "1000000",
+      "storageCost": "53922000",
+      "storageRebate": "978120",
+      "nonRefundableStorageFee": "9880"
+    },
+    "modifiedAtVersions": [
+      {
+        "objectId": "0x0ba1fb429dc345a11f5d0ad6af78e694a4fc1d87f1dca149a2deee003697c673",
+        "sequenceNumber": "349179594"
+      }
+    ],
+    "transactionDigest": "G7yaXVzwDGK1BWb6zZoAQNdAqE4hV2ESsi3EgPLRpAFL",
+    "created": [
+      {
+        "owner": "Immutable",
+        "reference": {
+          "objectId": "0x472d2268518bf1e212fa9e011d3c7a4f3ad66517cff8b46edd2cd6caee85c0ea",
+          "version": 1,
+          "digest": "DRm4CgmhpLhi5CBajYqf9FmFj3iCZKrG5Ztw3fufeigU"
+        }
+      },
+      {
+        "owner": {
+          "AddressOwner": "0x3783e5d43d5494fc73bd8d1d1aa119ce1b142978dc722a3ae6deab5bef9e3079"
+        },
+        "reference": {
+          "objectId": "0x853505f3f7bb02fe80980f739fea420adb5358e05c2ef1a3440dadc6323a7d76",
+          "version": 349179595,
+          "digest": "8WnG8NuyjkVEynzb4iXpDb1N9j5oXdc3X8RyjbTC1rwe"
+        }
+      },
+      {
+        "owner": {
+          "Shared": {
+            "initial_shared_version": 349179595
+          }
+        },
+        "reference": {
+          "objectId": "0x8a5497ef53af5fae237da513e298fe8f141138be5533cb61c107f444d0c64b57",
+          "version": 349179595,
+          "digest": "AFS2Zqhkw8QLabbhCtruFcCPwbHFPE2EcjKcvLPnNUjh"
+        }
+      }
+    ],
+    "mutated": [
+      {
+        "owner": {
+          "AddressOwner": "0x3783e5d43d5494fc73bd8d1d1aa119ce1b142978dc722a3ae6deab5bef9e3079"
+        },
+        "reference": {
+          "objectId": "0x0ba1fb429dc345a11f5d0ad6af78e694a4fc1d87f1dca149a2deee003697c673",
+          "version": 349179595,
+          "digest": "FTK5J2JY7tyofBT5ffGWL5N3LTQQe7mFrUzux8uedoBH"
+        }
+      }
+    ],
+    "gasObject": {
+      "owner": {
+        "AddressOwner": "0x3783e5d43d5494fc73bd8d1d1aa119ce1b142978dc722a3ae6deab5bef9e3079"
+      },
+      "reference": {
+        "objectId": "0x0ba1fb429dc345a11f5d0ad6af78e694a4fc1d87f1dca149a2deee003697c673",
+        "version": 349179595,
+        "digest": "FTK5J2JY7tyofBT5ffGWL5N3LTQQe7mFrUzux8uedoBH"
+      }
+    },
+    "dependencies": [
+      "6pZ2bpkwLwnCH4qdHS1NcJypXLFUNvSHRKfKXhZvXQuo",
+      "8GxJsh2Z34PMNFNDbAjFgwYvFjfoFmGkKK5F61m9zaPn",
+      "HGXrEkxjT3SaxZRtJ1BxsuWFpbvgaTCpjQNJ81VjeoW4"
+    ]
+  },
+  "events": [],
+  "objectChanges": [
+    {
+      "type": "mutated",
+      "sender": "0x3783e5d43d5494fc73bd8d1d1aa119ce1b142978dc722a3ae6deab5bef9e3079",
+      "owner": {
+        "AddressOwner": "0x3783e5d43d5494fc73bd8d1d1aa119ce1b142978dc722a3ae6deab5bef9e3079"
+      },
+      "objectType": "0x2::coin::Coin<0x2::sui::SUI>",
+      "objectId": "0x0ba1fb429dc345a11f5d0ad6af78e694a4fc1d87f1dca149a2deee003697c673",
+      "version": "349179595",
+      "previousVersion": "349179594",
+      "digest": "FTK5J2JY7tyofBT5ffGWL5N3LTQQe7mFrUzux8uedoBH"
+    },
+    {
+      "type": "published",
+      "packageId": "0x472d2268518bf1e212fa9e011d3c7a4f3ad66517cff8b46edd2cd6caee85c0ea",
+      "version": "1",
+      "digest": "DRm4CgmhpLhi5CBajYqf9FmFj3iCZKrG5Ztw3fufeigU",
+      "modules": [
+        "credential_registry",
+        "did_registry",
+        "identity_types"
+      ]
+    },
+    {
+      "type": "created",
+      "sender": "0x3783e5d43d5494fc73bd8d1d1aa119ce1b142978dc722a3ae6deab5bef9e3079",
+      "owner": {
+        "AddressOwner": "0x3783e5d43d5494fc73bd8d1d1aa119ce1b142978dc722a3ae6deab5bef9e3079"
+      },
+      "objectType": "0x2::package::UpgradeCap",
+      "objectId": "0x853505f3f7bb02fe80980f739fea420adb5358e05c2ef1a3440dadc6323a7d76",
+      "version": "349179595",
+      "digest": "8WnG8NuyjkVEynzb4iXpDb1N9j5oXdc3X8RyjbTC1rwe"
+    },
+    {
+      "type": "created",
+      "sender": "0x3783e5d43d5494fc73bd8d1d1aa119ce1b142978dc722a3ae6deab5bef9e3079",
+      "owner": {
+        "Shared": {
+          "initial_shared_version": 349179595
+        }
+      },
+      "objectType": "0x472d2268518bf1e212fa9e011d3c7a4f3ad66517cff8b46edd2cd6caee85c0ea::did_registry::DIDRegistry",
+      "objectId": "0x8a5497ef53af5fae237da513e298fe8f141138be5533cb61c107f444d0c64b57",
+      "version": "349179595",
+      "digest": "AFS2Zqhkw8QLabbhCtruFcCPwbHFPE2EcjKcvLPnNUjh"
+    }
+  ],
+  "balanceChanges": [
+    {
+      "owner": {
+        "AddressOwner": "0x3783e5d43d5494fc73bd8d1d1aa119ce1b142978dc722a3ae6deab5bef9e3079"
+      },
+      "coinType": "0x2::sui::SUI",
+      "amount": "-53943880"
+    }
+  ],
+  "timestampMs": "1748227831340",
+  "confirmedLocalExecution": true,
+  "checkpoint": "200336894"
+}

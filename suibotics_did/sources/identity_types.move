@@ -1,4 +1,4 @@
-module suibotics_core::identity_types {
+module suibotics_did::identity_types {
     use sui::object::{UID, new};
     use sui::tx_context::TxContext;
     use sui::transfer::{transfer, public_transfer};

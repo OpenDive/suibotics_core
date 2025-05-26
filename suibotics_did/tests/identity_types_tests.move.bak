@@ -1,9 +1,9 @@
 #[test_only]
-module suibotics_core::identity_types_tests {
+module suibotics_did::identity_types_tests {
     use sui::test_scenario::{Self as ts};
     use std::vector;
     
-    use suibotics_core::identity_types::{
+    use suibotics_did::identity_types::{
         new_did_info, new_key_info, new_service_info, new_credential_info,
         transfer_did_info, transfer_credential_info,
         did_info_controller, did_info_created_at, key_info_pubkey, key_info_purpose,
