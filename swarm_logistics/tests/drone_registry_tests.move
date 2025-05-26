@@ -291,7 +291,7 @@ module swarm_logistics::drone_registry_tests {
         test_scenario::next_tx(scenario, DRONE_OWNER);
         {
             // This should fail due to invalid autonomy level
-            let (_drone, _financials, _capability) = drone_registry::register_drone_for_test(
+            let (drone, financials, capability) = drone_registry::register_drone_for_test(
                 b"Invalid-Drone".to_string(),
                 drone::fully_autonomous(),
                 150, // Invalid: > 100
@@ -302,6 +302,11 @@ module swarm_logistics::drone_registry_tests {
                 clock::timestamp_ms(&clock),
                 test_scenario::ctx(scenario)
             );
+            
+            // Transfer the objects (though this test should fail before reaching here)
+            transfer::public_transfer(drone, DRONE_OWNER);
+            transfer::public_transfer(financials, DRONE_OWNER);
+            transfer::public_transfer(capability, DRONE_OWNER);
         };
 
         clock::destroy_for_testing(clock);
