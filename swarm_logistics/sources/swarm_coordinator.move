@@ -16,7 +16,7 @@ module swarm_logistics::swarm_coordinator {
     // ==================== COORDINATOR STRUCTURES ====================
 
     /// Central swarm coordination hub
-    public struct SwarmCoordinator has key {
+    public struct SwarmCoordinator has key, store {
         id: UID,
         active_airspace_slots: vector<ID>,
         pending_emergencies: vector<ID>,
@@ -523,5 +523,21 @@ module swarm_logistics::swarm_coordinator {
 
     public fun load_balancer_pending_orders(load_balancer: &LoadBalancer): u64 {
         vector::length(&load_balancer.pending_orders)
+    }
+
+    // ==================== TEST HELPER FUNCTIONS ====================
+
+    #[test_only]
+    public fun create_test_coordinator(ctx: &mut TxContext): SwarmCoordinator {
+        SwarmCoordinator {
+            id: object::new(ctx),
+            active_airspace_slots: vector::empty(),
+            pending_emergencies: vector::empty(),
+            coordination_events: vector::empty(),
+            total_coordinated_flights: 0,
+            successful_emergency_responses: 0,
+            airspace_conflicts_resolved: 0,
+            network_efficiency_score: 100,
+        }
     }
 } 
