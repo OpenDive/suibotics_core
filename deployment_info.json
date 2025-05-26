@@ -1,0 +1,17 @@
+{
+  "package_id": "0x472d2268518bf1e212fa9e011d3c7a4f3ad66517cff8b46edd2cd6caee85c0ea",
+  "transaction_digest": "G7yaXVzwDGK1BWb6zZoAQNdAqE4hV2ESsi3EgPLRpAFL",
+  "network": "testnet",
+  "timestamp": "2025-01-25T22:50:31Z",
+  "package_name": "suibotics_core",
+  "gas_budget": 100000000,
+  "modules": [
+    "credential_registry",
+    "did_registry", 
+    "identity_types"
+  ],
+  "shared_objects": {
+    "did_registry": "0x8a5497ef53af5fae237da513e298fe8f141138be5533cb61c107f444d0c64b57"
+  },
+  "upgrade_cap": "0x853505f3f7bb02fe80980f739fea420adb5358e05c2ef1a3440dadc6323a7d76"
+} 

@@ -201,10 +201,74 @@ suibotics_core/
 │   ├── simple_test.move        # Integration tests
 │   └── suibotics_core_tests.move # End-to-end tests
 ├── Move.toml                   # Project configuration
+├── deploy_testnet.sh           # Comprehensive testnet deployment script
+├── deploy_simple.sh            # Simple testnet deployment script
 └── README.md                   # This file
 ```
 
-### Contributing
+## Deployment
+
+### Testnet Deployment
+
+Two deployment scripts are provided for testnet deployment:
+
+#### Option 1: Comprehensive Deployment (Recommended)
+```bash
+./deploy_testnet.sh
+```
+
+This script provides:
+- ✅ Comprehensive pre-deployment checks
+- ✅ Automatic environment setup
+- ✅ Gas balance verification and faucet requests
+- ✅ Build and test validation
+- ✅ Detailed logging and error handling
+- ✅ Post-deployment verification
+- ✅ Explorer links and deployment info
+
+#### Option 2: Quick Deployment
+```bash
+./deploy_simple.sh
+```
+
+This script provides:
+- ⚡ Fast deployment with minimal checks
+- 🎯 Essential steps only
+- 📦 Package ID extraction
+- 🔗 Explorer links
+
+### Prerequisites for Deployment
+- Sui CLI installed (version 1.49.1+)
+- Active Sui wallet
+- `jq` installed for JSON parsing (optional but recommended)
+
+### Manual Deployment
+If you prefer manual deployment:
+
+```bash
+# Switch to testnet
+sui client switch --env testnet
+
+# Request testnet tokens
+sui client faucet
+
+# Build and test
+sui move build
+sui move test
+
+# Deploy
+sui client publish --gas-budget 100000000
+```
+
+### Post-Deployment
+After successful deployment, you'll receive:
+- **Package ID**: Use this to interact with your deployed modules
+- **Transaction Digest**: For verification on blockchain explorers
+- **Explorer Links**: View your deployment on Sui explorers
+
+The deployment information is automatically saved to `deployment_info.json` for future reference.
+
+## Contributing
 
 1. Ensure all tests pass: `sui move test`
 2. Follow Move coding conventions
