@@ -1,90 +1,102 @@
-address 0xRobotID {
-module DidRegistry {
-    use sui::object::{UID, ID, move_to, borrow_global_mut};
-    use sui::dynamic_fields::{DynamicField, DynamicFieldInfo};
-    use sui::tx_context::TxContext;
-    use std::vector;
-    use IdentityTypes::{DIDInfo, KeyInfo, ServiceInfo};
+module suibotics_core::did_registry {
+    use sui::object::{UID, new};
+    use sui::dynamic_field;
+    use sui::tx_context::{TxContext, sender};
+    use sui::transfer::share_object;
+    use std::option;
+    use suibotics_core::identity_types::{
+        DIDInfo, KeyInfo, 
+        new_did_info, transfer_did_info, new_key_info, new_service_info,
+        did_info_id_mut, did_info_controller, revoke_key_info
+    };
 
-    /// Name of the dynamic field map for DIDInfo children.
-    const DID_MAP: vector<u8> = b"did_map";
-
-    /// Initialize the registry (one-time).
-    public entry fun init_registry(ctx: &mut TxContext) {
-        let map = DynamicFieldInfo::new<vector<u8>, ID<DIDInfo>>(DID_MAP);
-        DynamicFieldInfo::publish(ctx, map);
+    /// Global registry for name-to-DID mappings
+    public struct DIDRegistry has key {
+        id: UID,
     }
 
-    /// Register a new DID with initial key.
+    /// Initialize the registry as a shared object
+    fun init(ctx: &mut TxContext) {
+        let registry = DIDRegistry {
+            id: new(ctx),
+        };
+        share_object(registry);
+    }
+
+    /// Register a new DID with initial key
     public entry fun register_did(
-        ctx: &mut TxContext,
+        registry: &mut DIDRegistry,
         name: vector<u8>,             // human-readable label
         initial_pubkey: vector<u8>,   // Ed25519 public key
-        purpose: vector<u8>           // authentication, assertion, etc.
+        purpose: vector<u8>,          // authentication, assertion, etc.
+        ctx: &mut TxContext
     ) {
-        let controller = TxContext::sender(ctx);
-        let ts = TxContext::timestamp(ctx);
+        let controller = sender(ctx);
+        let ts = sui::tx_context::epoch_timestamp_ms(ctx);
 
-        // Mint the DIDInfo object under controller
-        let did = DIDInfo { id: UID::new(ctx), controller, created_at: ts };
-        move_to(ctx, did);
+        // Create the DIDInfo object
+        let mut did = new_did_info(controller, ts, ctx);
 
-        // Index by name: name -> DIDInfo object ID
-        let idx = DynamicField { name: name.clone(), value: ID::of(did.id) };
-        DynamicFieldInfo::create_dynamic_field(ctx, DID_MAP, idx);
+        // Store name mapping in the registry
+        dynamic_field::add(&mut registry.id, name, controller);
 
-        // Create initial KeyInfo dynamic field under this DIDInfo
-        let key_info = KeyInfo { pubkey: initial_pubkey, purpose, revoked: false };
-        let key_field = DynamicField { name: b"key_0".to_vec(), value: key_info };
-        DynamicFieldInfo::create_dynamic_field(ctx, DID_MAP, key_field);
+        // Create initial KeyInfo and attach it to the DIDInfo
+        let key_info = new_key_info(initial_pubkey, purpose);
+        dynamic_field::add(did_info_id_mut(&mut did), b"key_0", key_info);
+
+        // Transfer DIDInfo to the controller
+        transfer_did_info(did, controller);
     }
 
-    /// Add or rotate a key for an existing DID.
+    /// Add or rotate a key for an existing DID
     public entry fun add_key(
-        ctx: &mut TxContext,
-        did_id: ID<DIDInfo>,
+        did: &mut DIDInfo,
         key_id: vector<u8>,
         pubkey: vector<u8>,
-        purpose: vector<u8>
+        purpose: vector<u8>,
+        ctx: &mut TxContext
     ) {
-        let sender = TxContext::sender(ctx);
-        let did = borrow_global_mut<DIDInfo>(ID::id_of(&did_id));
-        assert!(sender == did.controller, 1);
+        let sender_addr = sender(ctx);
+        assert!(sender_addr == did_info_controller(did), 1);
 
-        let key_info = KeyInfo { pubkey, purpose, revoked: false };
-        let field = DynamicField { name: key_id, value: key_info };
-        DynamicFieldInfo::create_dynamic_field(ctx, ID::id_of(&did_id), field);
+        let key_info = new_key_info(pubkey, purpose);
+        dynamic_field::add(did_info_id_mut(did), key_id, key_info);
     }
 
-    /// Revoke a key by setting its `revoked` flag true.
+    /// Revoke a key by setting its `revoked` flag true
     public entry fun revoke_key(
-        ctx: &mut TxContext,
-        did_id: ID<DIDInfo>,
-        key_id: vector<u8>
+        did: &mut DIDInfo,
+        key_id: vector<u8>,
+        ctx: &mut TxContext
     ) {
-        let sender = TxContext::sender(ctx);
-        let did = borrow_global_mut<DIDInfo>(ID::id_of(&did_id));
-        assert!(sender == did.controller, 2);
+        let sender_addr = sender(ctx);
+        assert!(sender_addr == did_info_controller(did), 2);
 
-        let mut df = DynamicFieldInfo::borrow_mut(ctx, ID::id_of(&did_id), key_id);
-        df.value.revoked = true;
+        let key_info: &mut KeyInfo = dynamic_field::borrow_mut(did_info_id_mut(did), key_id);
+        revoke_key_info(key_info);
     }
 
-    /// Add a service endpoint to the DID Document.
+    /// Add a service endpoint to the DID Document
     public entry fun add_service(
-        ctx: &mut TxContext,
-        did_id: ID<DIDInfo>,
+        did: &mut DIDInfo,
         svc_id: vector<u8>,
         svc_type: vector<u8>,
-        endpoint: vector<u8>
+        endpoint: vector<u8>,
+        ctx: &mut TxContext
     ) {
-        let sender = TxContext::sender(ctx);
-        let did = borrow_global_mut<DIDInfo>(ID::id_of(&did_id));
-        assert!(sender == did.controller, 3);
+        let sender_addr = sender(ctx);
+        assert!(sender_addr == did_info_controller(did), 3);
 
-        let svc = ServiceInfo { id: svc_id.clone(), type_: svc_type, endpoint };
-        let field = DynamicField { name: svc_id, value: svc };
-        DynamicFieldInfo::create_dynamic_field(ctx, ID::id_of(&did_id), field);
+        let svc = new_service_info(svc_id, svc_type, endpoint);
+        dynamic_field::add(did_info_id_mut(did), svc_id, svc);
     }
-}
+
+    /// Get the controller address for a given DID name
+    public fun get_did_controller(registry: &DIDRegistry, name: vector<u8>): option::Option<address> {
+        if (dynamic_field::exists_(&registry.id, name)) {
+            option::some(*dynamic_field::borrow(&registry.id, name))
+        } else {
+            option::none()
+        }
+    }
 }

@@ -1,39 +1,65 @@
-address 0xRobotID {
-module CredentialRegistry {
-    use sui::object::{UID, ID, move_to, borrow_global_mut};
-    use sui::tx_context::TxContext;
-    use IdentityTypes::CredentialInfo;
+module suibotics_core::credential_registry {
+    use sui::tx_context::{TxContext, sender};
+    use suibotics_core::identity_types::{
+        CredentialInfo, new_credential_info, transfer_credential_info,
+        credential_info_issuer, revoke_credential_info, credential_info_revoked,
+        credential_info_subject, credential_info_schema, credential_info_data_hash,
+        credential_info_issued_at
+    };
 
-    /// Issue a new credential: links a credential hash to a subject DID
+    /// Issue a new credential: creates a credential object and transfers it to the subject
     public entry fun issue_credential(
-        ctx: &mut TxContext,
-        subject: ID<DIDInfo>,
+        subject: address,             // Address of the subject DID controller
         schema: vector<u8>,
-        data_hash: vector<u8>
+        data_hash: vector<u8>,
+        ctx: &mut TxContext
     ) {
-        let issuer = TxContext::sender(ctx);
-        let ts = TxContext::timestamp(ctx);
-        let cred = CredentialInfo {
-            id: UID::new(ctx),
-            subject,
-            issuer,
-            schema,
-            data_hash,
-            revoked: false,
-            issued_at: ts
-        };
-        move_to(ctx, cred);
+        let issuer = sender(ctx);
+        let ts = sui::tx_context::epoch_timestamp_ms(ctx);
+        
+        let cred = new_credential_info(subject, issuer, schema, data_hash, ts, ctx);
+        
+        // Transfer credential to the subject
+        transfer_credential_info(cred, subject);
     }
 
     /// Revoke an existing credential (issuer-only)
     public entry fun revoke_credential(
-        ctx: &mut TxContext,
-        cred_id: ID<CredentialInfo>
+        cred: &mut CredentialInfo,
+        ctx: &mut TxContext
     ) {
-        let caller = TxContext::sender(ctx);
-        let mut cred = borrow_global_mut<CredentialInfo>(ID::id_of(&cred_id));
-        assert!(caller == cred.issuer, 4);
-        cred.revoked = true;
+        let caller = sender(ctx);
+        assert!(caller == credential_info_issuer(cred), 4);
+        revoke_credential_info(cred);
     }
-}
+
+    /// Check if a credential is revoked
+    public fun is_revoked(cred: &CredentialInfo): bool {
+        credential_info_revoked(cred)
+    }
+
+    /// Get credential issuer
+    public fun get_issuer(cred: &CredentialInfo): address {
+        credential_info_issuer(cred)
+    }
+
+    /// Get credential subject
+    public fun get_subject(cred: &CredentialInfo): address {
+        credential_info_subject(cred)
+    }
+
+    /// Get credential schema
+    public fun get_schema(cred: &CredentialInfo): &vector<u8> {
+        credential_info_schema(cred)
+    }
+
+    /// Get credential data hash
+    public fun get_data_hash(cred: &CredentialInfo): &vector<u8> {
+        credential_info_data_hash(cred)
+    }
+
+    /// Get credential issuance timestamp
+    public fun get_issued_at(cred: &CredentialInfo): u64 {
+        credential_info_issued_at(cred)
+    }
 }
