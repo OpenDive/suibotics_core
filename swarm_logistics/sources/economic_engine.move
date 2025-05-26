@@ -16,7 +16,7 @@ module swarm_logistics::economic_engine {
     // ==================== ECONOMIC STRUCTURES ====================
 
     /// Central economic coordination system
-    public struct EconomicEngine has key {
+    public struct EconomicEngine has key, store {
         id: UID,
         total_network_revenue: u64,
         total_transactions: u64,
@@ -189,6 +189,34 @@ module swarm_logistics::economic_engine {
     const STRATEGY_AGGRESSIVE: u8 = 2;
 
     // ==================== INITIALIZATION ====================
+
+    /// Create economic engine for testing
+    #[test_only]
+    public fun create_test_economic_engine(ctx: &mut TxContext): EconomicEngine {
+        let market_conditions = MarketConditions {
+            demand_level: DEMAND_MEDIUM,
+            supply_level: 2,
+            weather_impact: 0,
+            traffic_density: 1,
+            fuel_cost_index: 100,
+            competition_factor: 100,
+            seasonal_factor: 100,
+            last_updated: 0,
+        };
+
+        EconomicEngine {
+            id: object::new(ctx),
+            total_network_revenue: 0,
+            total_transactions: 0,
+            active_pricing_models: vector::empty(),
+            revenue_pools: vector::empty(),
+            market_conditions,
+            pricing_algorithm: PRICING_DYNAMIC,
+            base_delivery_rate: 1000000000, // 1 SUI base rate
+            surge_multiplier: 100,          // 1.0x multiplier
+            network_efficiency_score: 100,
+        }
+    }
 
     /// Initialize the economic engine
     fun init(ctx: &mut TxContext) {
