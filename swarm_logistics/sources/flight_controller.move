@@ -72,7 +72,7 @@ module swarm_logistics::flight_controller {
     }
 
     /// Individual waypoint in a flight route
-    public struct Waypoint has store {
+    public struct Waypoint has store, copy, drop {
         coordinates: String,         // GPS "lat,lng"
         altitude: u64,              // meters above ground
         speed: u64,                 // km/h
@@ -99,7 +99,7 @@ module swarm_logistics::flight_controller {
     }
 
     /// Detected obstacle requiring avoidance
-    public struct Obstacle has store {
+    public struct Obstacle has store, drop {
         obstacle_type: u8,          // 0=Aircraft, 1=Building, 2=Weather, 3=NoFlyZone, 4=Bird
         location: String,           // GPS coordinates
         size_estimate: u64,         // meters diameter
@@ -110,7 +110,7 @@ module swarm_logistics::flight_controller {
     }
 
     /// Record of autonomous decisions made by the flight controller
-    public struct AutonomousDecision has store {
+    public struct AutonomousDecision has store, drop {
         decision_type: u8,          // 0=RouteChange, 1=SpeedAdjust, 2=AltitudeChange, 3=EmergencyLand
         trigger_reason: String,
         parameters: String,         // JSON-encoded decision parameters
@@ -120,7 +120,7 @@ module swarm_logistics::flight_controller {
     }
 
     /// Route optimization parameters and constraints
-    public struct OptimizationParams has store {
+    public struct OptimizationParams has store, drop {
         priority_weight: u64,       // 0-100 (speed vs efficiency)
         energy_efficiency: u64,     // 0-100 importance of battery conservation
         safety_margin: u64,         // 0-100 extra safety buffer
@@ -195,8 +195,8 @@ module swarm_logistics::flight_controller {
         let drone_id = drone_mod::drone_id(drone);
 
         // Validate coordinates (simplified validation)
-        assert!(vector::length(&origin.bytes()) > 0, E_INVALID_COORDINATES);
-        assert!(vector::length(&destination.bytes()) > 0, E_INVALID_COORDINATES);
+        assert!(vector::length(origin.as_bytes()) > 0, E_INVALID_COORDINATES);
+        assert!(vector::length(destination.as_bytes()) > 0, E_INVALID_COORDINATES);
 
         // Check drone availability and battery
         assert!(drone_mod::is_drone_available(drone), E_DRONE_NOT_AVAILABLE);
@@ -363,7 +363,14 @@ module swarm_logistics::flight_controller {
         };
 
         // Record the decision
-        vector::push_back(&mut nav_state.autonomous_decisions, decision);
+        vector::push_back(&mut nav_state.autonomous_decisions, AutonomousDecision {
+            decision_type: decision.decision_type,
+            trigger_reason: decision.trigger_reason,
+            parameters: decision.parameters,
+            confidence_score: decision.confidence_score,
+            timestamp: decision.timestamp,
+            outcome: decision.outcome,
+        });
 
         // Keep only last 20 decisions
         if (vector::length(&nav_state.autonomous_decisions) > 20) {
@@ -448,11 +455,11 @@ module swarm_logistics::flight_controller {
     fun calculate_route_parameters(
         origin: String,
         destination: String,
-        params: &OptimizationParams,
-        weather: &EnvironmentData
+        _params: &OptimizationParams,
+        _weather: &EnvironmentData
     ): (vector<Waypoint>, u64, u64, u64) {
         // Simplified route calculation - in reality this would use complex algorithms
-        let waypoints = vector::empty<Waypoint>();
+        let mut waypoints = vector::empty<Waypoint>();
         
         // Add origin waypoint
         vector::push_back(&mut waypoints, Waypoint {
@@ -491,14 +498,14 @@ module swarm_logistics::flight_controller {
         // Simplified scoring algorithm
         let time_score = if (flight_time < 1800000) 90 else 70; // Under 30 min = good
         let energy_score = if (energy_cost < 30) 90 else 60; // Under 30% = good
-        let weather_score = if (weather.weather_condition == 0) 100 else 70; // Clear = best
+        let weather_score = if (swarm_mod::environment_weather_condition(weather) == 0) 100 else 70; // Clear = best
         
         (time_score + energy_score + weather_score) / 3
     }
 
     /// Calculate weather impact on flight
     fun calculate_weather_impact(weather: &EnvironmentData): u64 {
-        match (weather.weather_condition) {
+        match (swarm_mod::environment_weather_condition(weather)) {
             0 => 10,  // Clear - minimal impact
             1 => 30,  // Rain - moderate impact
             2 => 50,  // Snow - high impact
@@ -510,7 +517,7 @@ module swarm_logistics::flight_controller {
 
     /// Process detected obstacles and make decisions
     fun process_obstacles_and_decide(nav_state: &mut NavigationState, current_time: u64) {
-        let i = 0;
+        let mut i = 0;
         let len = vector::length(&nav_state.obstacles_detected);
         
         while (i < len) {
@@ -536,7 +543,7 @@ module swarm_logistics::flight_controller {
 
     /// Check if there are critical obstacles requiring immediate action
     fun has_critical_obstacles(nav_state: &NavigationState): bool {
-        let i = 0;
+        let mut i = 0;
         let len = vector::length(&nav_state.obstacles_detected);
         
         while (i < len) {
@@ -552,13 +559,13 @@ module swarm_logistics::flight_controller {
 
     /// Determine if altitude adjustment is needed
     fun should_adjust_altitude(nav_state: &NavigationState): bool {
-        nav_state.weather_conditions.weather_condition >= 2 || // Snow or worse
+        swarm_mod::environment_weather_condition(&nav_state.weather_conditions) >= 2 || // Snow or worse
         nav_state.current_altitude < 50 // Too low
     }
 
     /// Determine if speed adjustment is needed
     fun should_adjust_speed(nav_state: &NavigationState): bool {
-        nav_state.weather_conditions.wind_speed > 30 || // High wind
+        swarm_mod::environment_wind_speed(&nav_state.weather_conditions) > 30 || // High wind
         nav_state.current_speed > 60 // Too fast
     }
 

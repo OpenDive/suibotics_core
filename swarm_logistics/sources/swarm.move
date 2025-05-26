@@ -43,7 +43,7 @@ module swarm_logistics::swarm {
     }
 
     /// Environmental conditions affecting drone operations
-    public struct EnvironmentData has store {
+    public struct EnvironmentData has store, drop {
         weather_condition: u8,       // 0=Clear, 1=Rain, 2=Snow, 3=Wind, 4=Storm
         visibility: u8,              // 0-100 visibility percentage
         wind_speed: u64,             // km/h
@@ -230,6 +230,28 @@ module swarm_logistics::swarm {
 
     public fun is_weather_suitable_for_flight(weather: &EnvironmentData): bool {
         weather.weather_condition < WEATHER_STORM && weather.visibility > 50
+    }
+
+    // ==================== ENVIRONMENT DATA GETTER FUNCTIONS ====================
+
+    public fun environment_weather_condition(weather: &EnvironmentData): u8 {
+        weather.weather_condition
+    }
+
+    public fun environment_wind_speed(weather: &EnvironmentData): u64 {
+        weather.wind_speed
+    }
+
+    public fun environment_visibility(weather: &EnvironmentData): u8 {
+        weather.visibility
+    }
+
+    public fun environment_temperature(weather: &EnvironmentData): u64 {
+        weather.temperature
+    }
+
+    public fun environment_air_traffic_density(weather: &EnvironmentData): u8 {
+        weather.air_traffic_density
     }
 
     public fun calculate_coordination_score(
