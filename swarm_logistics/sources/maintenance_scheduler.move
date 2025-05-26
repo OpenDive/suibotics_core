@@ -190,6 +190,22 @@ module swarm_logistics::maintenance_scheduler {
         transfer::share_object(scheduler);
     }
 
+    /// Create maintenance scheduler for testing
+    #[test_only]
+    public fun create_test_scheduler(ctx: &mut TxContext): MaintenanceScheduler {
+        MaintenanceScheduler {
+            id: object::new(ctx),
+            scheduled_maintenance: vector::empty(),
+            active_maintenance: vector::empty(),
+            completed_maintenance: vector::empty(),
+            maintenance_facilities: vector::empty(),
+            total_maintenance_sessions: 0,
+            average_maintenance_time: 7200000, // 2 hours default
+            predictive_accuracy: 85,           // 85% accuracy
+            cost_savings_from_prediction: 0,
+        }
+    }
+
     // ==================== MAINTENANCE SCHEDULING ====================
 
     /// Schedule routine maintenance for a drone
