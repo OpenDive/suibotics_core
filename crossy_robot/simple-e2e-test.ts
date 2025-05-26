@@ -78,9 +78,15 @@ class SimpleCrossyRobotTest {
     }
 
     try {
-      return Ed25519Keypair.fromSecretKey(fromB64(privateKey));
+      // Handle both Sui CLI format (suiprivkey1...) and base64 format
+      if (privateKey.startsWith('suiprivkey1')) {
+        return Ed25519Keypair.deriveKeypair(privateKey);
+      } else {
+        return Ed25519Keypair.fromSecretKey(fromB64(privateKey));
+      }
     } catch (error) {
       console.error(`❌ Invalid private key format for ${envVar}`);
+      console.log('💡 Private key should be either Sui CLI format (suiprivkey1...) or base64 encoded');
       process.exit(1);
     }
   }

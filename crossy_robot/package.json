@@ -6,7 +6,8 @@
   "scripts": {
     "test": "npx ts-node simple-e2e-test.ts",
     "test:simple": "npx ts-node simple-e2e-test.ts",
-    "test:full": "npx ts-node e2e-test.ts"
+    "test:full": "npx ts-node e2e-test.ts",
+    "generate-keys": "npx ts-node generate-keys.ts"
   },
   "dependencies": {
     "@mysten/sui": "^1.30.1",

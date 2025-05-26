@@ -17,6 +17,8 @@
   },
   "include": [
     "e2e-test.ts",
+    "simple-e2e-test.ts",
+    "generate-keys.ts",
     "deployment_info.json"
   ],
   "exclude": [
