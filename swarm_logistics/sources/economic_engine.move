@@ -270,7 +270,7 @@ module swarm_logistics::economic_engine {
         price = price + (weight_grams * pricing_model.weight_rate / 1000); // Per kg
         
         // Urgency multiplier
-        if (urgency_level < vector::length(&pricing_model.urgency_multipliers)) {
+        if ((urgency_level as u64) < vector::length(&pricing_model.urgency_multipliers)) {
             let urgency_mult = *vector::borrow(&pricing_model.urgency_multipliers, (urgency_level as u64));
             price = (price * urgency_mult) / 100;
         };
