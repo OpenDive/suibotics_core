@@ -12,7 +12,7 @@ module swarm_logistics::order_management_tests {
 
     #[test]
     fun test_order_creation() {
-        let scenario_val = test_scenario::begin(CUSTOMER);
+        let mut scenario_val = test_scenario::begin(CUSTOMER);
         let scenario = &mut scenario_val;
         let clock = clock::create_for_testing(test_scenario::ctx(scenario));
 
@@ -58,7 +58,7 @@ module swarm_logistics::order_management_tests {
 
     #[test]
     fun test_order_assignment() {
-        let scenario_val = test_scenario::begin(CUSTOMER);
+        let mut scenario_val = test_scenario::begin(CUSTOMER);
         let scenario = &mut scenario_val;
         let clock = clock::create_for_testing(test_scenario::ctx(scenario));
 
@@ -135,7 +135,7 @@ module swarm_logistics::order_management_tests {
 
     #[test]
     fun test_order_status_updates() {
-        let scenario_val = test_scenario::begin(CUSTOMER);
+        let mut scenario_val = test_scenario::begin(CUSTOMER);
         let scenario = &mut scenario_val;
         let clock = clock::create_for_testing(test_scenario::ctx(scenario));
 
