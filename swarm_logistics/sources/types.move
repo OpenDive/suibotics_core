@@ -147,7 +147,7 @@ module swarm_logistics::types {
     // ==================== OWNERSHIP STRUCTURES ====================
 
     /// Different ownership models for drones
-    public struct OwnershipModel has store {
+    public struct OwnershipModel has store, drop {
         model_type: u8,              // 0=Individual, 1=Fleet, 2=Autonomous, 3=DAO
         voting_power: u64,           // For DAO ownership
         profit_sharing: vector<u8>,  // How profits are distributed
@@ -187,7 +187,7 @@ module swarm_logistics::types {
         weather_condition: u8,       // 0=Clear, 1=Rain, 2=Snow, 3=Wind, 4=Storm
         visibility: u8,              // 0-100 visibility percentage
         wind_speed: u64,             // km/h
-        temperature: u64,            // Celsius * 100 (to handle decimals, changed from i32 to u64)
+        temperature: u64,            // Celsius * 100 (to handle decimals)
         air_traffic_density: u8,     // 0=Low, 1=Medium, 2=High, 3=Critical
         no_fly_zones: vector<String>, // Active no-fly zone coordinates
     }
@@ -247,25 +247,6 @@ module swarm_logistics::types {
         timestamp: u64,
     }
 
-    // ==================== ERROR CODES ====================
-
-    /// Error codes for the swarm logistics system
-    const E_INVALID_OPERATION_MODE: u64 = 1;
-    const E_INSUFFICIENT_BATTERY: u64 = 2;
-    const E_PAYLOAD_TOO_HEAVY: u64 = 3;
-    const E_OUT_OF_RANGE: u64 = 4;
-    const E_DRONE_NOT_AVAILABLE: u64 = 5;
-    const E_INVALID_AUTONOMY_LEVEL: u64 = 6;
-    const E_MAINTENANCE_OVERDUE: u64 = 7;
-    const E_INSUFFICIENT_FUNDS: u64 = 8;
-    const E_INVALID_COORDINATES: u64 = 9;
-    const E_AIRSPACE_CONFLICT: u64 = 10;
-    const E_EMERGENCY_ACTIVE: u64 = 11;
-    const E_UNAUTHORIZED_ACCESS: u64 = 12;
-    const E_INVALID_PROPOSAL: u64 = 13;
-    const E_VOTING_PERIOD_ENDED: u64 = 14;
-    const E_SWARM_COORDINATION_FAILED: u64 = 15;
-
     // ==================== CONSTANTS ====================
 
     // Operation modes
@@ -307,6 +288,159 @@ module swarm_logistics::types {
     const OWNERSHIP_AUTONOMOUS: u8 = 2;
     const OWNERSHIP_DAO: u8 = 3;
 
+    // ==================== ERROR CODES ====================
+    const E_INVALID_OPERATION_MODE: u64 = 1;
+    const E_INSUFFICIENT_BATTERY: u64 = 2;
+    const E_PAYLOAD_TOO_HEAVY: u64 = 3;
+    const E_OUT_OF_RANGE: u64 = 4;
+    const E_DRONE_NOT_AVAILABLE: u64 = 5;
+    const E_INVALID_AUTONOMY_LEVEL: u64 = 6;
+    const E_MAINTENANCE_OVERDUE: u64 = 7;
+    const E_INSUFFICIENT_FUNDS: u64 = 8;
+    const E_INVALID_COORDINATES: u64 = 9;
+    const E_AIRSPACE_CONFLICT: u64 = 10;
+    const E_EMERGENCY_ACTIVE: u64 = 11;
+    const E_UNAUTHORIZED_ACCESS: u64 = 12;
+    const E_INVALID_PROPOSAL: u64 = 13;
+    const E_VOTING_PERIOD_ENDED: u64 = 14;
+    const E_SWARM_COORDINATION_FAILED: u64 = 15;
+
+    // ==================== CONSTANT GETTER FUNCTIONS ====================
+
+    // Operation mode getters
+    public fun fully_autonomous(): u8 { FULLY_AUTONOMOUS }
+    public fun teleoperated(): u8 { TELEOPERATED }
+    public fun hybrid(): u8 { HYBRID }
+
+    // Status getters
+    public fun status_available(): u8 { STATUS_AVAILABLE }
+    public fun status_busy(): u8 { STATUS_BUSY }
+    public fun status_charging(): u8 { STATUS_CHARGING }
+    public fun status_maintenance(): u8 { STATUS_MAINTENANCE }
+    public fun status_offline(): u8 { STATUS_OFFLINE }
+
+    // Order status getters
+    public fun order_created(): u8 { ORDER_CREATED }
+    public fun order_assigned(): u8 { ORDER_ASSIGNED }
+    public fun order_picked_up(): u8 { ORDER_PICKED_UP }
+    public fun order_in_transit(): u8 { ORDER_IN_TRANSIT }
+    public fun order_delivered(): u8 { ORDER_DELIVERED }
+    public fun order_completed(): u8 { ORDER_COMPLETED }
+    public fun order_cancelled(): u8 { ORDER_CANCELLED }
+
+    // Priority getters
+    public fun priority_standard(): u8 { PRIORITY_STANDARD }
+    public fun priority_express(): u8 { PRIORITY_EXPRESS }
+    public fun priority_emergency(): u8 { PRIORITY_EMERGENCY }
+
+    // Emergency type getters
+    public fun emergency_low_battery(): u8 { EMERGENCY_LOW_BATTERY }
+    public fun emergency_malfunction(): u8 { EMERGENCY_MALFUNCTION }
+    public fun emergency_weather(): u8 { EMERGENCY_WEATHER }
+    public fun emergency_obstacle(): u8 { EMERGENCY_OBSTACLE }
+    public fun emergency_theft(): u8 { EMERGENCY_THEFT }
+
+    // Ownership model getters
+    public fun ownership_individual(): u8 { OWNERSHIP_INDIVIDUAL }
+    public fun ownership_fleet(): u8 { OWNERSHIP_FLEET }
+    public fun ownership_autonomous(): u8 { OWNERSHIP_AUTONOMOUS }
+    public fun ownership_dao(): u8 { OWNERSHIP_DAO }
+
+    // Error code getters
+    public fun e_invalid_operation_mode(): u64 { E_INVALID_OPERATION_MODE }
+    public fun e_insufficient_battery(): u64 { E_INSUFFICIENT_BATTERY }
+    public fun e_payload_too_heavy(): u64 { E_PAYLOAD_TOO_HEAVY }
+    public fun e_out_of_range(): u64 { E_OUT_OF_RANGE }
+    public fun e_drone_not_available(): u64 { E_DRONE_NOT_AVAILABLE }
+    public fun e_invalid_autonomy_level(): u64 { E_INVALID_AUTONOMY_LEVEL }
+    public fun e_maintenance_overdue(): u64 { E_MAINTENANCE_OVERDUE }
+    public fun e_insufficient_funds(): u64 { E_INSUFFICIENT_FUNDS }
+    public fun e_invalid_coordinates(): u64 { E_INVALID_COORDINATES }
+    public fun e_airspace_conflict(): u64 { E_AIRSPACE_CONFLICT }
+    public fun e_emergency_active(): u64 { E_EMERGENCY_ACTIVE }
+    public fun e_unauthorized_access(): u64 { E_UNAUTHORIZED_ACCESS }
+    public fun e_invalid_proposal(): u64 { E_INVALID_PROPOSAL }
+    public fun e_voting_period_ended(): u64 { E_VOTING_PERIOD_ENDED }
+    public fun e_swarm_coordination_failed(): u64 { E_SWARM_COORDINATION_FAILED }
+
+    // ==================== CONSTRUCTOR FUNCTIONS ====================
+
+    /// Create a new drone
+    public fun new_drone(
+        owner: address,
+        operation_mode: u8,
+        autonomy_level: u8,
+        payload_capacity: u64,
+        max_range: u64,
+        service_area: String,
+        initial_location: String,
+        current_time: u64,
+        ctx: &mut sui::tx_context::TxContext
+    ): Drone {
+        let drone_uid = sui::object::new(ctx);
+        Drone {
+            id: drone_uid,
+            owner,
+            operation_mode,
+            autonomy_level,
+            status: STATUS_AVAILABLE,
+            current_location: initial_location,
+            battery_level: 100,
+            payload_capacity,
+            max_range,
+            service_area,
+            delivery_count: 0,
+            success_rate: 100,
+            earnings_balance: 0,
+            last_maintenance: current_time,
+            maintenance_due: current_time + (30 * 24 * 60 * 60 * 1000),
+            created_at: current_time,
+            swarm_reputation: 100,
+            coordination_history: vector::empty(),
+        }
+    }
+
+    /// Create new drone financials
+    public fun new_drone_financials(
+        drone_id: ID,
+        ctx: &mut sui::tx_context::TxContext
+    ): DroneFinancials {
+        let revenue_share = RevenueShare {
+            drone_percentage: 60,
+            owner_percentage: 30,
+            platform_percentage: 5,
+            maintenance_percentage: 5,
+        };
+
+        DroneFinancials {
+            id: sui::object::new(ctx),
+            drone_id,
+            total_earnings: 0,
+            maintenance_fund: 0,
+            upgrade_fund: 0,
+            insurance_fund: 0,
+            operational_costs: 0,
+            revenue_share,
+        }
+    }
+
+    /// Create new drone registered event
+    public fun new_drone_registered_event(
+        drone_id: ID,
+        owner: address,
+        operation_mode: u8,
+        autonomy_level: u8,
+        timestamp: u64,
+    ): DroneRegistered {
+        DroneRegistered {
+            drone_id,
+            owner,
+            operation_mode,
+            autonomy_level,
+            timestamp,
+        }
+    }
+
     // ==================== GETTER FUNCTIONS ====================
 
     public fun drone_id(drone: &Drone): ID {
@@ -329,6 +463,26 @@ module swarm_logistics::types {
         drone.earnings_balance
     }
 
+    public fun drone_delivery_count(drone: &Drone): u64 {
+        drone.delivery_count
+    }
+
+    public fun drone_success_rate(drone: &Drone): u64 {
+        drone.success_rate
+    }
+
+    public fun drone_swarm_reputation(drone: &Drone): u64 {
+        drone.swarm_reputation
+    }
+
+    public fun drone_coordination_history_length(drone: &Drone): u64 {
+        vector::length(&drone.coordination_history)
+    }
+
+    public fun financials_maintenance_fund(financials: &DroneFinancials): u64 {
+        financials.maintenance_fund
+    }
+
     public fun order_id(order: &DeliveryOrder): ID {
         object::uid_to_inner(&order.id)
     }
@@ -343,6 +497,43 @@ module swarm_logistics::types {
 
     public fun order_payment_amount(order: &DeliveryOrder): u64 {
         order.payment_amount
+    }
+
+    // ==================== SETTER FUNCTIONS ====================
+
+    public fun set_drone_status(drone: &mut Drone, status: u8) {
+        drone.status = status;
+    }
+
+    public fun set_drone_location(drone: &mut Drone, location: String) {
+        drone.current_location = location;
+    }
+
+    public fun set_drone_battery_level(drone: &mut Drone, battery_level: u8) {
+        drone.battery_level = battery_level;
+    }
+
+    public fun set_drone_maintenance_due(drone: &mut Drone, maintenance_due: u64) {
+        drone.maintenance_due = maintenance_due;
+    }
+
+    public fun update_drone_reputation(drone: &mut Drone, performance_score: u64) {
+        drone.swarm_reputation = (drone.swarm_reputation * 9 + performance_score) / 10;
+    }
+
+    public fun add_coordination_event(drone: &mut Drone, event_id: ID) {
+        vector::push_back(&mut drone.coordination_history, event_id);
+        if (vector::length(&drone.coordination_history) > 10) {
+            vector::remove(&mut drone.coordination_history, 0);
+        };
+    }
+
+    public fun deduct_maintenance_fund(financials: &mut DroneFinancials, amount: u64) {
+        financials.maintenance_fund = financials.maintenance_fund - amount;
+    }
+
+    public fun add_operational_cost(financials: &mut DroneFinancials, amount: u64) {
+        financials.operational_costs = financials.operational_costs + amount;
     }
 
     // ==================== VALIDATION FUNCTIONS ====================

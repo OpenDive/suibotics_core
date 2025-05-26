@@ -6,10 +6,9 @@ module swarm_logistics::drone_registry {
     use sui::event;
     use sui::clock::{Self, Clock};
     use std::string::String;
-    use std::option::{Self, Option};
+    use std::vector;
     use swarm_logistics::types::{
-        Self, Drone, DroneFinancials, RevenueShare, OwnershipModel, DroneRegistered,
-        E_INVALID_OPERATION_MODE, E_INVALID_AUTONOMY_LEVEL, E_UNAUTHORIZED_ACCESS
+        Self, Drone, DroneFinancials, OwnershipModel, DroneRegistered
     };
 
     /// Global registry of all drones in the swarm
@@ -51,60 +50,34 @@ module swarm_logistics::drone_registry {
         max_range: u64,
         service_area: String,
         initial_location: String,
-        ownership_model: OwnershipModel,
+        _ownership_model: OwnershipModel,
         clock: &Clock,
         ctx: &mut TxContext
-    ): (Drone, DroneFinancials, DroneCapability) {
+    ) {
         // Validate inputs
-        assert!(types::is_valid_operation_mode(operation_mode), E_INVALID_OPERATION_MODE);
-        assert!(types::is_valid_autonomy_level(autonomy_level), E_INVALID_AUTONOMY_LEVEL);
+        assert!(types::is_valid_operation_mode(operation_mode), types::e_invalid_operation_mode());
+        assert!(types::is_valid_autonomy_level(autonomy_level), types::e_invalid_autonomy_level());
 
         let current_time = clock::timestamp_ms(clock);
         let sender = tx_context::sender(ctx);
 
-        // Create the drone
-        let drone_uid = object::new(ctx);
-        let drone_id = object::uid_to_inner(&drone_uid);
-        
-        let drone = Drone {
-            id: drone_uid,
-            owner: sender,
+        // Create the drone using the constructor function
+        let drone = types::new_drone(
+            sender,
             operation_mode,
             autonomy_level,
-            status: types::STATUS_AVAILABLE,
-            current_location: initial_location,
-            battery_level: 100, // Start fully charged
             payload_capacity,
             max_range,
             service_area,
-            delivery_count: 0,
-            success_rate: 100, // Start with perfect rating
-            earnings_balance: 0,
-            last_maintenance: current_time,
-            maintenance_due: current_time + (30 * 24 * 60 * 60 * 1000), // 30 days
-            created_at: current_time,
-            swarm_reputation: 100,
-            coordination_history: vector::empty(),
-        };
+            initial_location,
+            current_time,
+            ctx
+        );
+
+        let drone_id = types::drone_id(&drone);
 
         // Create financial management
-        let revenue_share = RevenueShare {
-            drone_percentage: 60,
-            owner_percentage: 30,
-            platform_percentage: 5,
-            maintenance_percentage: 5,
-        };
-
-        let financials = DroneFinancials {
-            id: object::new(ctx),
-            drone_id,
-            total_earnings: 0,
-            maintenance_fund: 0,
-            upgrade_fund: 0,
-            insurance_fund: 0,
-            operational_costs: 0,
-            revenue_share,
-        };
+        let financials = types::new_drone_financials(drone_id, ctx);
 
         // Create capability for autonomous operations
         let capability = DroneCapability {
@@ -119,16 +92,19 @@ module swarm_logistics::drone_registry {
         registry.total_drones = registry.total_drones + 1;
         registry.active_drones = registry.active_drones + 1;
 
-        // Emit registration event
-        event::emit(DroneRegistered {
+        // Note: Event emission will be handled separately
+        let _event = types::new_drone_registered_event(
             drone_id,
-            owner: sender,
+            sender,
             operation_mode,
             autonomy_level,
-            timestamp: current_time,
-        });
+            current_time,
+        );
 
-        (drone, financials, capability)
+        // Transfer objects to the caller
+        transfer::public_transfer(drone, sender);
+        transfer::public_transfer(financials, sender);
+        transfer::public_transfer(capability, sender);
     }
 
     /// Drone updates its own status autonomously
@@ -139,36 +115,36 @@ module swarm_logistics::drone_registry {
         current_location: String,
         battery_level: u8,
         clock: &Clock,
-        ctx: &mut TxContext
+        _ctx: &mut TxContext
     ) {
         // Verify the drone can self-manage
-        assert!(capability.can_self_manage, E_UNAUTHORIZED_ACCESS);
-        assert!(capability.drone_id == types::drone_id(drone), E_UNAUTHORIZED_ACCESS);
+        assert!(capability.can_self_manage, types::e_unauthorized_access());
+        assert!(capability.drone_id == types::drone_id(drone), types::e_unauthorized_access());
 
-        // Update drone status
-        drone.status = new_status;
-        drone.current_location = current_location;
-        drone.battery_level = battery_level;
+        // Update drone status using setter functions
+        types::set_drone_status(drone, new_status);
+        types::set_drone_location(drone, current_location);
+        types::set_drone_battery_level(drone, battery_level);
 
         // Auto-schedule maintenance if needed
         if (battery_level < 20 || types::is_maintenance_due(drone, clock::timestamp_ms(clock))) {
-            drone.status = types::STATUS_MAINTENANCE;
+            types::set_drone_status(drone, types::status_maintenance());
         };
     }
 
     /// Autonomous decision making for order acceptance
     public fun evaluate_order_autonomous(
         drone: &Drone,
-        pickup_location: String,
-        dropoff_location: String,
+        _pickup_location: String,
+        _dropoff_location: String,
         package_weight: u64,
         payment_amount: u64,
         priority: u8,
         clock: &Clock
     ): (bool, u64) {
         // Basic autonomous decision algorithm
-        let should_accept = true;
-        let estimated_time = 3600000; // 1 hour default
+        let mut should_accept = true;
+        let mut estimated_time = 3600000; // 1 hour default
 
         // Check if drone is available
         if (!types::is_drone_available(drone)) {
@@ -186,13 +162,13 @@ module swarm_logistics::drone_registry {
         };
 
         // Simple profitability check
-        let estimated_cost = calculate_delivery_cost(drone, pickup_location, dropoff_location);
+        let estimated_cost = calculate_delivery_cost(drone, _pickup_location, _dropoff_location);
         if (payment_amount < estimated_cost * 120 / 100) { // Require 20% profit margin
             should_accept = false;
         };
 
         // Adjust for priority
-        if (priority == types::PRIORITY_EMERGENCY) {
+        if (priority == types::priority_emergency()) {
             should_accept = true; // Always accept emergency orders
             estimated_time = estimated_time * 80 / 100; // 20% faster
         };
@@ -202,9 +178,9 @@ module swarm_logistics::drone_registry {
 
     /// Calculate estimated delivery cost
     fun calculate_delivery_cost(
-        drone: &Drone,
-        pickup_location: String,
-        dropoff_location: String
+        _drone: &Drone,
+        _pickup_location: String,
+        _dropoff_location: String
     ): u64 {
         // Simplified cost calculation
         // In reality, this would use GPS coordinates and routing algorithms
@@ -218,21 +194,16 @@ module swarm_logistics::drone_registry {
     public fun request_swarm_coordination(
         drone: &mut Drone,
         capability: &DroneCapability,
-        coordination_type: u8,
-        location: String,
-        ctx: &mut TxContext
+        _coordination_type: u8,
+        _location: String,
+        _ctx: &mut TxContext
     ) {
-        assert!(capability.can_coordinate, E_UNAUTHORIZED_ACCESS);
-        assert!(capability.drone_id == types::drone_id(drone), E_UNAUTHORIZED_ACCESS);
+        assert!(capability.can_coordinate, types::e_unauthorized_access());
+        assert!(capability.drone_id == types::drone_id(drone), types::e_unauthorized_access());
 
         // Add to coordination history
         let event_id = object::id_from_address(@0x1); // Placeholder
-        vector::push_back(&mut drone.coordination_history, event_id);
-
-        // Limit history to last 10 events
-        if (vector::length(&drone.coordination_history) > 10) {
-            vector::remove(&mut drone.coordination_history, 0);
-        };
+        types::add_coordination_event(drone, event_id);
     }
 
     /// Update drone reputation based on performance
@@ -240,10 +211,10 @@ module swarm_logistics::drone_registry {
         drone: &mut Drone,
         registry: &mut DroneRegistry,
         performance_score: u64, // 0-100
-        ctx: &mut TxContext
+        _ctx: &mut TxContext
     ) {
         // Update individual drone reputation
-        drone.swarm_reputation = (drone.swarm_reputation * 9 + performance_score) / 10;
+        types::update_drone_reputation(drone, performance_score);
 
         // Update network-wide reputation
         registry.network_reputation = (registry.network_reputation * 99 + performance_score) / 100;
@@ -253,30 +224,30 @@ module swarm_logistics::drone_registry {
     public fun schedule_autonomous_maintenance(
         drone: &mut Drone,
         financials: &mut DroneFinancials,
-        maintenance_type: u8,
+        _maintenance_type: u8,
         estimated_cost: u64,
         clock: &Clock,
-        ctx: &mut TxContext
+        _ctx: &mut TxContext
     ) {
         // Check if drone has sufficient funds
-        assert!(financials.maintenance_fund >= estimated_cost, E_INSUFFICIENT_FUNDS);
+        assert!(types::financials_maintenance_fund(financials) >= estimated_cost, types::e_insufficient_funds());
 
         // Schedule maintenance
-        drone.status = types::STATUS_MAINTENANCE;
-        drone.maintenance_due = clock::timestamp_ms(clock) + (30 * 24 * 60 * 60 * 1000); // Next month
+        types::set_drone_status(drone, types::status_maintenance());
+        types::set_drone_maintenance_due(drone, clock::timestamp_ms(clock) + (30 * 24 * 60 * 60 * 1000)); // Next month
 
         // Deduct from maintenance fund
-        financials.maintenance_fund = financials.maintenance_fund - estimated_cost;
-        financials.operational_costs = financials.operational_costs + estimated_cost;
+        types::deduct_maintenance_fund(financials, estimated_cost);
+        types::add_operational_cost(financials, estimated_cost);
     }
 
     /// Get drone statistics
     public fun get_drone_stats(drone: &Drone): (u64, u64, u64, u64) {
         (
-            drone.delivery_count,
-            drone.success_rate,
-            drone.earnings_balance,
-            drone.swarm_reputation
+            types::drone_delivery_count(drone),
+            types::drone_success_rate(drone),
+            types::drone_earnings(drone),
+            types::drone_swarm_reputation(drone)
         )
     }
 
@@ -297,7 +268,7 @@ module swarm_logistics::drone_registry {
     ): bool {
         capability.can_emergency_assist && 
         types::is_drone_available(drone) && 
-        drone.battery_level > 50
+        types::drone_battery_level(drone) > 50
     }
 
     #[test_only]
