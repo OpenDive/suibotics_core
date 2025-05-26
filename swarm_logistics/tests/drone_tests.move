@@ -2,6 +2,7 @@
 module swarm_logistics::drone_tests {
     use sui::test_scenario::{Self, Scenario};
     use sui::clock::{Self, Clock};
+    use sui::transfer;
     use swarm_logistics::drone;
 
     const DRONE_OWNER: address = @0xDEADBEEF;
