@@ -1,13 +1,13 @@
 /// Module: crossy_robot
 /// A simple robot control game where users pay to control physical robots
 module crossy_robot::crossy_robot {
-    use sui::object::{Self, UID, ID};
-    use sui::tx_context::{Self, TxContext};
+    use sui::object::{UID, ID};
+    use sui::tx_context::TxContext;
     use sui::coin::{Self, Coin};
     use sui::sui::SUI;
     use sui::event;
     use sui::clock::{Self, Clock};
-    use std::option::{Self, Option};
+    use std::option::Option;
 
     // ===== Error Codes =====
     const E_GAME_NOT_WAITING: u64 = 1;
@@ -194,11 +194,6 @@ module crossy_robot::crossy_robot {
 
     // ===== Test Functions =====
     
-    #[test_only]
-    use sui::test_scenario;
-    #[test_only]
-    use sui::test_utils;
-
     #[test_only]
     public fun test_init(_ctx: &mut TxContext) {
         // Test initialization function

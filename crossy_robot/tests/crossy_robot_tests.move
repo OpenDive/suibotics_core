@@ -96,7 +96,7 @@ module crossy_robot::crossy_robot_tests {
         let received_payment = crossy_robot::connect_robot(&mut game, &clock, ts::ctx(&mut scenario));
         
         // Verify game state
-        let (user, robot_opt, status, _created_at) = crossy_robot::get_game_info(&game);
+        let (user, robot_opt, _status, _created_at) = crossy_robot::get_game_info(&game);
         assert!(user == USER, 0);
         assert!(robot_opt.is_some(), 1);
         assert!(*robot_opt.borrow() == ROBOT, 2);
