@@ -772,7 +772,7 @@ module swarm_logistics::flight_controller_tests {
     // ==================== ERROR CONDITION TESTS ====================
 
     #[test]
-    #[expected_failure(abort_code = 3)]
+    #[expected_failure(abort_code = 4)]
     fun test_insufficient_battery_failure() {
         let mut scenario_val = test_scenario::begin(ADMIN);
         let scenario = &mut scenario_val;
