@@ -426,28 +426,28 @@ module swarm_logistics::maintenance_scheduler {
     ): vector<u64> {
         let mut wear_scores = vector::empty<u64>();
         
-        // Battery wear (heavily influenced by cycles)
-        let battery_wear = (battery_cycles * 100) / 1000; // Assume 1000 cycle lifespan
+        // Battery wear (heavily influenced by cycles) - more aggressive wear
+        let battery_wear = (battery_cycles * 100) / 500; // Assume 500 cycle lifespan for higher wear
         vector::push_back(&mut wear_scores, battery_wear);
         
-        // Motor wear (influenced by flight hours)
-        let motor_wear = (flight_hours * 100) / 2000; // Assume 2000 hour lifespan
+        // Motor wear (influenced by flight hours) - more aggressive wear
+        let motor_wear = (flight_hours * 100) / 1000; // Assume 1000 hour lifespan
         vector::push_back(&mut wear_scores, motor_wear);
         
-        // Propeller wear (influenced by flight hours and environment)
-        let prop_wear = ((flight_hours * 50) + (environmental_exposure * 25)) / 1500;
+        // Propeller wear (influenced by flight hours and environment) - more aggressive
+        let prop_wear = ((flight_hours * 80) + (environmental_exposure * 40)) / 1000;
         vector::push_back(&mut wear_scores, prop_wear);
         
-        // Sensor wear (influenced by environment)
-        let sensor_wear = (environmental_exposure * 100) / 5000;
+        // Sensor wear (influenced by environment) - more aggressive
+        let sensor_wear = (environmental_exposure * 100) / 2000;
         vector::push_back(&mut wear_scores, sensor_wear);
         
-        // Navigation wear (influenced by flight hours)
-        let nav_wear = (flight_hours * 100) / 3000;
+        // Navigation wear (influenced by flight hours) - more aggressive
+        let nav_wear = (flight_hours * 100) / 1500;
         vector::push_back(&mut wear_scores, nav_wear);
         
-        // Communication wear (influenced by flight hours)
-        let comm_wear = (flight_hours * 100) / 4000;
+        // Communication wear (influenced by flight hours) - more aggressive
+        let comm_wear = (flight_hours * 100) / 2000;
         vector::push_back(&mut wear_scores, comm_wear);
         
         wear_scores
