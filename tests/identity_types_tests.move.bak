@@ -1,0 +1,304 @@
+#[test_only]
+module suibotics_core::identity_types_tests {
+    use sui::test_scenario::{Self as ts};
+    use std::vector;
+    
+    use suibotics_core::identity_types::{
+        new_did_info, new_key_info, new_service_info, new_credential_info,
+        transfer_did_info, transfer_credential_info,
+        did_info_controller, did_info_created_at, key_info_pubkey, key_info_purpose,
+        key_info_revoked, revoke_key_info, service_info_id, service_info_type,
+        service_info_endpoint, credential_info_subject, credential_info_issuer,
+        validate_address, validate_name, validate_public_key, validate_schema,
+        validate_data_hash, validate_purpose, validate_endpoint, validate_key_id,
+        E_INVALID_ADDRESS, E_EMPTY_FIELD, E_FIELD_TOO_LONG, E_INVALID_PUBLIC_KEY,
+        E_INVALID_DATA_HASH
+    };
+
+    // Test addresses
+    const ALICE: address = @0xa11ce;
+    const BOB: address = @0xb0b;
+
+    // Test helper functions
+    fun dummy_pubkey(): vector<u8> {
+        let mut key = vector::empty<u8>();
+        let mut i = 0;
+        while (i < 32) {  // Ed25519 key length
+            vector::push_back(&mut key, (i as u8));
+            i = i + 1;
+        };
+        key
+    }
+
+    fun dummy_sha256_hash(): vector<u8> {
+        let mut hash = vector::empty<u8>();
+        let mut i = 0;
+        while (i < 32) {  // SHA-256 hash length
+            vector::push_back(&mut hash, (i as u8));
+            i = i + 1;
+        };
+        hash
+    }
+
+    fun create_long_string(length: u64): vector<u8> {
+        let mut result = vector::empty<u8>();
+        let mut i = 0;
+        while (i < length) {
+            vector::push_back(&mut result, 65); // 'A'
+            i = i + 1;
+        };
+        result
+    }
+
+    // Validation function tests
+    #[test]
+    fun test_validate_address_success() {
+        validate_address(ALICE);
+        validate_address(BOB);
+        // Should not abort
+    }
+
+    #[test, expected_failure(abort_code = E_INVALID_ADDRESS)]
+    fun test_validate_address_zero() {
+        validate_address(@0x0);
+    }
+
+    #[test]
+    fun test_validate_name_success() {
+        validate_name(&b"alice_did".to_vector());
+        validate_name(&b"a".to_vector());
+        validate_name(&create_long_string(255)); // Max length
+    }
+
+    #[test, expected_failure(abort_code = E_EMPTY_FIELD)]
+    fun test_validate_name_empty() {
+        validate_name(&vector::empty<u8>());
+    }
+
+    #[test, expected_failure(abort_code = E_FIELD_TOO_LONG)]
+    fun test_validate_name_too_long() {
+        validate_name(&create_long_string(256)); // Over max length
+    }
+
+    #[test]
+    fun test_validate_public_key_success() {
+        validate_public_key(&dummy_pubkey());
+    }
+
+    #[test, expected_failure(abort_code = E_EMPTY_FIELD)]
+    fun test_validate_public_key_empty() {
+        validate_public_key(&vector::empty<u8>());
+    }
+
+    #[test, expected_failure(abort_code = E_INVALID_PUBLIC_KEY)]
+    fun test_validate_public_key_wrong_length() {
+        let mut key = vector::empty<u8>();
+        vector::push_back(&mut key, 1);
+        vector::push_back(&mut key, 2);
+        validate_public_key(&key); // Too short
+    }
+
+    #[test]
+    fun test_validate_schema_success() {
+        validate_schema(&b"FirmwareCertV1".to_vector());
+        validate_schema(&create_long_string(1000)); // Max length
+    }
+
+    #[test, expected_failure(abort_code = E_EMPTY_FIELD)]
+    fun test_validate_schema_empty() {
+        validate_schema(&vector::empty<u8>());
+    }
+
+    #[test, expected_failure(abort_code = E_FIELD_TOO_LONG)]
+    fun test_validate_schema_too_long() {
+        validate_schema(&create_long_string(1001)); // Over max length
+    }
+
+    #[test]
+    fun test_validate_data_hash_success() {
+        validate_data_hash(&dummy_sha256_hash());
+    }
+
+    #[test, expected_failure(abort_code = E_EMPTY_FIELD)]
+    fun test_validate_data_hash_empty() {
+        validate_data_hash(&vector::empty<u8>());
+    }
+
+    #[test, expected_failure(abort_code = E_INVALID_DATA_HASH)]
+    fun test_validate_data_hash_wrong_length() {
+        let mut hash = vector::empty<u8>();
+        vector::push_back(&mut hash, 1);
+        validate_data_hash(&hash); // Too short
+    }
+
+    #[test]
+    fun test_validate_purpose_success() {
+        validate_purpose(&b"authentication".to_vector());
+        validate_purpose(&b"assertion".to_vector());
+    }
+
+    #[test, expected_failure(abort_code = E_EMPTY_FIELD)]
+    fun test_validate_purpose_empty() {
+        validate_purpose(&vector::empty<u8>());
+    }
+
+    #[test]
+    fun test_validate_endpoint_success() {
+        validate_endpoint(&b"wss://mqtt.example.com:8883".to_vector());
+        validate_endpoint(&create_long_string(2000)); // Max length
+    }
+
+    #[test, expected_failure(abort_code = E_EMPTY_FIELD)]
+    fun test_validate_endpoint_empty() {
+        validate_endpoint(&vector::empty<u8>());
+    }
+
+    #[test, expected_failure(abort_code = E_FIELD_TOO_LONG)]
+    fun test_validate_endpoint_too_long() {
+        validate_endpoint(&create_long_string(2001)); // Over max length
+    }
+
+    #[test]
+    fun test_validate_key_id_success() {
+        validate_key_id(&b"key_1".to_vector());
+    }
+
+    #[test, expected_failure(abort_code = E_EMPTY_FIELD)]
+    fun test_validate_key_id_empty() {
+        validate_key_id(&vector::empty<u8>());
+    }
+
+    // Constructor and accessor tests
+    #[test]
+    fun test_did_info_creation() {
+        let mut scenario = ts::begin(ALICE);
+        let timestamp = 1234567890;
+        
+        let did = new_did_info(ALICE, timestamp, ts::ctx(&mut scenario));
+        
+        assert!(did_info_controller(&did) == ALICE, 0);
+        assert!(did_info_created_at(&did) == timestamp, 1);
+        
+        transfer_did_info(did, ALICE);
+        ts::end(scenario);
+    }
+
+    #[test]
+    fun test_key_info_creation() {
+        let pubkey = dummy_pubkey();
+        let purpose = b"authentication".to_vector();
+        
+        let key = new_key_info(pubkey, purpose);
+        
+        assert!(key_info_pubkey(&key) == &dummy_pubkey(), 0);
+        assert!(key_info_purpose(&key) == &b"authentication".to_vector(), 1);
+        assert!(!key_info_revoked(&key), 2);
+        
+        let mut key_mut = key;
+        revoke_key_info(&mut key_mut);
+        assert!(key_info_revoked(&key_mut), 3);
+    }
+
+    #[test]
+    fun test_service_info_creation() {
+        let id = b"mqtt1".to_vector();
+        let type_ = b"MQTTBroker".to_vector();
+        let endpoint = b"wss://host:port".to_vector();
+        
+        let service = new_service_info(id, type_, endpoint);
+        
+        assert!(service_info_id(&service) == &b"mqtt1".to_vector(), 0);
+        assert!(service_info_type(&service) == &b"MQTTBroker".to_vector(), 1);
+        assert!(service_info_endpoint(&service) == &b"wss://host:port".to_vector(), 2);
+    }
+
+    #[test]
+    fun test_credential_info_creation() {
+        let mut scenario = ts::begin(ALICE);
+        let subject = BOB;
+        let issuer = ALICE;
+        let schema = b"TestSchema".to_vector();
+        let data_hash = dummy_sha256_hash();
+        let timestamp = 1234567890;
+        
+        let cred = new_credential_info(
+            subject, issuer, schema, data_hash, timestamp, ts::ctx(&mut scenario)
+        );
+        
+        assert!(credential_info_subject(&cred) == subject, 0);
+        assert!(credential_info_issuer(&cred) == issuer, 1);
+        assert!(credential_info_schema(&cred) == &b"TestSchema".to_vector(), 2);
+        assert!(credential_info_data_hash(&cred) == &dummy_sha256_hash(), 3);
+        assert!(credential_info_issued_at(&cred) == timestamp, 4);
+        
+        transfer_credential_info(cred, subject);
+        ts::end(scenario);
+    }
+
+    #[test, expected_failure(abort_code = E_INVALID_ADDRESS)]
+    fun test_credential_info_invalid_subject() {
+        let mut scenario = ts::begin(ALICE);
+        
+        new_credential_info(
+            @0x0, // Invalid subject
+            ALICE,
+            b"TestSchema".to_vector(),
+            dummy_sha256_hash(),
+            1234567890,
+            ts::ctx(&mut scenario)
+        );
+        
+        ts::end(scenario);
+    }
+
+    #[test, expected_failure(abort_code = E_INVALID_ADDRESS)]
+    fun test_credential_info_invalid_issuer() {
+        let mut scenario = ts::begin(ALICE);
+        
+        new_credential_info(
+            BOB,
+            @0x0, // Invalid issuer
+            b"TestSchema".to_vector(),
+            dummy_sha256_hash(),
+            1234567890,
+            ts::ctx(&mut scenario)
+        );
+        
+        ts::end(scenario);
+    }
+
+    #[test, expected_failure(abort_code = E_EMPTY_FIELD)]
+    fun test_credential_info_empty_schema() {
+        let mut scenario = ts::begin(ALICE);
+        
+        new_credential_info(
+            BOB,
+            ALICE,
+            vector::empty<u8>(), // Empty schema
+            dummy_sha256_hash(),
+            1234567890,
+            ts::ctx(&mut scenario)
+        );
+        
+        ts::end(scenario);
+    }
+
+    #[test, expected_failure(abort_code = E_INVALID_DATA_HASH)]
+    fun test_credential_info_invalid_data_hash() {
+        let mut scenario = ts::begin(ALICE);
+        
+        let mut invalid_hash = vector::empty<u8>();
+        vector::push_back(&mut invalid_hash, 1); // Wrong length
+        
+        new_credential_info(
+            BOB,
+            ALICE,
+            b"TestSchema".to_vector(),
+            invalid_hash,
+            1234567890,
+            ts::ctx(&mut scenario)
+        );
+        
+        ts::end(scenario);
+    }
+} 
