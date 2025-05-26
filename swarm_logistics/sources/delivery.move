@@ -128,4 +128,39 @@ module swarm_logistics::delivery {
     public fun has_special_requirements(order: &DeliveryOrder): bool {
         order.requires_signature || order.requires_refrigeration || order.fragile
     }
+
+    // ==================== TEST HELPER FUNCTIONS ====================
+
+    #[test_only]
+    public fun create_test_delivery_order(
+        customer: address,
+        pickup_location: String,
+        dropoff_location: String,
+        weight: u64,
+        ctx: &mut sui::tx_context::TxContext
+    ): DeliveryOrder {
+        DeliveryOrder {
+            id: object::new(ctx),
+            customer,
+            pickup_location,
+            dropoff_location,
+            package_description: std::string::utf8(b"Test package"),
+            package_weight: weight,
+            package_dimensions: std::string::utf8(b"20,15,10"),
+            payment_amount: 1000000000, // 1 SUI
+            priority_level: PRIORITY_STANDARD,
+            status: ORDER_CREATED,
+            assigned_drone: std::option::none(),
+            created_at: 0,
+            pickup_deadline: 3600000, // 1 hour
+            delivery_deadline: 7200000, // 2 hours
+            estimated_delivery: 1800000, // 30 minutes
+            actual_delivery: std::option::none(),
+            requires_signature: false,
+            requires_refrigeration: false,
+            fragile: false,
+            backup_drones: vector::empty(),
+            route_optimization_data: std::string::utf8(b"{}"),
+        }
+    }
 } 
