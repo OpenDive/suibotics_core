@@ -1,8 +1,13 @@
 [package]
 name = "swarm_logistics"
-edition = "2024.beta" # edition = "legacy" to use legacy (pre-2024) Move
-# license = ""           # e.g., "MIT", "GPL", "Apache 2.0"
-# authors = ["..."]      # e.g., ["Joe Smith (joesmith@noemail.com)", "John Snow (johnsnow@noemail.com)"]
+version = "1.0.0"
+edition = "2024.beta"
+license = "MIT"
+authors = ["Swarm Logistics Team"]
+description = "Autonomous drone delivery smart contracts with swarm intelligence, route optimization, and decentralized financial management"
+repository = "https://github.com/opendive/suibotics-core"
+homepage = "https://suibotics.gg"
+documentation = "https://docs.suibotics.io"
 
 [dependencies]
 Sui = { git = "https://github.com/MystenLabs/sui.git", subdir = "crates/sui-framework/packages/sui-framework", rev = "framework/testnet", override = true }
