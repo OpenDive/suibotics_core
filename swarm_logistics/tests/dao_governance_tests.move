@@ -8,6 +8,7 @@ module swarm_logistics::dao_governance_tests {
     use sui::object;
     use std::string;
     use std::option;
+    use std::vector;
     use swarm_logistics::dao_governance;
 
     // Test addresses
@@ -110,14 +111,14 @@ module swarm_logistics::dao_governance_tests {
                 test_scenario::ctx(scenario)
             );
 
-            transfer::public_transfer(dao, FOUNDER);
+            transfer::share_object(dao);
             transfer::public_transfer(founder_membership, FOUNDER);
         };
 
         // Member joins DAO
         test_scenario::next_tx(scenario, MEMBER1);
         {
-            let mut dao = test_scenario::take_from_sender<dao_governance::DroneDAO>(scenario);
+            let mut dao = test_scenario::take_shared<dao_governance::DroneDAO>(scenario);
             let membership_payment = coin::mint_for_testing<SUI>(1_000_000_000, test_scenario::ctx(scenario)); // 1 SUI
 
             let membership = dao_governance::join_dao(
@@ -138,7 +139,7 @@ module swarm_logistics::dao_governance_tests {
             assert!(dao_governance::membership_tier(&membership) == 1, 4); // TIER_PREMIUM
             assert!(dao_governance::membership_reputation(&membership) == 50, 5);
 
-            transfer::public_transfer(dao, FOUNDER);
+            test_scenario::return_shared(dao);
             transfer::public_transfer(membership, MEMBER1);
         };
 
@@ -158,7 +159,7 @@ module swarm_logistics::dao_governance_tests {
         // Create proposal
         test_scenario::next_tx(scenario, FOUNDER);
         {
-            let mut dao = test_scenario::take_from_sender<dao_governance::DroneDAO>(scenario);
+            let mut dao = test_scenario::take_shared<dao_governance::DroneDAO>(scenario);
             let founder_membership = test_scenario::take_from_sender<dao_governance::DAOMembership>(scenario);
             let deposit = coin::mint_for_testing<SUI>(PROPOSAL_DEPOSIT, test_scenario::ctx(scenario));
 
@@ -176,16 +177,16 @@ module swarm_logistics::dao_governance_tests {
 
             assert!(dao_governance::proposal_status(&proposal) == 0, 0); // STATUS_ACTIVE
 
-            transfer::public_transfer(dao, FOUNDER);
+            test_scenario::return_shared(dao);
             transfer::public_transfer(founder_membership, FOUNDER);
-            transfer::public_transfer(proposal, FOUNDER);
+            transfer::share_object(proposal);
         };
 
         // Vote on proposal
         test_scenario::next_tx(scenario, MEMBER1);
         {
-            let mut dao = test_scenario::take_from_sender<dao_governance::DroneDAO>(scenario);
-            let mut proposal = test_scenario::take_from_sender<dao_governance::Proposal>(scenario);
+            let mut dao = test_scenario::take_shared<dao_governance::DroneDAO>(scenario);
+            let mut proposal = test_scenario::take_shared<dao_governance::Proposal>(scenario);
             let mut member_membership = test_scenario::take_from_sender<dao_governance::DAOMembership>(scenario);
 
             let vote = dao_governance::cast_vote(
@@ -201,8 +202,8 @@ module swarm_logistics::dao_governance_tests {
             assert!(dao_governance::proposal_votes_for(&proposal) == MEMBER_TOKENS, 0);
             assert!(dao_governance::membership_reputation(&member_membership) > 50, 1); // Reputation increased
 
-            transfer::public_transfer(dao, FOUNDER);
-            transfer::public_transfer(proposal, FOUNDER);
+            test_scenario::return_shared(dao);
+            test_scenario::return_shared(proposal);
             transfer::public_transfer(member_membership, MEMBER1);
             transfer::public_transfer(vote, MEMBER1);
         };
@@ -230,8 +231,8 @@ module swarm_logistics::dao_governance_tests {
         // Finalize proposal
         test_scenario::next_tx(scenario, FOUNDER);
         {
-            let mut dao = test_scenario::take_from_sender<dao_governance::DroneDAO>(scenario);
-            let mut proposal = test_scenario::take_from_sender<dao_governance::Proposal>(scenario);
+            let mut dao = test_scenario::take_shared<dao_governance::DroneDAO>(scenario);
+            let mut proposal = test_scenario::take_shared<dao_governance::Proposal>(scenario);
 
             dao_governance::finalize_proposal(&mut dao, &mut proposal, &clock);
 
@@ -239,8 +240,8 @@ module swarm_logistics::dao_governance_tests {
             let status = dao_governance::proposal_status(&proposal);
             assert!(status == 1 || status == 2, 0); // STATUS_PASSED or STATUS_REJECTED
 
-            transfer::public_transfer(dao, FOUNDER);
-            transfer::public_transfer(proposal, FOUNDER);
+            test_scenario::return_shared(dao);
+            test_scenario::return_shared(proposal);
         };
 
         clock::destroy_for_testing(clock);
@@ -259,7 +260,7 @@ module swarm_logistics::dao_governance_tests {
         // Test vote delegation
         test_scenario::next_tx(scenario, MEMBER1);
         {
-            let dao = test_scenario::take_from_sender<dao_governance::DroneDAO>(scenario);
+            let dao = test_scenario::take_shared<dao_governance::DroneDAO>(scenario);
             let mut member1_membership = test_scenario::take_from_sender<dao_governance::DAOMembership>(scenario);
 
             let delegation_power = 500;
@@ -277,7 +278,7 @@ module swarm_logistics::dao_governance_tests {
             // Check that tokens were deducted from delegator
             assert!(dao_governance::membership_tokens(&member1_membership) == MEMBER_TOKENS - delegation_power, 0);
 
-            transfer::public_transfer(dao, FOUNDER);
+            test_scenario::return_shared(dao);
             transfer::public_transfer(member1_membership, MEMBER1);
             transfer::public_transfer(delegation, MEMBER1);
         };
@@ -298,7 +299,7 @@ module swarm_logistics::dao_governance_tests {
         // Test revenue distribution
         test_scenario::next_tx(scenario, FOUNDER);
         {
-            let mut dao = test_scenario::take_from_sender<dao_governance::DroneDAO>(scenario);
+            let mut dao = test_scenario::take_shared<dao_governance::DroneDAO>(scenario);
             let initial_balance = dao_governance::dao_treasury_balance(&dao);
 
             dao_governance::distribute_revenue(
@@ -311,7 +312,7 @@ module swarm_logistics::dao_governance_tests {
             // Treasury should remain the same (distribution is conceptual in this test)
             assert!(dao_governance::dao_treasury_balance(&dao) == initial_balance, 0);
 
-            transfer::public_transfer(dao, FOUNDER);
+            test_scenario::return_shared(dao);
         };
 
         clock::destroy_for_testing(clock);
@@ -369,14 +370,14 @@ module swarm_logistics::dao_governance_tests {
                 test_scenario::ctx(scenario)
             );
 
-            transfer::public_transfer(dao, FOUNDER);
+            transfer::share_object(dao);
             transfer::public_transfer(founder_membership, FOUNDER);
         };
 
         // Add Member 1
         test_scenario::next_tx(scenario, MEMBER1);
         {
-            let mut dao = test_scenario::take_from_sender<dao_governance::DroneDAO>(scenario);
+            let mut dao = test_scenario::take_shared<dao_governance::DroneDAO>(scenario);
             let payment = coin::mint_for_testing<SUI>(1_000_000_000, test_scenario::ctx(scenario));
 
             let membership = dao_governance::join_dao(
@@ -387,14 +388,14 @@ module swarm_logistics::dao_governance_tests {
                 test_scenario::ctx(scenario)
             );
 
-            transfer::public_transfer(dao, FOUNDER);
+            test_scenario::return_shared(dao);
             transfer::public_transfer(membership, MEMBER1);
         };
 
         // Add Member 2
         test_scenario::next_tx(scenario, MEMBER2);
         {
-            let mut dao = test_scenario::take_from_sender<dao_governance::DroneDAO>(scenario);
+            let mut dao = test_scenario::take_shared<dao_governance::DroneDAO>(scenario);
             let payment = coin::mint_for_testing<SUI>(1_000_000_000, test_scenario::ctx(scenario));
 
             let membership = dao_governance::join_dao(
@@ -405,7 +406,7 @@ module swarm_logistics::dao_governance_tests {
                 test_scenario::ctx(scenario)
             );
 
-            transfer::public_transfer(dao, FOUNDER);
+            test_scenario::return_shared(dao);
             transfer::public_transfer(membership, MEMBER2);
         };
     }
@@ -413,7 +414,7 @@ module swarm_logistics::dao_governance_tests {
     fun create_test_proposal(scenario: &mut Scenario, clock: &Clock) {
         test_scenario::next_tx(scenario, FOUNDER);
         {
-            let mut dao = test_scenario::take_from_sender<dao_governance::DroneDAO>(scenario);
+            let mut dao = test_scenario::take_shared<dao_governance::DroneDAO>(scenario);
             let founder_membership = test_scenario::take_from_sender<dao_governance::DAOMembership>(scenario);
             let deposit = coin::mint_for_testing<SUI>(PROPOSAL_DEPOSIT, test_scenario::ctx(scenario));
 
@@ -429,9 +430,9 @@ module swarm_logistics::dao_governance_tests {
                 test_scenario::ctx(scenario)
             );
 
-            transfer::public_transfer(dao, FOUNDER);
+            test_scenario::return_shared(dao);
             transfer::public_transfer(founder_membership, FOUNDER);
-            transfer::public_transfer(proposal, FOUNDER);
+            transfer::share_object(proposal);
         };
     }
 
@@ -439,8 +440,8 @@ module swarm_logistics::dao_governance_tests {
         // Founder votes FOR
         test_scenario::next_tx(scenario, FOUNDER);
         {
-            let mut dao = test_scenario::take_from_sender<dao_governance::DroneDAO>(scenario);
-            let mut proposal = test_scenario::take_from_sender<dao_governance::Proposal>(scenario);
+            let mut dao = test_scenario::take_shared<dao_governance::DroneDAO>(scenario);
+            let mut proposal = test_scenario::take_shared<dao_governance::Proposal>(scenario);
             let mut founder_membership = test_scenario::take_from_sender<dao_governance::DAOMembership>(scenario);
 
             let vote = dao_governance::cast_vote(
@@ -453,8 +454,8 @@ module swarm_logistics::dao_governance_tests {
                 test_scenario::ctx(scenario)
             );
 
-            transfer::public_transfer(dao, FOUNDER);
-            transfer::public_transfer(proposal, FOUNDER);
+            test_scenario::return_shared(dao);
+            test_scenario::return_shared(proposal);
             transfer::public_transfer(founder_membership, FOUNDER);
             transfer::public_transfer(vote, FOUNDER);
         };
@@ -462,8 +463,8 @@ module swarm_logistics::dao_governance_tests {
         // Member 1 votes FOR
         test_scenario::next_tx(scenario, MEMBER1);
         {
-            let mut dao = test_scenario::take_from_sender<dao_governance::DroneDAO>(scenario);
-            let mut proposal = test_scenario::take_from_sender<dao_governance::Proposal>(scenario);
+            let mut dao = test_scenario::take_shared<dao_governance::DroneDAO>(scenario);
+            let mut proposal = test_scenario::take_shared<dao_governance::Proposal>(scenario);
             let mut member1_membership = test_scenario::take_from_sender<dao_governance::DAOMembership>(scenario);
 
             let vote = dao_governance::cast_vote(
@@ -476,8 +477,8 @@ module swarm_logistics::dao_governance_tests {
                 test_scenario::ctx(scenario)
             );
 
-            transfer::public_transfer(dao, FOUNDER);
-            transfer::public_transfer(proposal, FOUNDER);
+            test_scenario::return_shared(dao);
+            test_scenario::return_shared(proposal);
             transfer::public_transfer(member1_membership, MEMBER1);
             transfer::public_transfer(vote, MEMBER1);
         };
@@ -485,8 +486,8 @@ module swarm_logistics::dao_governance_tests {
         // Member 2 votes AGAINST
         test_scenario::next_tx(scenario, MEMBER2);
         {
-            let mut dao = test_scenario::take_from_sender<dao_governance::DroneDAO>(scenario);
-            let mut proposal = test_scenario::take_from_sender<dao_governance::Proposal>(scenario);
+            let mut dao = test_scenario::take_shared<dao_governance::DroneDAO>(scenario);
+            let mut proposal = test_scenario::take_shared<dao_governance::Proposal>(scenario);
             let mut member2_membership = test_scenario::take_from_sender<dao_governance::DAOMembership>(scenario);
 
             let vote = dao_governance::cast_vote(
@@ -499,8 +500,8 @@ module swarm_logistics::dao_governance_tests {
                 test_scenario::ctx(scenario)
             );
 
-            transfer::public_transfer(dao, FOUNDER);
-            transfer::public_transfer(proposal, FOUNDER);
+            test_scenario::return_shared(dao);
+            test_scenario::return_shared(proposal);
             transfer::public_transfer(member2_membership, MEMBER2);
             transfer::public_transfer(vote, MEMBER2);
         };
