@@ -229,6 +229,18 @@ module swarm_logistics::swarm {
         object::uid_to_inner(&event.id)
     }
 
+    public fun airspace_drone_id(slot: &AirspaceSlot): ID {
+        slot.reserved_by
+    }
+
+    public fun airspace_priority(slot: &AirspaceSlot): u8 {
+        slot.priority
+    }
+
+    public fun airspace_altitude_range(slot: &AirspaceSlot): String {
+        slot.altitude_range
+    }
+
     // ==================== SETTER FUNCTIONS ====================
 
     public fun add_responding_drone(request: &mut EmergencyRequest, drone_id: ID) {
@@ -288,5 +300,27 @@ module swarm_logistics::swarm {
         let base_score = if (outcome == 0) { 100 } else { 50 }; // Success vs failure
         let participation_bonus = vector::length(participating_drones) * 10;
         base_score + participation_bonus
+    }
+
+    // ==================== TEST HELPER FUNCTIONS ====================
+
+    #[test_only]
+    public fun create_test_emergency_request(
+        drone_id: ID,
+        assistance_type: u8,
+        location: String,
+        ctx: &mut sui::tx_context::TxContext
+    ): EmergencyRequest {
+        EmergencyRequest {
+            id: object::new(ctx),
+            requesting_drone: drone_id,
+            location,
+            assistance_type,
+            urgency: URGENCY_MEDIUM,
+            responding_drones: vector::empty(),
+            status: EMERGENCY_OPEN,
+            created_at: 0,
+            resolved_at: std::option::none(),
+        }
     }
 } 
