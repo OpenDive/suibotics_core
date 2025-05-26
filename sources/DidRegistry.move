@@ -10,9 +10,9 @@ module suibotics_core::did_registry {
         new_did_info, transfer_did_info, new_key_info, new_service_info,
         did_info_id_mut, did_info_controller, revoke_key_info,
         validate_address, validate_name, validate_public_key, validate_purpose,
-        validate_endpoint, validate_key_id, DIDRegistered, KeyAdded, KeyRevoked,
-        ServiceAdded, E_NAME_ALREADY_EXISTS, E_KEY_ALREADY_EXISTS, E_KEY_NOT_FOUND,
-        E_INVALID_CONTROLLER
+        validate_endpoint, validate_key_id, 
+        emit_did_registered, emit_key_added, emit_key_revoked, emit_service_added,
+        e_name_already_exists, e_key_already_exists, e_key_not_found, e_invalid_controller
     };
 
     /// Global registry for name-to-DID mappings
@@ -52,7 +52,7 @@ module suibotics_core::did_registry {
         validate_address(controller);
 
         // Check if name already exists
-        assert!(!dynamic_field::exists_(&registry.id, name), E_NAME_ALREADY_EXISTS);
+        assert!(!dynamic_field::exists_(&registry.id, name), e_name_already_exists());
 
         // Create the DIDInfo object
         let mut did = new_did_info(controller, ts, ctx);
@@ -66,19 +66,8 @@ module suibotics_core::did_registry {
         dynamic_field::add(did_info_id_mut(&mut did), b"key_0", key_info);
 
         // Emit events
-        event::emit(DIDRegistered {
-            did_id,
-            controller,
-            name,
-            timestamp: ts,
-        });
-
-        event::emit(KeyAdded {
-            did_id,
-            key_id: b"key_0",
-            purpose,
-            timestamp: ts,
-        });
+        emit_did_registered(did_id, controller, name, ts);
+        emit_key_added(did_id, b"key_0", purpose, ts);
 
         // Transfer DIDInfo to the controller
         transfer_did_info(did, controller);
@@ -101,21 +90,16 @@ module suibotics_core::did_registry {
         validate_purpose(&purpose);
         
         // Verify sender is the DID controller
-        assert!(sender_addr == did_info_controller(did), E_INVALID_CONTROLLER);
+        assert!(sender_addr == did_info_controller(did), e_invalid_controller());
 
         // Check if key ID already exists
-        assert!(!dynamic_field::exists_(did_info_id_mut(did), key_id), E_KEY_ALREADY_EXISTS);
+        assert!(!dynamic_field::exists_(did_info_id_mut(did), key_id), e_key_already_exists());
 
         let key_info = new_key_info(pubkey, purpose);
         dynamic_field::add(did_info_id_mut(did), key_id, key_info);
 
         // Emit event
-        event::emit(KeyAdded {
-            did_id: sui::object::uid_to_address(did_info_id_mut(did)),
-            key_id,
-            purpose,
-            timestamp: ts,
-        });
+        emit_key_added(sui::object::uid_to_address(did_info_id_mut(did)), key_id, purpose, ts);
     }
 
     /// Revoke a key by setting its `revoked` flag true
@@ -131,20 +115,16 @@ module suibotics_core::did_registry {
         validate_key_id(&key_id);
         
         // Verify sender is the DID controller
-        assert!(sender_addr == did_info_controller(did), E_INVALID_CONTROLLER);
+        assert!(sender_addr == did_info_controller(did), e_invalid_controller());
 
         // Check if key exists before trying to revoke it
-        assert!(dynamic_field::exists_(did_info_id_mut(did), key_id), E_KEY_NOT_FOUND);
+        assert!(dynamic_field::exists_(did_info_id_mut(did), key_id), e_key_not_found());
 
         let key_info: &mut KeyInfo = dynamic_field::borrow_mut(did_info_id_mut(did), key_id);
         revoke_key_info(key_info);
 
         // Emit event
-        event::emit(KeyRevoked {
-            did_id: sui::object::uid_to_address(did_info_id_mut(did)),
-            key_id,
-            timestamp: ts,
-        });
+        emit_key_revoked(sui::object::uid_to_address(did_info_id_mut(did)), key_id, ts);
     }
 
     /// Add a service endpoint to the DID Document
@@ -164,22 +144,16 @@ module suibotics_core::did_registry {
         validate_endpoint(&endpoint);
         
         // Verify sender is the DID controller
-        assert!(sender_addr == did_info_controller(did), E_INVALID_CONTROLLER);
+        assert!(sender_addr == did_info_controller(did), e_invalid_controller());
 
         // Check if service ID already exists
-        assert!(!dynamic_field::exists_(did_info_id_mut(did), svc_id), E_KEY_ALREADY_EXISTS);
+        assert!(!dynamic_field::exists_(did_info_id_mut(did), svc_id), e_key_already_exists());
 
         let svc = new_service_info(svc_id, svc_type, endpoint);
         dynamic_field::add(did_info_id_mut(did), svc_id, svc);
 
         // Emit event
-        event::emit(ServiceAdded {
-            did_id: sui::object::uid_to_address(did_info_id_mut(did)),
-            service_id: svc_id,
-            service_type: svc_type,
-            endpoint,
-            timestamp: ts,
-        });
+        emit_service_added(sui::object::uid_to_address(did_info_id_mut(did)), svc_id, svc_type, endpoint, ts);
     }
 
     /// Get the controller address for a given DID name

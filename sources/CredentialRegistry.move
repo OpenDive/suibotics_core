@@ -5,7 +5,7 @@ module suibotics_core::credential_registry {
         credential_info_issuer, revoke_credential_info, credential_info_revoked,
         credential_info_subject, credential_info_schema, credential_info_data_hash,
         credential_info_issued_at, validate_address, validate_schema, validate_data_hash,
-        E_INVALID_CONTROLLER
+        e_invalid_controller
     };
 
     /// Issue a new credential: creates a credential object and transfers it to the subject
@@ -33,7 +33,7 @@ module suibotics_core::credential_registry {
         let caller = sender(ctx);
         let ts = sui::tx_context::epoch_timestamp_ms(ctx);
         
-        assert!(caller == credential_info_issuer(cred), E_INVALID_CONTROLLER);
+        assert!(caller == credential_info_issuer(cred), e_invalid_controller());
         revoke_credential_info(cred, ts);
     }
 
