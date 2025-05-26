@@ -221,6 +221,14 @@ module swarm_logistics::swarm {
         slot.time_end
     }
 
+    public fun airspace_id(slot: &AirspaceSlot): ID {
+        object::uid_to_inner(&slot.id)
+    }
+
+    public fun coordination_event_id(event: &CoordinationEvent): ID {
+        object::uid_to_inner(&event.id)
+    }
+
     // ==================== SETTER FUNCTIONS ====================
 
     public fun add_responding_drone(request: &mut EmergencyRequest, drone_id: ID) {

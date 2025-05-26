@@ -141,7 +141,7 @@ module swarm_logistics::swarm_coordinator {
             ctx
         );
 
-        let slot_id = object::uid_to_inner(&slot.id);
+        let slot_id = swarm_mod::airspace_id(&slot);
 
         // Check for conflicts with existing slots
         let conflicts = detect_airspace_conflicts(coordinator, &slot, current_time);
@@ -163,7 +163,7 @@ module swarm_logistics::swarm_coordinator {
             current_time,
             ctx
         );
-        vector::push_back(&mut coordinator.coordination_events, object::uid_to_inner(&coord_event.id));
+        vector::push_back(&mut coordinator.coordination_events, swarm_mod::coordination_event_id(&coord_event));
         transfer::public_transfer(coord_event, tx_context::sender(ctx));
 
         slot
@@ -289,7 +289,7 @@ module swarm_logistics::swarm_coordinator {
             current_time,
             ctx
         );
-        vector::push_back(&mut coordinator.coordination_events, object::uid_to_inner(&coord_event.id));
+        vector::push_back(&mut coordinator.coordination_events, swarm_mod::coordination_event_id(&coord_event));
         transfer::public_transfer(coord_event, tx_context::sender(ctx));
 
         response
@@ -451,7 +451,7 @@ module swarm_logistics::swarm_coordinator {
             current_time,
             ctx
         );
-        vector::push_back(&mut coordinator.coordination_events, object::uid_to_inner(&coord_event.id));
+        vector::push_back(&mut coordinator.coordination_events, swarm_mod::coordination_event_id(&coord_event));
         transfer::public_transfer(coord_event, tx_context::sender(ctx));
     }
 
