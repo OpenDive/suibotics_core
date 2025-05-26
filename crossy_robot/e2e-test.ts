@@ -14,6 +14,7 @@ import { SuiClient, getFullnodeUrl } from '@mysten/sui/client';
 import { Transaction } from '@mysten/sui/transactions';
 import { Ed25519Keypair } from '@mysten/sui/keypairs/ed25519';
 import { fromB64 } from '@mysten/sui/utils';
+import { decodeSuiPrivateKey } from '@mysten/sui/cryptography';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as dotenv from 'dotenv';
@@ -63,6 +64,7 @@ class CrossyRobotE2ETest {
   private packageId: string;
   private gameState: GameState | null = null;
   private eventSubscription: any = null;
+  private pollingInterval: NodeJS.Timeout | null = null;
   private testResults = {
     gameCreated: false,
     robotConnected: false,
@@ -102,12 +104,17 @@ class CrossyRobotE2ETest {
     try {
       // Handle both Sui CLI format (suiprivkey1...) and base64 format
       if (privateKey.startsWith('suiprivkey1')) {
-        return Ed25519Keypair.deriveKeypair(privateKey);
+        const { schema, secretKey } = decodeSuiPrivateKey(privateKey);
+        if (schema === 'ED25519') {
+          return Ed25519Keypair.fromSecretKey(secretKey);
+        } else {
+          throw new Error('Only ED25519 keys are supported');
+        }
       } else {
         return Ed25519Keypair.fromSecretKey(fromB64(privateKey));
       }
     } catch (error) {
-      console.error(`❌ Invalid private key format for ${envVar}`);
+      console.error(`❌ Invalid private key format for ${envVar}:`, error);
       console.log('💡 Private key should be either Sui CLI format (suiprivkey1...) or base64 encoded');
       process.exit(1);
     }
@@ -159,14 +166,59 @@ class CrossyRobotE2ETest {
     console.log('👂 Starting event listener...');
     
     try {
-      // For this simplified version, we'll use polling instead of WebSocket subscription
-      // which has compatibility issues with the current SDK version
+      // Start polling for events from our package
+      this.pollForEvents();
       console.log('✅ Event listener started (using polling mode)');
       console.log('');
     } catch (error) {
       console.error('❌ Failed to start event listener:', error);
       throw error;
     }
+  }
+
+  private async pollForEvents(): Promise<void> {
+    let cursor: any = null;
+    
+    this.pollingInterval = setInterval(async () => {
+      try {
+        // Query events from our package
+        const { data, hasNextPage, nextCursor } = await this.client.queryEvents({
+          query: {
+            MoveEventModule: {
+              module: 'crossy_robot',
+              package: this.packageId,
+            },
+          },
+          cursor,
+          order: 'ascending',
+        });
+
+        // Process any new events
+        if (data.length > 0) {
+          for (const event of data) {
+            this.handleEvent(event);
+          }
+          
+          // Update cursor for next poll
+          if (nextCursor) {
+            cursor = nextCursor;
+          }
+        }
+
+        // Stop polling if we have completed the test
+        if (this.testResults.gameCreated && 
+            this.testResults.robotConnected && 
+            this.testResults.movementsExecuted >= 4) {
+          if (this.pollingInterval) {
+            clearInterval(this.pollingInterval);
+            this.pollingInterval = null;
+          }
+        }
+
+      } catch (error) {
+        console.error('❌ Error polling for events:', error);
+      }
+    }, 1000); // Poll every second
   }
 
   private handleEvent(event: any): void {
@@ -442,6 +494,10 @@ class CrossyRobotE2ETest {
       process.exit(1);
     } finally {
       // Cleanup
+      if (this.pollingInterval) {
+        clearInterval(this.pollingInterval);
+        this.pollingInterval = null;
+      }
       if (this.eventSubscription) {
         await this.eventSubscription.unsubscribe();
       }
