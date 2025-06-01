@@ -1,7 +1,6 @@
 #[test_only]
 module suibotics_did::batch_operations_tests {
     use sui::test_scenario::{Self as ts};
-    use std::vector;
     
     use suibotics_did::did_registry::{Self, DIDRegistry, BatchResult, count_batch_successes, get_batch_failures, is_batch_fully_successful, new_batch_result};
     use suibotics_did::credential_registry::{Self, CredentialRegistry};

@@ -1,12 +1,9 @@
 #[test_only]
 module suibotics_did::reverse_lookup_tests {
     use sui::test_scenario::{Self as ts};
-    use std::vector;
-    use std::option;
     
     use suibotics_did::did_registry::{Self, DIDRegistry, get_did_controller_by_name, get_dids_by_controller, 
         get_registry_stats, did_name_exists};
-    use suibotics_did::identity_types::{DIDInfo, did_info_id};
 
     // Test addresses
     const ALICE: address = @0xa11ce;

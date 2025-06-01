@@ -1,20 +1,13 @@
 #[test_only]
 module suibotics_did::did_registry_tests {
-    use sui::test_scenario::{Self as ts, Scenario};
-    use sui::tx_context::{Self, TxContext};
-    use sui::object;
-    use sui::dynamic_field;
-    use std::option;
-    use std::vector;
+    use sui::test_scenario::{Self as ts};
     
     use suibotics_did::did_registry::{Self, DIDRegistry};
     use suibotics_did::identity_types::{
-        DIDInfo, KeyInfo, ServiceInfo,
-        did_info_controller, key_info_pubkey, key_info_purpose, key_info_revoked,
-        service_info_id, service_info_type, service_info_endpoint,
-        e_name_already_exists, e_key_already_exists, e_key_not_found, e_invalid_controller,
+        DIDInfo,
+        did_info_controller,
         // Import DID document structures for testing
-        DIDDocumentData, did_document_verification_methods, did_document_services,
+        did_document_verification_methods, did_document_services,
         did_document_authentication, verification_method_id, verification_method_revoked,
         service_data_id, service_data_type
     };

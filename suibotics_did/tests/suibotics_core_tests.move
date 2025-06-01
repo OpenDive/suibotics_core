@@ -20,7 +20,6 @@ fun test_suibotics_did_fail() {
 #[test_only]
 module suibotics_did::integration_tests {
     use sui::test_scenario::{Self as ts};
-    use std::vector;
     
     use suibotics_did::did_registry::{Self, DIDRegistry};
     use suibotics_did::credential_registry::{Self, CredentialRegistry};
@@ -64,7 +63,7 @@ module suibotics_did::integration_tests {
         
         // Get the shared registries
         let mut did_registry = ts::take_shared<DIDRegistry>(&scenario);
-        let mut cred_registry = ts::take_shared<CredentialRegistry>(&scenario);
+        let cred_registry = ts::take_shared<CredentialRegistry>(&scenario);
         
         // Alice registers her DID
         did_registry::register_did(
