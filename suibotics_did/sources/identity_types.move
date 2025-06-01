@@ -34,6 +34,33 @@ module suibotics_did::identity_types {
     const ED25519_PUBLIC_KEY_LENGTH: u64 = 32;
     const SHA256_HASH_LENGTH: u64 = 32;
 
+    // Type-safe dynamic field keys to prevent collisions
+    public struct KeyFieldKey has copy, drop, store {
+        key_id: vector<u8>,
+    }
+
+    public struct ServiceFieldKey has copy, drop, store {
+        service_id: vector<u8>,
+    }
+
+    // Constructor functions for field keys
+    public fun new_key_field_key(key_id: vector<u8>): KeyFieldKey {
+        KeyFieldKey { key_id }
+    }
+
+    public fun new_service_field_key(service_id: vector<u8>): ServiceFieldKey {
+        ServiceFieldKey { service_id }
+    }
+
+    // Accessor functions for field keys
+    public fun key_field_key_id(key: &KeyFieldKey): &vector<u8> {
+        &key.key_id
+    }
+
+    public fun service_field_key_id(key: &ServiceFieldKey): &vector<u8> {
+        &key.service_id
+    }
+
     // Events
     public struct DIDRegistered has copy, drop {
         did_id: address,

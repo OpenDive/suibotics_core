@@ -12,7 +12,9 @@ module suibotics_did::did_registry {
         validate_address, validate_name, validate_public_key, validate_purpose,
         validate_endpoint, validate_key_id, 
         emit_did_registered, emit_key_added, emit_key_revoked, emit_service_added,
-        e_name_already_exists, e_key_already_exists, e_key_not_found, e_invalid_controller
+        e_name_already_exists, e_key_already_exists, e_key_not_found, e_invalid_controller,
+        KeyFieldKey, ServiceFieldKey, new_key_field_key, new_service_field_key,
+        ServiceInfo, did_info_id
     };
 
     /// Global registry for name-to-DID mappings
@@ -61,9 +63,10 @@ module suibotics_did::did_registry {
         // Store name mapping in the registry
         dynamic_field::add(&mut registry.id, name, controller);
 
-        // Create initial KeyInfo and attach it to the DIDInfo
+        // Create initial KeyInfo and attach it to the DIDInfo using type-safe key
         let key_info = new_key_info(initial_pubkey, purpose);
-        dynamic_field::add(did_info_id_mut(&mut did), b"key_0", key_info);
+        let key_field_key = new_key_field_key(b"key_0");
+        dynamic_field::add(did_info_id_mut(&mut did), key_field_key, key_info);
 
         // Emit events
         emit_did_registered(did_id, controller, name, ts);
@@ -92,11 +95,14 @@ module suibotics_did::did_registry {
         // Verify sender is the DID controller
         assert!(sender_addr == did_info_controller(did), e_invalid_controller());
 
+        // Create type-safe key field key
+        let key_field_key = new_key_field_key(key_id);
+        
         // Check if key ID already exists
-        assert!(!dynamic_field::exists_(did_info_id_mut(did), key_id), e_key_already_exists());
+        assert!(!dynamic_field::exists_(did_info_id_mut(did), key_field_key), e_key_already_exists());
 
         let key_info = new_key_info(pubkey, purpose);
-        dynamic_field::add(did_info_id_mut(did), key_id, key_info);
+        dynamic_field::add(did_info_id_mut(did), key_field_key, key_info);
 
         // Emit event
         emit_key_added(sui::object::uid_to_address(did_info_id_mut(did)), key_id, purpose, ts);
@@ -117,10 +123,13 @@ module suibotics_did::did_registry {
         // Verify sender is the DID controller
         assert!(sender_addr == did_info_controller(did), e_invalid_controller());
 
-        // Check if key exists before trying to revoke it
-        assert!(dynamic_field::exists_(did_info_id_mut(did), key_id), e_key_not_found());
+        // Create type-safe key field key
+        let key_field_key = new_key_field_key(key_id);
 
-        let key_info: &mut KeyInfo = dynamic_field::borrow_mut(did_info_id_mut(did), key_id);
+        // Check if key exists before trying to revoke it
+        assert!(dynamic_field::exists_(did_info_id_mut(did), key_field_key), e_key_not_found());
+
+        let key_info: &mut KeyInfo = dynamic_field::borrow_mut(did_info_id_mut(did), key_field_key);
         revoke_key_info(key_info);
 
         // Emit event
@@ -146,11 +155,14 @@ module suibotics_did::did_registry {
         // Verify sender is the DID controller
         assert!(sender_addr == did_info_controller(did), e_invalid_controller());
 
+        // Create type-safe service field key
+        let service_field_key = new_service_field_key(svc_id);
+
         // Check if service ID already exists
-        assert!(!dynamic_field::exists_(did_info_id_mut(did), svc_id), e_key_already_exists());
+        assert!(!dynamic_field::exists_(did_info_id_mut(did), service_field_key), e_key_already_exists());
 
         let svc = new_service_info(svc_id, svc_type, endpoint);
-        dynamic_field::add(did_info_id_mut(did), svc_id, svc);
+        dynamic_field::add(did_info_id_mut(did), service_field_key, svc);
 
         // Emit event
         emit_service_added(sui::object::uid_to_address(did_info_id_mut(did)), svc_id, svc_type, endpoint, ts);
@@ -163,5 +175,29 @@ module suibotics_did::did_registry {
         } else {
             option::none()
         }
+    }
+
+    /// Get a specific key from a DID
+    public fun get_key(did: &DIDInfo, key_id: vector<u8>): &KeyInfo {
+        let key_field_key = new_key_field_key(key_id);
+        dynamic_field::borrow(did_info_id(did), key_field_key)
+    }
+
+    /// Get a specific service from a DID
+    public fun get_service(did: &DIDInfo, service_id: vector<u8>): &ServiceInfo {
+        let service_field_key = new_service_field_key(service_id);
+        dynamic_field::borrow(did_info_id(did), service_field_key)
+    }
+
+    /// Check if a key exists on a DID
+    public fun has_key(did: &DIDInfo, key_id: vector<u8>): bool {
+        let key_field_key = new_key_field_key(key_id);
+        dynamic_field::exists_(did_info_id(did), key_field_key)
+    }
+
+    /// Check if a service exists on a DID
+    public fun has_service(did: &DIDInfo, service_id: vector<u8>): bool {
+        let service_field_key = new_service_field_key(service_id);
+        dynamic_field::exists_(did_info_id(did), service_field_key)
     }
 }

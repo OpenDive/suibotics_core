@@ -418,4 +418,54 @@ module suibotics_did::did_registry_tests {
         ts::return_to_address(ALICE, did);
         ts::end(scenario);
     }
+
+    #[test]
+    fun test_key_service_id_collision_prevention() {
+        let mut scenario = ts::begin(ALICE);
+        let ctx = ts::ctx(&mut scenario);
+        
+        did_registry::test_init(ctx);
+        ts::next_tx(&mut scenario, ALICE);
+        
+        let mut registry = ts::take_shared<DIDRegistry>(&scenario);
+        
+        // Register a DID
+        did_registry::register_did(
+            &mut registry,
+            b"alice_did",
+            dummy_pubkey(),
+            b"authentication",
+            ts::ctx(&mut scenario)
+        );
+        
+        ts::return_shared(registry);
+        ts::next_tx(&mut scenario, ALICE);
+        
+        let mut did = ts::take_from_sender<DIDInfo>(&scenario);
+        
+        // Add a key with ID "endpoint1"
+        did_registry::add_key(
+            &mut did,
+            b"endpoint1",
+            dummy_pubkey_2(),
+            b"assertion",
+            ts::ctx(&mut scenario)
+        );
+        
+        // Add a service with the same ID "endpoint1" - should NOT collide
+        did_registry::add_service(
+            &mut did,
+            b"endpoint1",
+            b"MQTTBroker",
+            b"wss://mqtt.example.com:8883",
+            ts::ctx(&mut scenario)
+        );
+        
+        // Verify both exist and can be retrieved
+        assert!(did_registry::has_key(&did, b"endpoint1"), 0);
+        assert!(did_registry::has_service(&did, b"endpoint1"), 1);
+        
+        ts::return_to_sender(&scenario, did);
+        ts::end(scenario);
+    }
 } 
