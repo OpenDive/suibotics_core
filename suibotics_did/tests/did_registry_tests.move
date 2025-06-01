@@ -103,7 +103,7 @@ module suibotics_did::did_registry_tests {
         ts::end(scenario);
     }
 
-    #[test, expected_failure(abort_code = 4)]
+    #[test, expected_failure(abort_code = suibotics_did::identity_types::E_NAME_ALREADY_EXISTS, location = suibotics_did::did_registry)]
     fun test_register_did_name_already_exists() {
         let mut scenario = ts::begin(ALICE);
         let ctx = ts::ctx(&mut scenario);
@@ -174,7 +174,7 @@ module suibotics_did::did_registry_tests {
         ts::end(scenario);
     }
 
-    #[test, expected_failure(abort_code = 1)]
+    #[test, expected_failure(abort_code = suibotics_did::identity_types::E_INVALID_CONTROLLER, location = suibotics_did::did_registry)]
     fun test_add_key_invalid_controller() {
         let mut scenario = ts::begin(ALICE);
         let ctx = ts::ctx(&mut scenario);
@@ -211,7 +211,7 @@ module suibotics_did::did_registry_tests {
         ts::end(scenario);
     }
 
-    #[test, expected_failure(abort_code = 3)]
+    #[test, expected_failure(abort_code = suibotics_did::identity_types::E_KEY_ALREADY_EXISTS, location = suibotics_did::did_registry)]
     fun test_add_key_already_exists() {
         let mut scenario = ts::begin(ALICE);
         let ctx = ts::ctx(&mut scenario);
@@ -301,7 +301,7 @@ module suibotics_did::did_registry_tests {
         ts::end(scenario);
     }
 
-    #[test, expected_failure(abort_code = 2)]
+    #[test, expected_failure(abort_code = suibotics_did::identity_types::E_KEY_NOT_FOUND, location = suibotics_did::did_registry)]
     fun test_revoke_key_not_found() {
         let mut scenario = ts::begin(ALICE);
         let ctx = ts::ctx(&mut scenario);
@@ -373,7 +373,7 @@ module suibotics_did::did_registry_tests {
         ts::end(scenario);
     }
 
-    #[test, expected_failure(abort_code = 1)]
+    #[test, expected_failure(abort_code = suibotics_did::identity_types::E_INVALID_CONTROLLER, location = suibotics_did::did_registry)]
     fun test_add_service_invalid_controller() {
         let mut scenario = ts::begin(ALICE);
         let ctx = ts::ctx(&mut scenario);

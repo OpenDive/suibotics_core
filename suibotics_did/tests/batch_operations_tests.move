@@ -184,7 +184,7 @@ module suibotics_did::batch_operations_tests {
         ts::end(scenario);
     }
 
-    #[test, expected_failure(abort_code = 10)]
+    #[test, expected_failure(abort_code = suibotics_did::identity_types::E_BATCH_TOO_LARGE, location = suibotics_did::did_registry)]
     fun test_batch_size_limit() {
         let mut scenario = ts::begin(ALICE);
         
