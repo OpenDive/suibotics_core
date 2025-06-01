@@ -376,23 +376,6 @@ module suibotics_did::credential_registry {
         timestamp: u64,
     }
 
-    // === VALIDATION FUNCTIONS ===
-    
-    /// Validate address (simple non-zero check)
-    fun validate_address(addr: address): bool {
-        addr != @0x0
-    }
-    
-    /// Validate schema (non-empty and reasonable size)
-    fun validate_schema(schema: vector<u8>): bool {
-        !vector::is_empty(&schema) && vector::length(&schema) <= 1000
-    }
-    
-    /// Validate data hash (32-byte hash)
-    fun validate_data_hash(hash: vector<u8>): bool {
-        vector::length(&hash) == 32
-    }
-
     // === EVENT FUNCTIONS ===
     
     /// Emit credential issued event
@@ -610,5 +593,8 @@ module suibotics_did::credential_registry {
     // - e_batch_too_large(): Batch size exceeds max_batch_size()
     // - e_batch_size_mismatch(): Input vector lengths don't match
     // - e_empty_field(): Required field is empty
-    // All error codes are consistent across the entire suibotics_did system
+    // 
+    // VALIDATION: All validation is handled by centralized functions in identity_types
+    // to ensure consistency across all modules. No duplicate validation functions.
+    // All error codes are consistent across the entire suibotics_did system.
 }
