@@ -27,12 +27,14 @@ module suibotics_did::did_registry {
     /// Global registry for name-to-DID mappings
     public struct DIDRegistry has key {
         id: UID,
+        total_dids: u64,  // Track total DIDs for statistics
     }
 
     /// Initialize the registry as a shared object
     fun init(ctx: &mut TxContext) {
         let registry = DIDRegistry {
             id: new(ctx),
+            total_dids: 0,
         };
         share_object(registry);
     }
@@ -69,6 +71,19 @@ module suibotics_did::did_registry {
 
         // Store name mapping in the registry
         dynamic_field::add(&mut registry.id, name, controller);
+
+        // Add to controller reverse lookup
+        let controller_key = address_to_string(controller);
+        if (dynamic_field::exists_(&registry.id, controller_key)) {
+            let did_list: &mut vector<address> = dynamic_field::borrow_mut(&mut registry.id, controller_key);
+            vector::push_back(did_list, did_id);
+        } else {
+            let did_list = vector[did_id];
+            dynamic_field::add(&mut registry.id, controller_key, did_list);
+        };
+        
+        // Update registry statistics
+        registry.total_dids = registry.total_dids + 1;
 
         // Create initial KeyInfo and attach it to the DIDInfo using type-safe key
         let key_info = new_key_info(initial_pubkey, purpose);
@@ -384,6 +399,11 @@ module suibotics_did::did_registry {
         error_code: u64,
     }
 
+    /// Create a new BatchResult (for testing purposes)
+    public fun new_batch_result(index: u64, success: bool, error_code: u64): BatchResult {
+        BatchResult { index, success, error_code }
+    }
+
     /// Maximum batch size to prevent gas limit issues
     const MAX_BATCH_SIZE: u64 = 50;
 
@@ -439,6 +459,19 @@ module suibotics_did::did_registry {
 
                 // Store name mapping in the registry
                 dynamic_field::add(&mut registry.id, name, controller);
+
+                // Add to controller reverse lookup
+                let controller_key = address_to_string(controller);
+                if (dynamic_field::exists_(&registry.id, controller_key)) {
+                    let did_list: &mut vector<address> = dynamic_field::borrow_mut(&mut registry.id, controller_key);
+                    vector::push_back(did_list, did_id);
+                } else {
+                    let did_list = vector[did_id];
+                    dynamic_field::add(&mut registry.id, controller_key, did_list);
+                };
+                
+                // Update registry statistics
+                registry.total_dids = registry.total_dids + 1;
 
                 // Create initial KeyInfo and attach it to the DIDInfo using type-safe key
                 let key_info = new_key_info(pubkey, purpose);
@@ -787,22 +820,64 @@ module suibotics_did::did_registry {
         true
     }
 
-    // === TEST INITIALIZATION ===
-    
-    #[test_only]
-    /// Initialize the DID registry for testing
-    public fun init_for_testing(ctx: &mut TxContext) {
-        let registry = DIDRegistry {
-            id: sui::object::new(ctx),
-        };
-        sui::transfer::share_object(registry);
+    // === REVERSE LOOKUP FUNCTIONS ===
+
+    /// Get DID controller by name (enhanced with Option return)
+    public fun get_did_controller_by_name(
+        registry: &DIDRegistry,
+        name: vector<u8>
+    ): option::Option<address> {
+        if (dynamic_field::exists_(&registry.id, name)) {
+            option::some(*dynamic_field::borrow(&registry.id, name))
+        } else {
+            option::none()
+        }
     }
 
-    // === HELPER FUNCTIONS FOR TESTING ===
-    
-    #[test_only]
-    /// Helper to create BatchResult for testing
-    public fun new_batch_result(index: u64, success: bool, error_code: u64): BatchResult {
-        BatchResult { index, success, error_code }
+    /// Get all DIDs controlled by a specific address
+    public fun get_dids_by_controller(
+        registry: &DIDRegistry,
+        controller: address
+    ): vector<address> {
+        let controller_key = address_to_string(controller);
+        if (dynamic_field::exists_(&registry.id, controller_key)) {
+            *dynamic_field::borrow(&registry.id, controller_key)
+        } else {
+            vector::empty<address>()
+        }
+    }
+
+    /// Get registry statistics
+    public fun get_registry_stats(registry: &DIDRegistry): u64 {
+        registry.total_dids
+    }
+
+    /// Check if a DID name exists in the registry
+    public fun did_name_exists(
+        registry: &DIDRegistry,
+        name: vector<u8>
+    ): bool {
+        dynamic_field::exists_(&registry.id, name)
+    }
+
+    // === HELPER FUNCTIONS ===
+
+    /// Convert address to string for indexing (simple approach)
+    fun address_to_string(addr: address): vector<u8> {
+        // Create a unique key by prefixing with "controller_" and converting address
+        let mut key = b"controller_";
+        // Convert address to u256 then to bytes
+        let addr_u256 = sui::address::to_u256(addr);
+        let mut temp = addr_u256;
+        
+        if (temp == 0) {
+            vector::push_back(&mut key, 0);
+        } else {
+            while (temp > 0) {
+                vector::push_back(&mut key, ((temp % 256) as u8));
+                temp = temp / 256;
+            };
+        };
+        key
     }
 }

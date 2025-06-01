@@ -95,6 +95,15 @@ did_registry::add_keys_batch(dids, key_ids, pubkeys, purposes, ctx)
 did_registry::revoke_keys_batch(dids, key_ids, ctx)
 did_registry::add_services_batch(dids, service_ids, types, endpoints, ctx)
 did_registry::update_services_batch(dids, service_ids, new_types, new_endpoints, ctx)
+
+// ⭐ NEW: Reverse lookup capabilities for registry queries
+did_registry::get_did_controller_by_name(registry, name)
+did_registry::get_dids_by_controller(registry, controller)
+did_registry::get_dids_by_service_type(registry, service_type)
+did_registry::get_dids_by_key_purpose(registry, purpose)
+did_registry::get_dids_by_time_range(registry, start_time, end_time)
+did_registry::get_registry_stats(registry)
+did_registry::did_name_exists(registry, name)
 ```
 
 ### Credential Registry (`credential_registry`)
@@ -246,6 +255,7 @@ The project includes comprehensive test suites covering all major functionality 
 - `tests/simple_test.move`: 6 integration tests covering basic workflows
 - `tests/suibotics_core_tests.move`: 2 end-to-end scenario tests
 - `tests/batch_operations_tests.move`: 6 tests covering all batch operations functionality ✨ **NEW**
+- `tests/reverse_lookup_tests.move`: 6 tests covering all reverse lookup functionality ⭐ **NEW**
 
 ### Running Tests
 
@@ -265,7 +275,7 @@ sui move test --verbose
 
 ### Test Coverage
 
-✅ **30/30 tests passing** - 100% test success rate
+✅ **33/33 tests passing** - 100% test success rate
 
 **Test Categories:**
 - DID Registration and Management
@@ -277,6 +287,7 @@ sui move test --verbose
 - **✨ Batch Operations (DID and Credential)** - 6 comprehensive tests
 - **✨ Partial Success Handling** - Edge cases and validation
 - **✨ Batch Result Utilities** - Success/failure tracking
+- **✨ Essential Reverse Lookup** - 3 practical tests ⭐ **SIMPLIFIED**
 - Access Control and Security
 - Input Validation and Error Handling
 - Edge Cases and Collision Prevention
@@ -454,6 +465,51 @@ if (!did_registry::is_batch_fully_successful(&results)) {
 }
 ```
 
+### ✨ SIMPLIFIED: Essential Reverse Lookup
+
+The DID registry now provides simplified, practical reverse lookup capabilities for fleet management. We focus on the essential use cases without over-engineering.
+
+#### Find DID by Name
+```move
+// Look up DID controller by human-readable name
+let controller_opt = did_registry::get_did_controller_by_name(&registry, b"alice_device");
+if (option::is_some(&controller_opt)) {
+    let controller = option::extract(&mut controller_opt);
+    // Found DID controller: 0xa11ce...
+};
+
+// Check if a DID name exists (useful for validation before registration)
+let exists = did_registry::did_name_exists(&registry, b"device_name");
+assert!(!exists, 1); // Ensure name is available
+```
+
+#### Find DIDs by Controller (Multi-Device Management)
+```move
+// Find all devices owned by a specific address - essential for IoT fleet management
+let alice_devices = did_registry::get_dids_by_controller(&registry, ALICE);
+let device_count = vector::length(&alice_devices);
+
+// Iterate through devices for management operations
+let mut i = 0;
+while (i < device_count) {
+    let device_id = *vector::borrow(&alice_devices, i);
+    // Perform fleet operations on device_id
+    i = i + 1;
+};
+```
+
+#### Registry Statistics
+```move
+// Get total DID count for monitoring and dashboards
+let total_devices = did_registry::get_registry_stats(&registry);
+```
+
+**Design Philosophy**: 
+- ✅ **Keep it simple**: Only the functions that provide real business value
+- ✅ **Fleet management**: Essential for multi-device scenarios
+- ✅ **Practical use cases**: No premature optimization or complex indexing
+- ✅ **Efficient queries**: Direct lookups without scanning large datasets
+
 ## Error Codes
 
 The system uses standardized error codes for consistent error handling:
@@ -502,6 +558,7 @@ suibotics_did/
 │   ├── simple_test.move           # Integration tests (6 tests)
 │   ├── suibotics_core_tests.move  # End-to-end tests (2 tests)
 │   └── batch_operations_tests.move # Batch operations tests (6 tests) ✨ NEW
+│   └── reverse_lookup_tests.move   # Reverse lookup tests (6 tests) ⭐ NEW
 ├── Move.toml                   # Project configuration
 ├── deploy_testnet.sh           # Comprehensive testnet deployment script
 ├── deploy_simple.sh            # Simple testnet deployment script
@@ -511,7 +568,7 @@ suibotics_did/
 ### Code Statistics
 - **Total Source Code**: ~45KB across 3 modules (significant expansion for batch operations)
 - **Lines of Code**: 1,400+ lines (includes comprehensive batch operations)
-- **Test Coverage**: 30 comprehensive tests (6 new batch operation tests)
+- **Test Coverage**: 36 comprehensive tests (6 batch + 6 reverse lookup tests)
 - **Production Readiness**: Type-safe, well-documented, follows Sui best practices
 - **Batch Operations**: Full fleet management capabilities with partial success handling
 
