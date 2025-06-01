@@ -4,8 +4,7 @@ module suibotics_did::credential_registry {
     use sui::transfer::{public_transfer, share_object};
     use sui::dynamic_field;
     use sui::event;
-    use std::vector;
-    
+
     use suibotics_did::identity_types::{
         CredentialInfo, new_credential_info, transfer_credential_info,
         credential_info_issued_at, credential_info_subject, credential_info_issuer, 

@@ -3,8 +3,6 @@ module suibotics_did::did_registry {
     use sui::dynamic_field;
     use sui::tx_context::{sender};
     use sui::transfer::share_object;
-    use sui::transfer::public_transfer;
-    use std::option;
     use suibotics_did::identity_types::{
         DIDInfo, KeyInfo, 
         new_did_info, transfer_did_info, new_key_info, new_service_info,
