@@ -23,7 +23,7 @@ module suibotics_did::integration_tests {
     use std::vector;
     
     use suibotics_did::did_registry::{Self, DIDRegistry};
-    use suibotics_did::credential_registry;
+    use suibotics_did::credential_registry::{Self, CredentialRegistry};
     use suibotics_did::identity_types::{DIDInfo, CredentialInfo, did_info_controller};
 
     // Test addresses
@@ -57,23 +57,26 @@ module suibotics_did::integration_tests {
         let mut scenario = ts::begin(ALICE);
         let ctx = ts::ctx(&mut scenario);
         
-        // Initialize DID registry
+        // Initialize DID registry and credential registry
         did_registry::test_init(ctx);
+        credential_registry::test_init(ctx);
         ts::next_tx(&mut scenario, ALICE);
         
-        // Get the shared registry
-        let mut registry = ts::take_shared<DIDRegistry>(&scenario);
+        // Get the shared registries
+        let mut did_registry = ts::take_shared<DIDRegistry>(&scenario);
+        let mut cred_registry = ts::take_shared<CredentialRegistry>(&scenario);
         
         // Alice registers her DID
         did_registry::register_did(
-            &mut registry,
+            &mut did_registry,
             b"alice_identity",
             dummy_pubkey(),
             b"authentication",
             ts::ctx(&mut scenario)
         );
         
-        ts::return_shared(registry);
+        ts::return_shared(did_registry);
+        ts::return_shared(cred_registry);
         ts::next_tx(&mut scenario, ALICE);
         
         // Verify Alice's DID was created
@@ -102,12 +105,15 @@ module suibotics_did::integration_tests {
         ts::next_tx(&mut scenario, ALICE);
         
         // Alice issues a credential to Bob
+        let mut cred_registry = ts::take_shared<CredentialRegistry>(&scenario);
         credential_registry::issue_credential(
+            &mut cred_registry,
             BOB,
             b"DeviceCertificate",
             dummy_sha256_hash(),
             ts::ctx(&mut scenario)
         );
+        ts::return_shared(cred_registry);
         
         ts::next_tx(&mut scenario, BOB);
         
@@ -120,7 +126,9 @@ module suibotics_did::integration_tests {
         ts::next_tx(&mut scenario, ALICE);
         
         // Alice later revokes the credential
-        credential_registry::revoke_credential(&mut bobs_credential, ts::ctx(&mut scenario));
+        let mut cred_registry = ts::take_shared<CredentialRegistry>(&scenario);
+        credential_registry::revoke_credential(&mut cred_registry, &mut bobs_credential, ts::ctx(&mut scenario));
+        ts::return_shared(cred_registry);
         
         // Verify the credential is now revoked
         assert!(credential_registry::is_revoked(&bobs_credential), 4);
@@ -134,15 +142,17 @@ module suibotics_did::integration_tests {
         let mut scenario = ts::begin(ALICE);
         let ctx = ts::ctx(&mut scenario);
         
-        // Initialize DID registry
+        // Initialize DID registry and credential registry
         did_registry::test_init(ctx);
+        credential_registry::test_init(ctx);
         ts::next_tx(&mut scenario, ALICE);
         
-        let mut registry = ts::take_shared<DIDRegistry>(&scenario);
+        let mut did_registry = ts::take_shared<DIDRegistry>(&scenario);
+        let mut cred_registry = ts::take_shared<CredentialRegistry>(&scenario);
         
         // Alice registers her DID
         did_registry::register_did(
-            &mut registry,
+            &mut did_registry,
             b"alice_ca",
             dummy_pubkey(),
             b"authentication",
@@ -153,18 +163,19 @@ module suibotics_did::integration_tests {
         
         // Bob registers his DID
         did_registry::register_did(
-            &mut registry,
+            &mut did_registry,
             b"bob_device",
             dummy_pubkey(),
             b"authentication",
             ts::ctx(&mut scenario)
         );
         
-        ts::return_shared(registry);
+        ts::return_shared(did_registry);
         ts::next_tx(&mut scenario, ALICE);
         
         // Alice (acting as CA) issues multiple credentials to Bob
         credential_registry::issue_credential(
+            &mut cred_registry,
             BOB,
             b"FirmwareAttestation",
             dummy_sha256_hash(),
@@ -172,12 +183,14 @@ module suibotics_did::integration_tests {
         );
         
         credential_registry::issue_credential(
+            &mut cred_registry,
             BOB,
             b"ManufacturerCert",
             dummy_sha256_hash(),
             ts::ctx(&mut scenario)
         );
         
+        ts::return_shared(cred_registry);
         ts::next_tx(&mut scenario, BOB);
         
         // Bob should have received both credentials

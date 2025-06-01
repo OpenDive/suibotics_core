@@ -335,6 +335,10 @@ module suibotics_did::identity_types {
     }
 
     // Accessor and mutator functions for CredentialInfo
+    public fun credential_info_id(cred: &CredentialInfo): &UID {
+        &cred.id
+    }
+
     public fun credential_info_subject(cred: &CredentialInfo): address {
         cred.subject
     }

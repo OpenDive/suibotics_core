@@ -1,10 +1,10 @@
 #[test_only]
-module suibotics_did::simple_test {
+module suibotics_did::simple_tests {
     use sui::test_scenario::{Self as ts};
     use std::vector;
     
     use suibotics_did::did_registry::{Self, DIDRegistry};
-    use suibotics_did::credential_registry;
+    use suibotics_did::credential_registry::{Self, CredentialRegistry};
     use suibotics_did::identity_types::{
         DIDInfo, CredentialInfo, did_info_controller,
         validate_address, validate_name, validate_public_key, validate_schema,
@@ -102,15 +102,24 @@ module suibotics_did::simple_test {
     #[test]
     fun test_credential_issuance() {
         let mut scenario = ts::begin(ALICE);
+        let ctx = ts::ctx(&mut scenario);
+        
+        // Initialize credential registry
+        credential_registry::test_init(ctx);
+        ts::next_tx(&mut scenario, ALICE);
+        
+        let mut cred_registry = ts::take_shared<CredentialRegistry>(&scenario);
         
         // Issue a credential from Alice to Bob
         credential_registry::issue_credential(
+            &mut cred_registry,
             BOB,
             b"FirmwareCertV1",
             dummy_sha256_hash(),
             ts::ctx(&mut scenario)
         );
         
+        ts::return_shared(cred_registry);
         ts::next_tx(&mut scenario, BOB);
         
         // Verify the credential was transferred to Bob
@@ -132,15 +141,24 @@ module suibotics_did::simple_test {
     #[test]
     fun test_credential_revocation() {
         let mut scenario = ts::begin(ALICE);
+        let ctx = ts::ctx(&mut scenario);
+        
+        // Initialize credential registry
+        credential_registry::test_init(ctx);
+        ts::next_tx(&mut scenario, ALICE);
+        
+        let mut cred_registry = ts::take_shared<CredentialRegistry>(&scenario);
         
         // Issue a credential
         credential_registry::issue_credential(
+            &mut cred_registry,
             BOB,
             b"TestCredential",
             dummy_sha256_hash(),
             ts::ctx(&mut scenario)
         );
         
+        ts::return_shared(cred_registry);
         ts::next_tx(&mut scenario, BOB);
         let mut cred = ts::take_from_sender<CredentialInfo>(&scenario);
         
@@ -150,7 +168,9 @@ module suibotics_did::simple_test {
         ts::next_tx(&mut scenario, ALICE);
         
         // Revoke the credential (as the issuer)
-        credential_registry::revoke_credential(&mut cred, ts::ctx(&mut scenario));
+        let mut cred_registry = ts::take_shared<CredentialRegistry>(&scenario);
+        credential_registry::revoke_credential(&mut cred_registry, &mut cred, ts::ctx(&mut scenario));
+        ts::return_shared(cred_registry);
         
         // Verify it's now revoked
         assert!(credential_registry::is_revoked(&cred), 1);
