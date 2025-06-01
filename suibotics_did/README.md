@@ -49,6 +49,95 @@ The system consists of three focused modules with clean separation of concerns:
 - **Service Lifecycle Management**: Complete add → update → remove workflow with audit trails
 - **Production-Ready Patterns**: Comprehensive error handling, validation, and event emission
 
+## Dual Registry System
+
+Suibotics DID uses **two separate registry systems** that serve distinct but complementary purposes:
+
+### DID Registry (`did_registry`)
+**Purpose**: Manages **Decentralized Identifiers (DIDs)** and their associated identity data
+
+**What it stores:**
+- **DID documents** with verification methods (public keys)
+- **Service endpoints** (like MQTT brokers, API endpoints)
+- **Name-to-address mappings** for human-readable DID names
+- **Key management** (add, revoke keys)
+
+**Key functions:**
+```move
+// Register a new DID identity
+did_registry::register_did(registry, name, pubkey, purpose, ctx)
+
+// Add keys for different purposes (authentication, assertion, etc.)
+did_registry::add_key(did, key_id, pubkey, purpose, ctx)
+
+// Manage service endpoints
+did_registry::add_service(did, service_id, service_type, endpoint, ctx)
+did_registry::update_service(did, service_id, new_type, new_endpoint, ctx)
+did_registry::remove_service(did, service_id, ctx)
+
+// Build W3C-compliant DID documents
+did_registry::build_did_document(did, did_string, key_ids, service_ids)
+```
+
+### Credential Registry (`credential_registry`)
+**Purpose**: Manages **Verifiable Credentials** and enables credential discovery
+
+**What it stores:**
+- **Credential metadata** (issuer, subject, schema, timestamps)
+- **Discovery indices** (by subject, issuer, schema, time ranges)
+- **Revocation status** tracking
+- **Registry statistics** (total credentials, active, revoked)
+
+**Key functions:**
+```move
+// Issue credentials to subjects
+credential_registry::issue_credential(registry, subject, schema, data_hash, ctx)
+
+// Revoke credentials
+credential_registry::revoke_credential(registry, credential, ctx)
+
+// Discovery functions
+credential_registry::get_credentials_by_subject(registry, subject)
+credential_registry::get_credentials_by_issuer(registry, issuer)
+credential_registry::get_credentials_by_schema(registry, schema)
+credential_registry::get_active_credentials_by_subject(registry, subject)
+```
+
+### Architectural Comparison
+
+| Aspect | DID Registry | Credential Registry |
+|--------|-------------|-------------------|
+| **Data Focus** | Identity & verification methods | Attestations & claims |
+| **Ownership** | DIDs owned by controllers | Credentials owned by subjects |
+| **Discovery** | Name-based lookup | Multi-dimensional indexing |
+| **Lifecycle** | Create → Update → (Keys/Services) | Issue → Verify → Revoke |
+| **Standards** | W3C DID Core specification | W3C VC Data Model |
+
+### Why Separate Registries?
+
+1. **Separation of Concerns**: Identity management vs. credential management are distinct functions
+2. **Scalability**: Each registry can be optimized for its specific access patterns
+3. **Security**: Different access controls and validation rules
+4. **Standards Compliance**: Each follows different W3C specifications
+
+### How They Work Together
+
+```move
+// 1. Alice registers her DID (identity)
+did_registry::register_did(&mut did_registry, b"alice_ca", pubkey, b"authentication", ctx);
+
+// 2. Alice issues a credential to Bob (using her DID as issuer)
+credential_registry::issue_credential(&mut cred_registry, BOB, b"DeviceCert", hash, ctx);
+
+// 3. Bob can discover all credentials issued to him
+let bobs_creds = credential_registry::get_credentials_by_subject(&cred_registry, BOB);
+
+// 4. Anyone can resolve Alice's DID to verify her keys
+let alice_did_doc = did_registry::build_did_document(&alice_did, did_string, key_ids, service_ids);
+```
+
+This separation makes the system more modular, secure, and allows each registry to be optimized for its specific use case.
+
 ## Prerequisites
 
 - **Sui CLI**: Version 1.49.1 or later
