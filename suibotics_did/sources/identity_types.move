@@ -5,9 +5,11 @@ module suibotics_did::identity_types {
     use sui::event;
     use std::vector;
 
-    // Error constants
+    // === ERROR CONSTANTS (STANDARDIZED ACROSS ALL MODULES) ===
+
+    // Core validation errors (1-9)
     const E_INVALID_CONTROLLER: u64 = 1;
-    const E_KEY_NOT_FOUND: u64 = 2;
+    const E_KEY_NOT_FOUND: u64 = 2; 
     const E_KEY_ALREADY_EXISTS: u64 = 3;
     const E_NAME_ALREADY_EXISTS: u64 = 4;
     const E_INVALID_PUBLIC_KEY: u64 = 5;
@@ -16,23 +18,102 @@ module suibotics_did::identity_types {
     const E_FIELD_TOO_LONG: u64 = 8;
     const E_INVALID_ADDRESS: u64 = 9;
 
-    // Public error code accessors
+    // Batch operation errors (10-19)
+    const E_BATCH_TOO_LARGE: u64 = 10;
+    const E_BATCH_SIZE_MISMATCH: u64 = 11;
+    const E_BATCH_EMPTY: u64 = 12;
+
+    // Credential-specific errors (20-29)  
+    const E_CREDENTIAL_NOT_FOUND: u64 = 20;
+    const E_CREDENTIAL_ALREADY_REVOKED: u64 = 21;
+    const E_UNAUTHORIZED_REVOCATION: u64 = 22;
+    const E_INVALID_SCHEMA: u64 = 23;
+    const E_CREDENTIAL_EXPIRED: u64 = 24;
+
+    // Service management errors (30-39)
+    const E_SERVICE_NOT_FOUND: u64 = 30;
+    const E_SERVICE_ALREADY_EXISTS: u64 = 31;
+    const E_INVALID_SERVICE_TYPE: u64 = 32;
+    const E_INVALID_ENDPOINT: u64 = 33;
+
+    // Registry errors (40-49)
+    const E_REGISTRY_NOT_FOUND: u64 = 40;
+    const E_REGISTRY_FULL: u64 = 41;
+    const E_INDEX_CORRUPTED: u64 = 42;
+
+    // Future expansion (50+)
+    // Reserved for future error categories
+
+    // === ERROR CODE ACCESSOR FUNCTIONS ===
+
+    /// Get error code for invalid controller
     public fun e_invalid_controller(): u64 { E_INVALID_CONTROLLER }
+
+    /// Get error code for key not found
     public fun e_key_not_found(): u64 { E_KEY_NOT_FOUND }
+
+    /// Get error code for key already exists
     public fun e_key_already_exists(): u64 { E_KEY_ALREADY_EXISTS }
+
+    /// Get error code for name already exists
     public fun e_name_already_exists(): u64 { E_NAME_ALREADY_EXISTS }
+
+    /// Get error code for invalid public key
     public fun e_invalid_public_key(): u64 { E_INVALID_PUBLIC_KEY }
+
+    /// Get error code for invalid data hash
     public fun e_invalid_data_hash(): u64 { E_INVALID_DATA_HASH }
+
+    /// Get error code for empty field
     public fun e_empty_field(): u64 { E_EMPTY_FIELD }
+
+    /// Get error code for field too long
     public fun e_field_too_long(): u64 { E_FIELD_TOO_LONG }
+
+    /// Get error code for invalid address
     public fun e_invalid_address(): u64 { E_INVALID_ADDRESS }
 
+    /// Get error code for batch too large
+    public fun e_batch_too_large(): u64 { E_BATCH_TOO_LARGE }
+
+    /// Get error code for batch size mismatch
+    public fun e_batch_size_mismatch(): u64 { E_BATCH_SIZE_MISMATCH }
+
+    /// Get error code for empty batch
+    public fun e_batch_empty(): u64 { E_BATCH_EMPTY }
+
+    /// Get error code for credential not found
+    public fun e_credential_not_found(): u64 { E_CREDENTIAL_NOT_FOUND }
+
+    /// Get error code for credential already revoked
+    public fun e_credential_already_revoked(): u64 { E_CREDENTIAL_ALREADY_REVOKED }
+
+    /// Get error code for unauthorized revocation
+    public fun e_unauthorized_revocation(): u64 { E_UNAUTHORIZED_REVOCATION }
+
+    /// Get error code for invalid schema
+    public fun e_invalid_schema(): u64 { E_INVALID_SCHEMA }
+
+    /// Get error code for service not found
+    public fun e_service_not_found(): u64 { E_SERVICE_NOT_FOUND }
+
+    /// Get error code for service already exists
+    public fun e_service_already_exists(): u64 { E_SERVICE_ALREADY_EXISTS }
+
     // Constants for validation
-    const MAX_NAME_LENGTH: u64 = 255;
-    const MAX_SCHEMA_LENGTH: u64 = 1000;
-    const MAX_ENDPOINT_LENGTH: u64 = 2000;
     const ED25519_PUBLIC_KEY_LENGTH: u64 = 32;
     const SHA256_HASH_LENGTH: u64 = 32;
+    const MAX_NAME_LENGTH: u64 = 255;
+    const MAX_SCHEMA_LENGTH: u64 = 255;
+    const MAX_ENDPOINT_LENGTH: u64 = 2000;
+
+    // Batch operation constants
+    const MAX_BATCH_SIZE: u64 = 50;
+
+    // === BATCH OPERATION CONSTANTS ACCESSOR FUNCTIONS ===
+    
+    /// Get maximum batch size for operations
+    public fun max_batch_size(): u64 { MAX_BATCH_SIZE }
 
     // Type-safe dynamic field keys to prevent collisions
     public struct KeyFieldKey has copy, drop, store {

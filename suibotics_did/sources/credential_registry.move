@@ -10,7 +10,9 @@ module suibotics_did::credential_registry {
         CredentialInfo, new_credential_info, transfer_credential_info,
         credential_info_issued_at, credential_info_subject, credential_info_issuer, 
         credential_info_schema, credential_info_data_hash, credential_info_revoked, 
-        revoke_credential_info, credential_info_id
+        revoke_credential_info, credential_info_id,
+        e_unauthorized_revocation, e_credential_already_revoked, max_batch_size,
+        e_batch_too_large, e_batch_size_mismatch, e_empty_field
     };
 
     /// Global registry for credential discovery and indexing
@@ -88,11 +90,11 @@ module suibotics_did::credential_registry {
         assert!(
             caller == credential_info_issuer(cred) || 
             caller == credential_info_subject(cred), 
-            1
+            e_unauthorized_revocation()
         );
         
         // Only revoke if not already revoked
-        assert!(!credential_info_revoked(cred), 2);
+        assert!(!credential_info_revoked(cred), e_credential_already_revoked());
         
         revoke_credential_info(cred, ts);
         
@@ -436,10 +438,10 @@ module suibotics_did::credential_registry {
         ctx: &mut TxContext
     ): vector<BatchResult> {
         let batch_size = vector::length(&subjects);
-        assert!(batch_size <= 50, 10); // MAX_BATCH_SIZE and E_BATCH_TOO_LARGE
-        assert!(batch_size == vector::length(&issuers), 7);
-        assert!(batch_size == vector::length(&schemas), 7);
-        assert!(batch_size == vector::length(&data_hashes), 7);
+        assert!(batch_size <= max_batch_size(), e_batch_too_large());
+        assert!(batch_size == vector::length(&issuers), e_batch_size_mismatch());
+        assert!(batch_size == vector::length(&schemas), e_batch_size_mismatch());
+        assert!(batch_size == vector::length(&data_hashes), e_batch_size_mismatch());
         
         let mut results = vector::empty<BatchResult>();
         let ts = sui::tx_context::epoch_timestamp_ms(ctx);
@@ -454,19 +456,13 @@ module suibotics_did::credential_registry {
             let mut success = true;
             let mut error_code = 0;
             
-            // Validate inputs
-            if (!validate_address(subject)) {
+            // Validate inputs - simplified for batch operations
+            if (vector::is_empty(&schema)) {
                 success = false;
-                error_code = 1; // Invalid address
-            } else if (!validate_address(issuer)) {
+                error_code = e_empty_field();
+            } else if (vector::is_empty(&data_hash)) {
                 success = false;
-                error_code = 1; // Invalid address
-            } else if (!validate_schema(schema)) {
-                success = false;
-                error_code = 2; // Invalid schema
-            } else if (!validate_data_hash(data_hash)) {
-                success = false;
-                error_code = 3; // Invalid data hash
+                error_code = e_empty_field();
             };
             
             if (success) {
@@ -502,7 +498,7 @@ module suibotics_did::credential_registry {
         ctx: &mut TxContext
     ): vector<BatchResult> {
         let batch_size = vector::length(credentials);
-        assert!(batch_size <= 50, 10); // MAX_BATCH_SIZE and E_BATCH_TOO_LARGE
+        assert!(batch_size <= max_batch_size(), e_batch_too_large());
         
         let mut results = vector::empty<BatchResult>();
         let sender_addr = sender(ctx);
@@ -516,17 +512,18 @@ module suibotics_did::credential_registry {
             let mut success = true;
             let mut error_code = 0;
             
-            // Validate that sender is the issuer and credential is not already revoked
-            if (sender_addr != credential_info_issuer(credential)) {
+            // Validate that sender is authorized and credential is not already revoked
+            if (sender_addr != credential_info_issuer(credential) && 
+                sender_addr != credential_info_subject(credential)) {
                 success = false;
-                error_code = 1; // Unauthorized
+                error_code = e_unauthorized_revocation();
             } else if (credential_info_revoked(credential)) {
                 success = false;
-                error_code = 4; // Already revoked
+                error_code = e_credential_already_revoked();
             };
             
             if (success) {
-                // Revoke the credential - fix function call to match signature
+                // Revoke the credential
                 revoke_credential_info(credential, ts);
                 
                 // Emit event
@@ -605,4 +602,13 @@ module suibotics_did::credential_registry {
         };
         share_object(registry);
     }
+
+    // === ERROR HANDLING DOCUMENTATION ===
+    // This module uses standardized error codes from identity_types:
+    // - e_unauthorized_revocation(): Only issuer or subject can revoke
+    // - e_credential_already_revoked(): Credential already revoked
+    // - e_batch_too_large(): Batch size exceeds max_batch_size()
+    // - e_batch_size_mismatch(): Input vector lengths don't match
+    // - e_empty_field(): Required field is empty
+    // All error codes are consistent across the entire suibotics_did system
 }

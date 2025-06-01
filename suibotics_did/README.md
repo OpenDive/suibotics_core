@@ -512,8 +512,9 @@ let total_devices = did_registry::get_registry_stats(&registry);
 
 ## Error Codes
 
-The system uses standardized error codes for consistent error handling:
+The system uses **standardized error codes** for consistent error handling across all modules:
 
+### Core Validation Errors (1-9)
 - `1`: Invalid controller (unauthorized access)
 - `2`: Key not found
 - `3`: Key already exists
@@ -523,7 +524,47 @@ The system uses standardized error codes for consistent error handling:
 - `7`: Empty field
 - `8`: Field too long
 - `9`: Invalid address
-- `10`: Batch too large (max 50 operations) ✨ **NEW**
+
+### Batch Operation Errors (10-19)
+- `10`: Batch too large (max 50 operations) ✨ **IMPROVED**
+- `11`: Batch size mismatch (input vector lengths don't match) ✨ **NEW**
+- `12`: Batch empty (reserved for future use) ✨ **NEW**
+
+### Credential-Specific Errors (20-29) ✨ **NEW**
+- `20`: Credential not found
+- `21`: Credential already revoked ✨ **IMPROVED**
+- `22`: Unauthorized revocation (only issuer or subject can revoke) ✨ **IMPROVED**
+- `23`: Invalid schema
+- `24`: Credential expired (reserved for future use)
+
+### Service Management Errors (30-39) ✨ **NEW**
+- `30`: Service not found ✨ **IMPROVED**
+- `31`: Service already exists ✨ **IMPROVED**
+- `32`: Invalid service type (reserved for future use)
+- `33`: Invalid endpoint (reserved for future use)
+
+### Registry Errors (40-49) ✨ **RESERVED**
+- `40-49`: Reserved for future registry-specific errors
+
+### Error Handling Improvements ✨ **NEW**
+
+**Consistent Error Patterns:**
+- ✅ **Standardized Error Constants**: All modules use the same error codes from `identity_types`
+- ✅ **Error Code Accessor Functions**: Clean API with functions like `e_invalid_controller()`
+- ✅ **Comprehensive Documentation**: Every error code is documented with clear descriptions
+- ✅ **Semantic Error Codes**: Specific errors for different contexts (service vs key vs credential)
+- ✅ **Future-Proof**: Reserved error code ranges for expansion
+
+**Before vs After:**
+```move
+// ❌ Before: Inconsistent hardcoded errors
+assert!(valid, 1);           // What does 1 mean?
+assert!(batch_size <= 50, 10); // Hardcoded values
+
+// ✅ After: Standardized semantic errors
+assert!(valid, e_invalid_controller());     // Clear meaning
+assert!(batch_size <= max_batch_size(), e_batch_too_large()); // Consistent patterns
+```
 
 ## Events
 

@@ -14,6 +14,8 @@ module suibotics_did::did_registry {
         validate_endpoint, validate_key_id, 
         emit_did_registered, emit_key_added, emit_key_revoked, emit_service_added,
         e_name_already_exists, e_key_already_exists, e_key_not_found, e_invalid_controller,
+        e_batch_too_large, e_batch_size_mismatch, e_empty_field, e_invalid_public_key,
+        e_service_already_exists, e_service_not_found, max_batch_size,
         KeyFieldKey, ServiceFieldKey, new_key_field_key, new_service_field_key,
         ServiceInfo, did_info_id,
         DIDDocumentData, VerificationMethodData, ServiceData,
@@ -181,7 +183,7 @@ module suibotics_did::did_registry {
         let service_field_key = new_service_field_key(svc_id);
 
         // Check if service ID already exists
-        assert!(!dynamic_field::exists_(did_info_id_mut(did), service_field_key), e_key_already_exists());
+        assert!(!dynamic_field::exists_(did_info_id_mut(did), service_field_key), e_service_already_exists());
 
         let svc = new_service_info(svc_id, svc_type, endpoint);
         dynamic_field::add(did_info_id_mut(did), service_field_key, svc);
@@ -209,7 +211,7 @@ module suibotics_did::did_registry {
         let service_field_key = new_service_field_key(svc_id);
 
         // Check if service exists before trying to remove it
-        assert!(dynamic_field::exists_(did_info_id_mut(did), service_field_key), e_key_not_found());
+        assert!(dynamic_field::exists_(did_info_id_mut(did), service_field_key), e_service_not_found());
 
         // Remove the service from dynamic fields
         let removed_service: ServiceInfo = dynamic_field::remove(did_info_id_mut(did), service_field_key);
@@ -241,7 +243,7 @@ module suibotics_did::did_registry {
         let service_field_key = new_service_field_key(svc_id);
 
         // Check if service exists before trying to update it
-        assert!(dynamic_field::exists_(did_info_id_mut(did), service_field_key), e_key_not_found());
+        assert!(dynamic_field::exists_(did_info_id_mut(did), service_field_key), e_service_not_found());
 
         // Get the current service to capture old values for event
         let current_service: &ServiceInfo = dynamic_field::borrow(did_info_id_mut(did), service_field_key);
@@ -404,12 +406,6 @@ module suibotics_did::did_registry {
         BatchResult { index, success, error_code }
     }
 
-    /// Maximum batch size to prevent gas limit issues
-    const MAX_BATCH_SIZE: u64 = 50;
-
-    /// Error code for batch size limit exceeded
-    const E_BATCH_TOO_LARGE: u64 = 10;
-
     /// Batch register multiple DIDs in a single transaction
     /// Returns vector of BatchResult indicating success/failure for each operation
     public entry fun register_dids_batch(
@@ -420,9 +416,9 @@ module suibotics_did::did_registry {
         ctx: &mut TxContext
     ): vector<BatchResult> {
         let batch_size = vector::length(&names);
-        assert!(batch_size <= MAX_BATCH_SIZE, E_BATCH_TOO_LARGE);
-        assert!(batch_size == vector::length(&pubkeys), 7);
-        assert!(batch_size == vector::length(&purposes), 7);
+        assert!(batch_size <= max_batch_size(), e_batch_too_large());
+        assert!(batch_size == vector::length(&pubkeys), e_batch_size_mismatch());
+        assert!(batch_size == vector::length(&purposes), e_batch_size_mismatch());
         
         let mut results = vector::empty<BatchResult>();
         let controller = sender(ctx);
@@ -440,16 +436,16 @@ module suibotics_did::did_registry {
             
             if (vector::is_empty(&name) || vector::length(&name) > 255) {
                 success = false;
-                error_code = 7; // E_EMPTY_FIELD or E_FIELD_TOO_LONG
+                error_code = e_empty_field();
             } else if (vector::length(&pubkey) != 32) {
                 success = false;
-                error_code = 5; // E_INVALID_PUBLIC_KEY
+                error_code = e_invalid_public_key();
             } else if (vector::is_empty(&purpose)) {
                 success = false;
-                error_code = 7; // E_EMPTY_FIELD
+                error_code = e_empty_field();
             } else if (dynamic_field::exists_(&registry.id, name)) {
                 success = false;
-                error_code = 4; // E_NAME_ALREADY_EXISTS
+                error_code = e_name_already_exists();
             };
             
             if (success) {
@@ -507,10 +503,10 @@ module suibotics_did::did_registry {
         ctx: &mut TxContext
     ): vector<BatchResult> {
         let batch_size = vector::length(dids);
-        assert!(batch_size <= MAX_BATCH_SIZE, E_BATCH_TOO_LARGE);
-        assert!(batch_size == vector::length(&key_ids), 7);
-        assert!(batch_size == vector::length(&pubkeys), 7);
-        assert!(batch_size == vector::length(&purposes), 7);
+        assert!(batch_size <= max_batch_size(), e_batch_too_large());
+        assert!(batch_size == vector::length(&key_ids), e_batch_size_mismatch());
+        assert!(batch_size == vector::length(&pubkeys), e_batch_size_mismatch());
+        assert!(batch_size == vector::length(&purposes), e_batch_size_mismatch());
         
         let mut results = vector::empty<BatchResult>();
         let sender_addr = sender(ctx);
@@ -529,21 +525,21 @@ module suibotics_did::did_registry {
             // Validate access control
             if (sender_addr != did_info_controller(did)) {
                 success = false;
-                error_code = 1; // E_INVALID_CONTROLLER
+                error_code = e_invalid_controller();
             } else if (vector::is_empty(&key_id)) {
                 success = false;
-                error_code = 7; // E_EMPTY_FIELD
+                error_code = e_empty_field();
             } else if (vector::length(&pubkey) != 32) {
                 success = false;
-                error_code = 5; // E_INVALID_PUBLIC_KEY
+                error_code = e_invalid_public_key();
             } else if (vector::is_empty(&purpose)) {
                 success = false;
-                error_code = 7; // E_EMPTY_FIELD
+                error_code = e_empty_field();
             } else {
                 let key_field_key = new_key_field_key(key_id);
                 if (dynamic_field::exists_(did_info_id_mut(did), key_field_key)) {
                     success = false;
-                    error_code = 3; // E_KEY_ALREADY_EXISTS
+                    error_code = e_key_already_exists();
                 };
             };
             
@@ -574,8 +570,8 @@ module suibotics_did::did_registry {
         ctx: &mut TxContext
     ): vector<BatchResult> {
         let batch_size = vector::length(dids);
-        assert!(batch_size <= MAX_BATCH_SIZE, E_BATCH_TOO_LARGE);
-        assert!(batch_size == vector::length(&key_ids), 7);
+        assert!(batch_size <= max_batch_size(), e_batch_too_large());
+        assert!(batch_size == vector::length(&key_ids), e_batch_size_mismatch());
         
         let mut results = vector::empty<BatchResult>();
         let sender_addr = sender(ctx);
@@ -592,15 +588,15 @@ module suibotics_did::did_registry {
             // Validate access control
             if (sender_addr != did_info_controller(did)) {
                 success = false;
-                error_code = 1; // E_INVALID_CONTROLLER
+                error_code = e_invalid_controller();
             } else if (vector::is_empty(&key_id)) {
                 success = false;
-                error_code = 7; // E_EMPTY_FIELD
+                error_code = e_empty_field();
             } else {
                 let key_field_key = new_key_field_key(key_id);
                 if (!dynamic_field::exists_(did_info_id_mut(did), key_field_key)) {
                     success = false;
-                    error_code = 2; // E_KEY_NOT_FOUND
+                    error_code = e_key_not_found();
                 };
             };
             
@@ -633,10 +629,10 @@ module suibotics_did::did_registry {
         ctx: &mut TxContext
     ): vector<BatchResult> {
         let batch_size = vector::length(dids);
-        assert!(batch_size <= MAX_BATCH_SIZE, E_BATCH_TOO_LARGE);
-        assert!(batch_size == vector::length(&service_ids), 7);
-        assert!(batch_size == vector::length(&service_types), 7);
-        assert!(batch_size == vector::length(&endpoints), 7);
+        assert!(batch_size <= max_batch_size(), e_batch_too_large());
+        assert!(batch_size == vector::length(&service_ids), e_batch_size_mismatch());
+        assert!(batch_size == vector::length(&service_types), e_batch_size_mismatch());
+        assert!(batch_size == vector::length(&endpoints), e_batch_size_mismatch());
         
         let mut results = vector::empty<BatchResult>();
         let sender_addr = sender(ctx);
@@ -655,21 +651,21 @@ module suibotics_did::did_registry {
             // Validate access control and inputs
             if (sender_addr != did_info_controller(did)) {
                 success = false;
-                error_code = 1; // E_INVALID_CONTROLLER
+                error_code = e_invalid_controller();
             } else if (vector::is_empty(&service_id)) {
                 success = false;
-                error_code = 7; // E_EMPTY_FIELD
+                error_code = e_empty_field();
             } else if (vector::is_empty(&service_type)) {
                 success = false;
-                error_code = 7; // E_EMPTY_FIELD
+                error_code = e_empty_field();
             } else if (vector::is_empty(&endpoint) || vector::length(&endpoint) > 2000) {
                 success = false;
-                error_code = 7; // E_EMPTY_FIELD or E_FIELD_TOO_LONG
+                error_code = e_empty_field();
             } else {
                 let service_field_key = new_service_field_key(service_id);
                 if (dynamic_field::exists_(did_info_id_mut(did), service_field_key)) {
                     success = false;
-                    error_code = 3; // E_KEY_ALREADY_EXISTS (reuse for service exists)
+                    error_code = e_service_already_exists();
                 };
             };
             
@@ -702,10 +698,10 @@ module suibotics_did::did_registry {
         ctx: &mut TxContext
     ): vector<BatchResult> {
         let batch_size = vector::length(dids);
-        assert!(batch_size <= MAX_BATCH_SIZE, E_BATCH_TOO_LARGE);
-        assert!(batch_size == vector::length(&service_ids), 7);
-        assert!(batch_size == vector::length(&new_service_types), 7);
-        assert!(batch_size == vector::length(&new_endpoints), 7);
+        assert!(batch_size <= max_batch_size(), e_batch_too_large());
+        assert!(batch_size == vector::length(&service_ids), e_batch_size_mismatch());
+        assert!(batch_size == vector::length(&new_service_types), e_batch_size_mismatch());
+        assert!(batch_size == vector::length(&new_endpoints), e_batch_size_mismatch());
         
         let mut results = vector::empty<BatchResult>();
         let sender_addr = sender(ctx);
@@ -724,21 +720,21 @@ module suibotics_did::did_registry {
             // Validate access control and inputs
             if (sender_addr != did_info_controller(did)) {
                 success = false;
-                error_code = 1; // E_INVALID_CONTROLLER
+                error_code = e_invalid_controller();
             } else if (vector::is_empty(&service_id)) {
                 success = false;
-                error_code = 7; // E_EMPTY_FIELD
+                error_code = e_empty_field();
             } else if (vector::is_empty(&new_service_type)) {
                 success = false;
-                error_code = 7; // E_EMPTY_FIELD
+                error_code = e_empty_field();
             } else if (vector::is_empty(&new_endpoint) || vector::length(&new_endpoint) > 2000) {
                 success = false;
-                error_code = 7; // E_EMPTY_FIELD or E_FIELD_TOO_LONG
+                error_code = e_empty_field();
             } else {
                 let service_field_key = new_service_field_key(service_id);
                 if (!dynamic_field::exists_(did_info_id_mut(did), service_field_key)) {
                     success = false;
-                    error_code = 2; // E_KEY_NOT_FOUND (reuse for service not found)
+                    error_code = e_service_not_found();
                 };
             };
             
