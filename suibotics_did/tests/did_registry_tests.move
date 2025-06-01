@@ -12,7 +12,11 @@ module suibotics_did::did_registry_tests {
         DIDInfo, KeyInfo, ServiceInfo,
         did_info_controller, key_info_pubkey, key_info_purpose, key_info_revoked,
         service_info_id, service_info_type, service_info_endpoint,
-        e_name_already_exists, e_key_already_exists, e_key_not_found, e_invalid_controller
+        e_name_already_exists, e_key_already_exists, e_key_not_found, e_invalid_controller,
+        // Import DID document structures for testing
+        DIDDocumentData, did_document_verification_methods, did_document_services,
+        did_document_authentication, verification_method_id, verification_method_revoked,
+        service_data_id, service_data_type
     };
 
     // Test addresses
@@ -464,6 +468,144 @@ module suibotics_did::did_registry_tests {
         // Verify both exist and can be retrieved
         assert!(did_registry::has_key(&did, b"endpoint1"), 0);
         assert!(did_registry::has_service(&did, b"endpoint1"), 1);
+        
+        ts::return_to_sender(&scenario, did);
+        ts::end(scenario);
+    }
+
+    #[test]
+    fun test_did_document_resolution() {
+        let mut scenario = ts::begin(ALICE);
+        let ctx = ts::ctx(&mut scenario);
+        
+        did_registry::test_init(ctx);
+        ts::next_tx(&mut scenario, ALICE);
+        
+        let mut registry = ts::take_shared<DIDRegistry>(&scenario);
+        
+        // Register a DID
+        did_registry::register_did(
+            &mut registry,
+            b"alice_did",
+            dummy_pubkey(),
+            b"authentication",
+            ts::ctx(&mut scenario)
+        );
+        
+        ts::return_shared(registry);
+        ts::next_tx(&mut scenario, ALICE);
+        
+        let mut did = ts::take_from_sender<DIDInfo>(&scenario);
+        
+        // Add additional keys and services
+        did_registry::add_key(
+            &mut did,
+            b"key_1",
+            dummy_pubkey_2(),
+            b"assertion",
+            ts::ctx(&mut scenario)
+        );
+        
+        did_registry::add_service(
+            &mut did,
+            b"mqtt_service",
+            b"MQTTBroker",
+            b"wss://mqtt.example.com:8883",
+            ts::ctx(&mut scenario)
+        );
+        
+        // Build DID document using the basic resolver
+        let doc = did_registry::build_basic_did_document(&did, b"did:sui:alice");
+        
+        // Verify the DID document structure
+        let verification_methods = did_document_verification_methods(&doc);
+        let services = did_document_services(&doc);
+        let authentication = did_document_authentication(&doc);
+        
+        // Should have 2 verification methods (key_0 and key_1)
+        assert!(vector::length(verification_methods) == 2, 0);
+        
+        // Should have 1 service (mqtt_service)
+        assert!(vector::length(services) == 1, 1);
+        
+        // Should have 1 authentication key (key_0 with authentication purpose)
+        assert!(vector::length(authentication) == 1, 2);
+        
+        // Verify key_0 exists and is for authentication
+        let vm0 = vector::borrow(verification_methods, 0);
+        assert!(*verification_method_id(vm0) == b"key_0", 3);
+        assert!(!verification_method_revoked(vm0), 4);
+        
+        // Verify service exists
+        let svc0 = vector::borrow(services, 0);
+        assert!(*service_data_id(svc0) == b"mqtt_service", 5);
+        assert!(*service_data_type(svc0) == b"MQTTBroker", 6);
+        
+        ts::return_to_sender(&scenario, did);
+        ts::end(scenario);
+    }
+
+    #[test]
+    fun test_custom_did_document_resolution() {
+        let mut scenario = ts::begin(ALICE);
+        let ctx = ts::ctx(&mut scenario);
+        
+        did_registry::test_init(ctx);
+        ts::next_tx(&mut scenario, ALICE);
+        
+        let mut registry = ts::take_shared<DIDRegistry>(&scenario);
+        
+        // Register a DID
+        did_registry::register_did(
+            &mut registry,
+            b"alice_did",
+            dummy_pubkey(),
+            b"authentication",
+            ts::ctx(&mut scenario)
+        );
+        
+        ts::return_shared(registry);
+        ts::next_tx(&mut scenario, ALICE);
+        
+        let mut did = ts::take_from_sender<DIDInfo>(&scenario);
+        
+        // Add custom keys and services
+        did_registry::add_key(
+            &mut did,
+            b"custom_key",
+            dummy_pubkey_2(),
+            b"assertion",
+            ts::ctx(&mut scenario)
+        );
+        
+        did_registry::add_service(
+            &mut did,
+            b"custom_service",
+            b"CustomAPI",
+            b"https://api.example.com",
+            ts::ctx(&mut scenario)
+        );
+        
+        // Build DID document with specific key and service IDs
+        let key_ids = vector[b"key_0", b"custom_key"];
+        let service_ids = vector[b"custom_service"];
+        
+        let doc = did_registry::build_did_document(&did, b"did:sui:custom", key_ids, service_ids);
+        
+        // Verify the custom DID document
+        let verification_methods = did_document_verification_methods(&doc);
+        let services = did_document_services(&doc);
+        
+        // Should have 2 verification methods
+        assert!(vector::length(verification_methods) == 2, 0);
+        
+        // Should have 1 service
+        assert!(vector::length(services) == 1, 1);
+        
+        // Find the custom service
+        let svc = vector::borrow(services, 0);
+        assert!(*service_data_id(svc) == b"custom_service", 2);
+        assert!(*service_data_type(svc) == b"CustomAPI", 3);
         
         ts::return_to_sender(&scenario, did);
         ts::end(scenario);

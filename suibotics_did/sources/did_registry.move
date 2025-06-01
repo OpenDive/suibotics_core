@@ -14,7 +14,12 @@ module suibotics_did::did_registry {
         emit_did_registered, emit_key_added, emit_key_revoked, emit_service_added,
         e_name_already_exists, e_key_already_exists, e_key_not_found, e_invalid_controller,
         KeyFieldKey, ServiceFieldKey, new_key_field_key, new_service_field_key,
-        ServiceInfo, did_info_id
+        ServiceInfo, did_info_id,
+        DIDDocumentData, VerificationMethodData, ServiceData,
+        new_did_document_data, new_verification_method_data, new_service_data,
+        add_verification_method, add_authentication_key, add_service_to_doc,
+        key_info_pubkey, key_info_purpose, key_info_revoked,
+        service_info_id, service_info_type, service_info_endpoint, did_info_created_at
     };
 
     /// Global registry for name-to-DID mappings
@@ -199,5 +204,96 @@ module suibotics_did::did_registry {
     public fun has_service(did: &DIDInfo, service_id: vector<u8>): bool {
         let service_field_key = new_service_field_key(service_id);
         dynamic_field::exists_(did_info_id(did), service_field_key)
+    }
+
+    /// Build a DID document from a DID object with known key and service IDs
+    /// Note: This function requires the caller to provide the key and service IDs
+    /// since Move doesn't have easy dynamic field enumeration
+    public fun build_did_document(
+        did: &DIDInfo,
+        did_string: vector<u8>,
+        key_ids: vector<vector<u8>>,
+        service_ids: vector<vector<u8>>
+    ): DIDDocumentData {
+        let controller = did_info_controller(did);
+        let created_at = did_info_created_at(did);
+        
+        // Create the base DID document
+        let mut doc = new_did_document_data(did_string, controller, created_at);
+        
+        // Add all verification methods
+        let mut i = 0;
+        while (i < vector::length(&key_ids)) {
+            let key_id = *vector::borrow(&key_ids, i);
+            
+            if (has_key(did, key_id)) {
+                let key_info = get_key(did, key_id);
+                
+                // Create verification method data
+                let vm = new_verification_method_data(
+                    key_id,
+                    b"Ed25519VerificationKey2020",
+                    did_string,
+                    *key_info_pubkey(key_info),
+                    *key_info_purpose(key_info),
+                    key_info_revoked(key_info)
+                );
+                
+                add_verification_method(&mut doc, vm);
+                
+                // Add to authentication if purpose is authentication
+                if (*key_info_purpose(key_info) == b"authentication") {
+                    add_authentication_key(&mut doc, key_id);
+                };
+            };
+            
+            i = i + 1;
+        };
+        
+        // Add all services
+        let mut j = 0;
+        while (j < vector::length(&service_ids)) {
+            let service_id = *vector::borrow(&service_ids, j);
+            
+            if (has_service(did, service_id)) {
+                let service_info = get_service(did, service_id);
+                
+                let service_data = new_service_data(
+                    *service_info_id(service_info),
+                    *service_info_type(service_info),
+                    *service_info_endpoint(service_info)
+                );
+                
+                add_service_to_doc(&mut doc, service_data);
+            };
+            
+            j = j + 1;
+        };
+        
+        doc
+    }
+
+    /// Build a DID document with common default key and service IDs
+    /// This is a convenience function for the most common use case
+    public fun build_basic_did_document(did: &DIDInfo, did_string: vector<u8>): DIDDocumentData {
+        // Try common key IDs
+        let key_ids = vector[
+            b"key_0",        // Initial key
+            b"key_1",        // Additional keys
+            b"key_2",
+            b"signing_key",
+            b"encryption_key"
+        ];
+        
+        // Try common service IDs  
+        let service_ids = vector[
+            b"mqtt_service",
+            b"mqtt1", 
+            b"endpoint1",
+            b"api_service",
+            b"broker"
+        ];
+        
+        build_did_document(did, did_string, key_ids, service_ids)
     }
 }

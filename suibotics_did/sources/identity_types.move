@@ -136,6 +136,31 @@ module suibotics_did::identity_types {
         issued_at: u64,         // issuance timestamp
     }
 
+    // DID Document representation structures
+    public struct DIDDocumentData has drop {
+        id: vector<u8>,                    // DID string
+        controller: address,               // Controller address
+        verification_methods: vector<VerificationMethodData>,
+        authentication: vector<vector<u8>>, // Key IDs for authentication
+        services: vector<ServiceData>,
+        created_at: u64,
+    }
+
+    public struct VerificationMethodData has drop {
+        id: vector<u8>,                    // Key ID
+        key_type: vector<u8>,              // "Ed25519VerificationKey2020"
+        controller: vector<u8>,            // DID string
+        public_key_bytes: vector<u8>,      // Raw public key
+        purpose: vector<u8>,               // "authentication", "assertion", etc.
+        revoked: bool,
+    }
+
+    public struct ServiceData has drop {
+        id: vector<u8>,                    // Service ID
+        service_type: vector<u8>,          // "MQTTBroker", etc.
+        service_endpoint: vector<u8>,      // Endpoint URL
+    }
+
     // Validation helper functions
     public fun validate_address(addr: address) {
         assert!(addr != @0x0, E_INVALID_ADDRESS);
@@ -384,5 +409,127 @@ module suibotics_did::identity_types {
             endpoint,
             timestamp,
         });
+    }
+
+    // Constructor functions for DID document structures
+    public fun new_did_document_data(
+        id: vector<u8>,
+        controller: address,
+        created_at: u64,
+    ): DIDDocumentData {
+        DIDDocumentData {
+            id,
+            controller,
+            verification_methods: vector::empty(),
+            authentication: vector::empty(),
+            services: vector::empty(),
+            created_at,
+        }
+    }
+
+    public fun new_verification_method_data(
+        id: vector<u8>,
+        key_type: vector<u8>,
+        controller: vector<u8>,
+        public_key_bytes: vector<u8>,
+        purpose: vector<u8>,
+        revoked: bool,
+    ): VerificationMethodData {
+        VerificationMethodData {
+            id,
+            key_type,
+            controller,
+            public_key_bytes,
+            purpose,
+            revoked,
+        }
+    }
+
+    public fun new_service_data(
+        id: vector<u8>,
+        service_type: vector<u8>,
+        service_endpoint: vector<u8>,
+    ): ServiceData {
+        ServiceData {
+            id,
+            service_type,
+            service_endpoint,
+        }
+    }
+
+    // Mutator functions for DID document
+    public fun add_verification_method(doc: &mut DIDDocumentData, vm: VerificationMethodData) {
+        vector::push_back(&mut doc.verification_methods, vm);
+    }
+
+    public fun add_authentication_key(doc: &mut DIDDocumentData, key_id: vector<u8>) {
+        vector::push_back(&mut doc.authentication, key_id);
+    }
+
+    public fun add_service_to_doc(doc: &mut DIDDocumentData, service: ServiceData) {
+        vector::push_back(&mut doc.services, service);
+    }
+
+    // Accessor functions for DID document structures
+    public fun did_document_id(doc: &DIDDocumentData): &vector<u8> {
+        &doc.id
+    }
+
+    public fun did_document_controller(doc: &DIDDocumentData): address {
+        doc.controller
+    }
+
+    public fun did_document_verification_methods(doc: &DIDDocumentData): &vector<VerificationMethodData> {
+        &doc.verification_methods
+    }
+
+    public fun did_document_authentication(doc: &DIDDocumentData): &vector<vector<u8>> {
+        &doc.authentication
+    }
+
+    public fun did_document_services(doc: &DIDDocumentData): &vector<ServiceData> {
+        &doc.services
+    }
+
+    public fun did_document_created_at(doc: &DIDDocumentData): u64 {
+        doc.created_at
+    }
+
+    // Accessor functions for VerificationMethodData
+    public fun verification_method_id(vm: &VerificationMethodData): &vector<u8> {
+        &vm.id
+    }
+
+    public fun verification_method_key_type(vm: &VerificationMethodData): &vector<u8> {
+        &vm.key_type
+    }
+
+    public fun verification_method_controller(vm: &VerificationMethodData): &vector<u8> {
+        &vm.controller
+    }
+
+    public fun verification_method_public_key_bytes(vm: &VerificationMethodData): &vector<u8> {
+        &vm.public_key_bytes
+    }
+
+    public fun verification_method_purpose(vm: &VerificationMethodData): &vector<u8> {
+        &vm.purpose
+    }
+
+    public fun verification_method_revoked(vm: &VerificationMethodData): bool {
+        vm.revoked
+    }
+
+    // Accessor functions for ServiceData
+    public fun service_data_id(svc: &ServiceData): &vector<u8> {
+        &svc.id
+    }
+
+    public fun service_data_type(svc: &ServiceData): &vector<u8> {
+        &svc.service_type
+    }
+
+    public fun service_data_endpoint(svc: &ServiceData): &vector<u8> {
+        &svc.service_endpoint
     }
 }
