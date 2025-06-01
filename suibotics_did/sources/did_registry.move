@@ -1,10 +1,9 @@
 module suibotics_did::did_registry {
-    use sui::object::{UID, new};
+    use sui::object::{new};
     use sui::dynamic_field;
-    use sui::tx_context::{TxContext, sender};
+    use sui::tx_context::{sender};
     use sui::transfer::share_object;
     use sui::transfer::public_transfer;
-    use sui::event;
     use std::option;
     use suibotics_did::identity_types::{
         DIDInfo, KeyInfo, 

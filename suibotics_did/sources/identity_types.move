@@ -1,9 +1,7 @@
 module suibotics_did::identity_types {
-    use sui::object::{UID, new};
-    use sui::tx_context::TxContext;
+    use sui::object::{new};
     use sui::transfer::{transfer, public_transfer};
     use sui::event;
-    use std::vector;
 
     // === ERROR CONSTANTS (STANDARDIZED ACROSS ALL MODULES) ===
 

@@ -1,7 +1,6 @@
 #[test_only]
 module suibotics_did::simple_tests {
     use sui::test_scenario::{Self as ts};
-    use std::vector;
     
     use suibotics_did::did_registry::{Self, DIDRegistry};
     use suibotics_did::credential_registry::{Self, CredentialRegistry};

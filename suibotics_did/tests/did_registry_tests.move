@@ -22,7 +22,6 @@ module suibotics_did::did_registry_tests {
     // Test addresses
     const ALICE: address = @0xa11ce;
     const BOB: address = @0xb0b;
-    const CHARLIE: address = @0xc4a12;
 
     // Test helper to create a dummy public key
     fun dummy_pubkey(): vector<u8> {
@@ -44,11 +43,6 @@ module suibotics_did::did_registry_tests {
             i = i + 1;
         };
         key
-    }
-
-    // Helper to convert b"string" to vector<u8>
-    fun string_to_vector(s: vector<u8>): vector<u8> {
-        s
     }
 
     #[test]
