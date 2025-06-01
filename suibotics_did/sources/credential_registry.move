@@ -348,4 +348,261 @@ module suibotics_did::credential_registry {
         vector::append(&mut range_key, encode_time_to_month(end_time));
         range_key
     }
+
+    // === BATCH OPERATION STRUCTURES ===
+    
+    /// Batch operation result for tracking success/failure of individual operations
+    public struct BatchResult has copy, drop {
+        index: u64,
+        success: bool,
+        error_code: u64,
+    }
+
+    // === EVENT STRUCTURES ===
+    
+    public struct CredentialIssued has copy, drop {
+        credential_id: address,
+        subject: address,
+        issuer: address,
+        schema: vector<u8>,
+        timestamp: u64,
+    }
+    
+    public struct CredentialRevoked has copy, drop {
+        credential_id: address,
+        issuer: address,
+        timestamp: u64,
+    }
+
+    // === VALIDATION FUNCTIONS ===
+    
+    /// Validate address (simple non-zero check)
+    fun validate_address(addr: address): bool {
+        addr != @0x0
+    }
+    
+    /// Validate schema (non-empty and reasonable size)
+    fun validate_schema(schema: vector<u8>): bool {
+        !vector::is_empty(&schema) && vector::length(&schema) <= 1000
+    }
+    
+    /// Validate data hash (32-byte hash)
+    fun validate_data_hash(hash: vector<u8>): bool {
+        vector::length(&hash) == 32
+    }
+
+    // === EVENT FUNCTIONS ===
+    
+    /// Emit credential issued event
+    fun emit_credential_issued(
+        credential_id: address,
+        subject: address,
+        issuer: address,
+        schema: vector<u8>,
+        timestamp: u64
+    ) {
+        event::emit(CredentialIssued {
+            credential_id,
+            subject,
+            issuer,
+            schema,
+            timestamp,
+        });
+    }
+    
+    /// Emit credential revoked event
+    fun emit_credential_revoked(
+        credential_id: address,
+        issuer: address,
+        timestamp: u64
+    ) {
+        event::emit(CredentialRevoked {
+            credential_id,
+            issuer,
+            timestamp,
+        });
+    }
+
+    // === BATCH OPERATIONS ===
+
+    /// Batch issue multiple credentials in a single transaction
+    /// Returns vector of BatchResult indicating success/failure for each operation
+    public fun issue_credentials_batch(
+        registry: &mut CredentialRegistry,
+        subjects: vector<address>,
+        issuers: vector<address>,
+        schemas: vector<vector<u8>>,
+        data_hashes: vector<vector<u8>>,
+        ctx: &mut TxContext
+    ): vector<BatchResult> {
+        let batch_size = vector::length(&subjects);
+        assert!(batch_size <= 50, 10); // MAX_BATCH_SIZE and E_BATCH_TOO_LARGE
+        assert!(batch_size == vector::length(&issuers), 7);
+        assert!(batch_size == vector::length(&schemas), 7);
+        assert!(batch_size == vector::length(&data_hashes), 7);
+        
+        let mut results = vector::empty<BatchResult>();
+        let ts = sui::tx_context::epoch_timestamp_ms(ctx);
+        
+        let mut i = 0;
+        while (i < batch_size) {
+            let subject = *vector::borrow(&subjects, i);
+            let issuer = *vector::borrow(&issuers, i);
+            let schema = *vector::borrow(&schemas, i);
+            let data_hash = *vector::borrow(&data_hashes, i);
+            
+            let mut success = true;
+            let mut error_code = 0;
+            
+            // Validate inputs
+            if (!validate_address(subject)) {
+                success = false;
+                error_code = 1; // Invalid address
+            } else if (!validate_address(issuer)) {
+                success = false;
+                error_code = 1; // Invalid address
+            } else if (!validate_schema(schema)) {
+                success = false;
+                error_code = 2; // Invalid schema
+            } else if (!validate_data_hash(data_hash)) {
+                success = false;
+                error_code = 3; // Invalid data hash
+            };
+            
+            if (success) {
+                // Create and transfer the credential
+                let credential = new_credential_info(subject, issuer, schema, data_hash, ts, ctx);
+                let credential_id = sui::object::uid_to_address(credential_info_id(&credential));
+                
+                // Update total count in registry (simplified indexing)
+                registry.total_credentials = registry.total_credentials + 1;
+                
+                // Emit event
+                emit_credential_issued(credential_id, subject, issuer, schema, ts);
+                
+                // Transfer to subject
+                transfer_credential_info(credential, subject);
+            };
+            
+            vector::push_back(&mut results, BatchResult {
+                index: i,
+                success,
+                error_code,
+            });
+            
+            i = i + 1;
+        };
+        
+        results
+    }
+
+    /// Batch revoke multiple credentials in a single transaction
+    public fun revoke_credentials_batch(
+        credentials: &mut vector<CredentialInfo>,
+        ctx: &mut TxContext
+    ): vector<BatchResult> {
+        let batch_size = vector::length(credentials);
+        assert!(batch_size <= 50, 10); // MAX_BATCH_SIZE and E_BATCH_TOO_LARGE
+        
+        let mut results = vector::empty<BatchResult>();
+        let sender_addr = sender(ctx);
+        let ts = sui::tx_context::epoch_timestamp_ms(ctx);
+        
+        let mut i = 0;
+        while (i < batch_size) {
+            let credential = vector::borrow_mut(credentials, i);
+            let credential_id = sui::object::uid_to_address(credential_info_id(credential));
+            
+            let mut success = true;
+            let mut error_code = 0;
+            
+            // Validate that sender is the issuer and credential is not already revoked
+            if (sender_addr != credential_info_issuer(credential)) {
+                success = false;
+                error_code = 1; // Unauthorized
+            } else if (credential_info_revoked(credential)) {
+                success = false;
+                error_code = 4; // Already revoked
+            };
+            
+            if (success) {
+                // Revoke the credential - fix function call to match signature
+                revoke_credential_info(credential, ts);
+                
+                // Emit event
+                emit_credential_revoked(credential_id, sender_addr, ts);
+            };
+            
+            vector::push_back(&mut results, BatchResult {
+                index: i,
+                success,
+                error_code,
+            });
+            
+            i = i + 1;
+        };
+        
+        results
+    }
+
+    // === BATCH RESULT UTILITIES ===
+
+    /// Count successful operations in batch results
+    public fun count_batch_successes(results: &vector<BatchResult>): u64 {
+        let mut success_count = 0;
+        let mut i = 0;
+        while (i < vector::length(results)) {
+            let result = vector::borrow(results, i);
+            if (result.success) {
+                success_count = success_count + 1;
+            };
+            i = i + 1;
+        };
+        success_count
+    }
+
+    /// Get failed operation indices from batch results
+    public fun get_batch_failures(results: &vector<BatchResult>): vector<u64> {
+        let mut failures = vector::empty<u64>();
+        let mut i = 0;
+        while (i < vector::length(results)) {
+            let result = vector::borrow(results, i);
+            if (!result.success) {
+                vector::push_back(&mut failures, result.index);
+            };
+            i = i + 1;
+        };
+        failures
+    }
+
+    /// Check if entire batch succeeded
+    public fun is_batch_fully_successful(results: &vector<BatchResult>): bool {
+        let mut i = 0;
+        while (i < vector::length(results)) {
+            let result = vector::borrow(results, i);
+            if (!result.success) {
+                return false
+            };
+            i = i + 1;
+        };
+        true
+    }
+
+    /// Get total credentials count from registry
+    public fun get_total_credentials(registry: &CredentialRegistry): u64 {
+        registry.total_credentials
+    }
+
+    // === TEST INITIALIZATION ===
+    
+    #[test_only]
+    /// Initialize the credential registry for testing
+    public fun init_for_testing(ctx: &mut TxContext) {
+        let registry = CredentialRegistry {
+            id: sui::object::new(ctx),
+            total_credentials: 0,
+            total_revoked: 0,
+        };
+        share_object(registry);
+    }
 }

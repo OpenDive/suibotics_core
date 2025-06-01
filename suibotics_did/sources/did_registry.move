@@ -374,4 +374,435 @@ module suibotics_did::did_registry {
         
         build_did_document(did, did_string, key_ids, service_ids)
     }
+
+    // === BATCH OPERATIONS ===
+
+    /// Batch operation result for tracking success/failure of individual operations
+    public struct BatchResult has copy, drop {
+        index: u64,
+        success: bool,
+        error_code: u64,
+    }
+
+    /// Maximum batch size to prevent gas limit issues
+    const MAX_BATCH_SIZE: u64 = 50;
+
+    /// Error code for batch size limit exceeded
+    const E_BATCH_TOO_LARGE: u64 = 10;
+
+    /// Batch register multiple DIDs in a single transaction
+    /// Returns vector of BatchResult indicating success/failure for each operation
+    public entry fun register_dids_batch(
+        registry: &mut DIDRegistry,
+        names: vector<vector<u8>>,
+        pubkeys: vector<vector<u8>>,
+        purposes: vector<vector<u8>>,
+        ctx: &mut TxContext
+    ): vector<BatchResult> {
+        let batch_size = vector::length(&names);
+        assert!(batch_size <= MAX_BATCH_SIZE, E_BATCH_TOO_LARGE);
+        assert!(batch_size == vector::length(&pubkeys), 7);
+        assert!(batch_size == vector::length(&purposes), 7);
+        
+        let mut results = vector::empty<BatchResult>();
+        let controller = sender(ctx);
+        let ts = sui::tx_context::epoch_timestamp_ms(ctx);
+        
+        let mut i = 0;
+        while (i < batch_size) {
+            let name = *vector::borrow(&names, i);
+            let pubkey = *vector::borrow(&pubkeys, i);
+            let purpose = *vector::borrow(&purposes, i);
+            
+            // Validate inputs and check if name exists
+            let mut success = true;
+            let mut error_code = 0;
+            
+            if (vector::is_empty(&name) || vector::length(&name) > 255) {
+                success = false;
+                error_code = 7; // E_EMPTY_FIELD or E_FIELD_TOO_LONG
+            } else if (vector::length(&pubkey) != 32) {
+                success = false;
+                error_code = 5; // E_INVALID_PUBLIC_KEY
+            } else if (vector::is_empty(&purpose)) {
+                success = false;
+                error_code = 7; // E_EMPTY_FIELD
+            } else if (dynamic_field::exists_(&registry.id, name)) {
+                success = false;
+                error_code = 4; // E_NAME_ALREADY_EXISTS
+            };
+            
+            if (success) {
+                // Create the DIDInfo object
+                let mut did = new_did_info(controller, ts, ctx);
+                let did_id = sui::object::uid_to_address(did_info_id_mut(&mut did));
+
+                // Store name mapping in the registry
+                dynamic_field::add(&mut registry.id, name, controller);
+
+                // Create initial KeyInfo and attach it to the DIDInfo using type-safe key
+                let key_info = new_key_info(pubkey, purpose);
+                let key_field_key = new_key_field_key(b"key_0");
+                dynamic_field::add(did_info_id_mut(&mut did), key_field_key, key_info);
+
+                // Emit events
+                emit_did_registered(did_id, controller, name, ts);
+                emit_key_added(did_id, b"key_0", purpose, ts);
+
+                // Transfer DIDInfo to the controller
+                transfer_did_info(did, controller);
+            };
+            
+            vector::push_back(&mut results, BatchResult {
+                index: i,
+                success,
+                error_code,
+            });
+            
+            i = i + 1;
+        };
+        
+        results
+    }
+
+    /// Batch add keys to multiple DIDs
+    public fun add_keys_batch(
+        dids: &mut vector<DIDInfo>,
+        key_ids: vector<vector<u8>>,
+        pubkeys: vector<vector<u8>>,
+        purposes: vector<vector<u8>>,
+        ctx: &mut TxContext
+    ): vector<BatchResult> {
+        let batch_size = vector::length(dids);
+        assert!(batch_size <= MAX_BATCH_SIZE, E_BATCH_TOO_LARGE);
+        assert!(batch_size == vector::length(&key_ids), 7);
+        assert!(batch_size == vector::length(&pubkeys), 7);
+        assert!(batch_size == vector::length(&purposes), 7);
+        
+        let mut results = vector::empty<BatchResult>();
+        let sender_addr = sender(ctx);
+        let ts = sui::tx_context::epoch_timestamp_ms(ctx);
+        
+        let mut i = 0;
+        while (i < batch_size) {
+            let did = vector::borrow_mut(dids, i);
+            let key_id = *vector::borrow(&key_ids, i);
+            let pubkey = *vector::borrow(&pubkeys, i);
+            let purpose = *vector::borrow(&purposes, i);
+            
+            let mut success = true;
+            let mut error_code = 0;
+            
+            // Validate access control
+            if (sender_addr != did_info_controller(did)) {
+                success = false;
+                error_code = 1; // E_INVALID_CONTROLLER
+            } else if (vector::is_empty(&key_id)) {
+                success = false;
+                error_code = 7; // E_EMPTY_FIELD
+            } else if (vector::length(&pubkey) != 32) {
+                success = false;
+                error_code = 5; // E_INVALID_PUBLIC_KEY
+            } else if (vector::is_empty(&purpose)) {
+                success = false;
+                error_code = 7; // E_EMPTY_FIELD
+            } else {
+                let key_field_key = new_key_field_key(key_id);
+                if (dynamic_field::exists_(did_info_id_mut(did), key_field_key)) {
+                    success = false;
+                    error_code = 3; // E_KEY_ALREADY_EXISTS
+                };
+            };
+            
+            if (success) {
+                let key_info = new_key_info(pubkey, purpose);
+                let key_field_key = new_key_field_key(key_id);
+                dynamic_field::add(did_info_id_mut(did), key_field_key, key_info);
+                
+                emit_key_added(sui::object::uid_to_address(did_info_id_mut(did)), key_id, purpose, ts);
+            };
+            
+            vector::push_back(&mut results, BatchResult {
+                index: i,
+                success,
+                error_code,
+            });
+            
+            i = i + 1;
+        };
+        
+        results
+    }
+
+    /// Batch revoke keys from multiple DIDs
+    public fun revoke_keys_batch(
+        dids: &mut vector<DIDInfo>,
+        key_ids: vector<vector<u8>>,
+        ctx: &mut TxContext
+    ): vector<BatchResult> {
+        let batch_size = vector::length(dids);
+        assert!(batch_size <= MAX_BATCH_SIZE, E_BATCH_TOO_LARGE);
+        assert!(batch_size == vector::length(&key_ids), 7);
+        
+        let mut results = vector::empty<BatchResult>();
+        let sender_addr = sender(ctx);
+        let ts = sui::tx_context::epoch_timestamp_ms(ctx);
+        
+        let mut i = 0;
+        while (i < batch_size) {
+            let did = vector::borrow_mut(dids, i);
+            let key_id = *vector::borrow(&key_ids, i);
+            
+            let mut success = true;
+            let mut error_code = 0;
+            
+            // Validate access control
+            if (sender_addr != did_info_controller(did)) {
+                success = false;
+                error_code = 1; // E_INVALID_CONTROLLER
+            } else if (vector::is_empty(&key_id)) {
+                success = false;
+                error_code = 7; // E_EMPTY_FIELD
+            } else {
+                let key_field_key = new_key_field_key(key_id);
+                if (!dynamic_field::exists_(did_info_id_mut(did), key_field_key)) {
+                    success = false;
+                    error_code = 2; // E_KEY_NOT_FOUND
+                };
+            };
+            
+            if (success) {
+                let key_field_key = new_key_field_key(key_id);
+                let key_info: &mut KeyInfo = dynamic_field::borrow_mut(did_info_id_mut(did), key_field_key);
+                revoke_key_info(key_info);
+                
+                emit_key_revoked(sui::object::uid_to_address(did_info_id_mut(did)), key_id, ts);
+            };
+            
+            vector::push_back(&mut results, BatchResult {
+                index: i,
+                success,
+                error_code,
+            });
+            
+            i = i + 1;
+        };
+        
+        results
+    }
+
+    /// Batch add services to multiple DIDs
+    public fun add_services_batch(
+        dids: &mut vector<DIDInfo>,
+        service_ids: vector<vector<u8>>,
+        service_types: vector<vector<u8>>,
+        endpoints: vector<vector<u8>>,
+        ctx: &mut TxContext
+    ): vector<BatchResult> {
+        let batch_size = vector::length(dids);
+        assert!(batch_size <= MAX_BATCH_SIZE, E_BATCH_TOO_LARGE);
+        assert!(batch_size == vector::length(&service_ids), 7);
+        assert!(batch_size == vector::length(&service_types), 7);
+        assert!(batch_size == vector::length(&endpoints), 7);
+        
+        let mut results = vector::empty<BatchResult>();
+        let sender_addr = sender(ctx);
+        let ts = sui::tx_context::epoch_timestamp_ms(ctx);
+        
+        let mut i = 0;
+        while (i < batch_size) {
+            let did = vector::borrow_mut(dids, i);
+            let service_id = *vector::borrow(&service_ids, i);
+            let service_type = *vector::borrow(&service_types, i);
+            let endpoint = *vector::borrow(&endpoints, i);
+            
+            let mut success = true;
+            let mut error_code = 0;
+            
+            // Validate access control and inputs
+            if (sender_addr != did_info_controller(did)) {
+                success = false;
+                error_code = 1; // E_INVALID_CONTROLLER
+            } else if (vector::is_empty(&service_id)) {
+                success = false;
+                error_code = 7; // E_EMPTY_FIELD
+            } else if (vector::is_empty(&service_type)) {
+                success = false;
+                error_code = 7; // E_EMPTY_FIELD
+            } else if (vector::is_empty(&endpoint) || vector::length(&endpoint) > 2000) {
+                success = false;
+                error_code = 7; // E_EMPTY_FIELD or E_FIELD_TOO_LONG
+            } else {
+                let service_field_key = new_service_field_key(service_id);
+                if (dynamic_field::exists_(did_info_id_mut(did), service_field_key)) {
+                    success = false;
+                    error_code = 3; // E_KEY_ALREADY_EXISTS (reuse for service exists)
+                };
+            };
+            
+            if (success) {
+                let svc = new_service_info(service_id, service_type, endpoint);
+                let service_field_key = new_service_field_key(service_id);
+                dynamic_field::add(did_info_id_mut(did), service_field_key, svc);
+                
+                emit_service_added(sui::object::uid_to_address(did_info_id_mut(did)), service_id, service_type, endpoint, ts);
+            };
+            
+            vector::push_back(&mut results, BatchResult {
+                index: i,
+                success,
+                error_code,
+            });
+            
+            i = i + 1;
+        };
+        
+        results
+    }
+
+    /// Batch update services across multiple DIDs
+    public fun update_services_batch(
+        dids: &mut vector<DIDInfo>,
+        service_ids: vector<vector<u8>>,
+        new_service_types: vector<vector<u8>>,
+        new_endpoints: vector<vector<u8>>,
+        ctx: &mut TxContext
+    ): vector<BatchResult> {
+        let batch_size = vector::length(dids);
+        assert!(batch_size <= MAX_BATCH_SIZE, E_BATCH_TOO_LARGE);
+        assert!(batch_size == vector::length(&service_ids), 7);
+        assert!(batch_size == vector::length(&new_service_types), 7);
+        assert!(batch_size == vector::length(&new_endpoints), 7);
+        
+        let mut results = vector::empty<BatchResult>();
+        let sender_addr = sender(ctx);
+        let ts = sui::tx_context::epoch_timestamp_ms(ctx);
+        
+        let mut i = 0;
+        while (i < batch_size) {
+            let did = vector::borrow_mut(dids, i);
+            let service_id = *vector::borrow(&service_ids, i);
+            let new_service_type = *vector::borrow(&new_service_types, i);
+            let new_endpoint = *vector::borrow(&new_endpoints, i);
+            
+            let mut success = true;
+            let mut error_code = 0;
+            
+            // Validate access control and inputs
+            if (sender_addr != did_info_controller(did)) {
+                success = false;
+                error_code = 1; // E_INVALID_CONTROLLER
+            } else if (vector::is_empty(&service_id)) {
+                success = false;
+                error_code = 7; // E_EMPTY_FIELD
+            } else if (vector::is_empty(&new_service_type)) {
+                success = false;
+                error_code = 7; // E_EMPTY_FIELD
+            } else if (vector::is_empty(&new_endpoint) || vector::length(&new_endpoint) > 2000) {
+                success = false;
+                error_code = 7; // E_EMPTY_FIELD or E_FIELD_TOO_LONG
+            } else {
+                let service_field_key = new_service_field_key(service_id);
+                if (!dynamic_field::exists_(did_info_id_mut(did), service_field_key)) {
+                    success = false;
+                    error_code = 2; // E_KEY_NOT_FOUND (reuse for service not found)
+                };
+            };
+            
+            if (success) {
+                let service_field_key = new_service_field_key(service_id);
+                let old_service: ServiceInfo = dynamic_field::remove(did_info_id_mut(did), service_field_key);
+                
+                // Capture old values for event
+                let old_type = *service_info_type(&old_service);
+                let old_endpoint = *service_info_endpoint(&old_service);
+                
+                // Create new service with updated values
+                let new_service = new_service_info(service_id, new_service_type, new_endpoint);
+                dynamic_field::add(did_info_id_mut(did), service_field_key, new_service);
+                
+                emit_service_updated(
+                    sui::object::uid_to_address(did_info_id_mut(did)), 
+                    service_id, 
+                    old_type, 
+                    new_service_type, 
+                    old_endpoint, 
+                    new_endpoint, 
+                    ts
+                );
+            };
+            
+            vector::push_back(&mut results, BatchResult {
+                index: i,
+                success,
+                error_code,
+            });
+            
+            i = i + 1;
+        };
+        
+        results
+    }
+
+    // === BATCH OPERATION UTILITIES ===
+
+    /// Count successful operations in batch results
+    public fun count_batch_successes(results: &vector<BatchResult>): u64 {
+        let mut success_count = 0;
+        let mut i = 0;
+        while (i < vector::length(results)) {
+            let result = vector::borrow(results, i);
+            if (result.success) {
+                success_count = success_count + 1;
+            };
+            i = i + 1;
+        };
+        success_count
+    }
+
+    /// Get failed operation indices from batch results
+    public fun get_batch_failures(results: &vector<BatchResult>): vector<u64> {
+        let mut failures = vector::empty<u64>();
+        let mut i = 0;
+        while (i < vector::length(results)) {
+            let result = vector::borrow(results, i);
+            if (!result.success) {
+                vector::push_back(&mut failures, result.index);
+            };
+            i = i + 1;
+        };
+        failures
+    }
+
+    /// Check if entire batch succeeded
+    public fun is_batch_fully_successful(results: &vector<BatchResult>): bool {
+        let mut i = 0;
+        while (i < vector::length(results)) {
+            let result = vector::borrow(results, i);
+            if (!result.success) {
+                return false
+            };
+            i = i + 1;
+        };
+        true
+    }
+
+    // === TEST INITIALIZATION ===
+    
+    #[test_only]
+    /// Initialize the DID registry for testing
+    public fun init_for_testing(ctx: &mut TxContext) {
+        let registry = DIDRegistry {
+            id: sui::object::new(ctx),
+        };
+        sui::transfer::share_object(registry);
+    }
+
+    // === HELPER FUNCTIONS FOR TESTING ===
+    
+    #[test_only]
+    /// Helper to create BatchResult for testing
+    public fun new_batch_result(index: u64, success: bool, error_code: u64): BatchResult {
+        BatchResult { index, success, error_code }
+    }
 }
