@@ -211,7 +211,7 @@ module suibotics_did::did_registry {
         assert!(dynamic_field::exists_(did_info_id_mut(did), service_field_key), e_service_not_found());
 
         // Remove the service from dynamic fields
-        let removed_service: ServiceInfo = dynamic_field::remove(did_info_id_mut(did), service_field_key);
+        let _old_service: ServiceInfo = dynamic_field::remove(did_info_id_mut(did), service_field_key);
         
         // Emit event
         emit_service_removed(sui::object::uid_to_address(did_info_id_mut(did)), svc_id, ts);
@@ -248,7 +248,7 @@ module suibotics_did::did_registry {
         let old_endpoint = *service_info_endpoint(current_service);
 
         // Remove old service and add new one (Move doesn't support in-place mutation of dynamic fields)
-        let old_service: ServiceInfo = dynamic_field::remove(did_info_id_mut(did), service_field_key);
+        let _old_service: ServiceInfo = dynamic_field::remove(did_info_id_mut(did), service_field_key);
         
         let updated_service = new_service_info(svc_id, new_svc_type, new_endpoint);
         dynamic_field::add(did_info_id_mut(did), service_field_key, updated_service);

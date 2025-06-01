@@ -1,7 +1,7 @@
 module suibotics_did::credential_registry {
     use sui::object::{new};
     use sui::tx_context::{sender};
-    use sui::transfer::{public_transfer, share_object};
+    use sui::transfer::share_object;
     use sui::dynamic_field;
     use sui::event;
 
