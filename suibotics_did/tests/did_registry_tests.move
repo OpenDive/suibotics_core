@@ -610,4 +610,164 @@ module suibotics_did::did_registry_tests {
         ts::return_to_sender(&scenario, did);
         ts::end(scenario);
     }
+
+    #[test]
+    fun test_remove_service_success() {
+        let mut scenario = ts::begin(ALICE);
+        let ctx = ts::ctx(&mut scenario);
+        
+        did_registry::test_init(ctx);
+        ts::next_tx(&mut scenario, ALICE);
+        
+        let mut registry = ts::take_shared<DIDRegistry>(&scenario);
+        
+        // Register a DID
+        did_registry::register_did(
+            &mut registry,
+            b"alice_did",
+            dummy_pubkey(),
+            b"authentication",
+            ts::ctx(&mut scenario)
+        );
+        
+        ts::return_shared(registry);
+        ts::next_tx(&mut scenario, ALICE);
+        
+        let mut did = ts::take_from_sender<DIDInfo>(&scenario);
+        
+        // Add a service to remove
+        did_registry::add_service(
+            &mut did,
+            b"temp_service",
+            b"TempAPI",
+            b"https://temp.example.com",
+            ts::ctx(&mut scenario)
+        );
+        
+        // Verify service exists
+        assert!(did_registry::has_service(&did, b"temp_service"), 0);
+        
+        // Remove the service
+        did_registry::remove_service(
+            &mut did,
+            b"temp_service",
+            ts::ctx(&mut scenario)
+        );
+        
+        // Verify service no longer exists
+        assert!(!did_registry::has_service(&did, b"temp_service"), 1);
+        
+        ts::return_to_sender(&scenario, did);
+        ts::end(scenario);
+    }
+
+    #[test]
+    fun test_update_service_success() {
+        let mut scenario = ts::begin(ALICE);
+        let ctx = ts::ctx(&mut scenario);
+        
+        did_registry::test_init(ctx);
+        ts::next_tx(&mut scenario, ALICE);
+        
+        let mut registry = ts::take_shared<DIDRegistry>(&scenario);
+        
+        // Register a DID
+        did_registry::register_did(
+            &mut registry,
+            b"alice_did",
+            dummy_pubkey(),
+            b"authentication",
+            ts::ctx(&mut scenario)
+        );
+        
+        ts::return_shared(registry);
+        ts::next_tx(&mut scenario, ALICE);
+        
+        let mut did = ts::take_from_sender<DIDInfo>(&scenario);
+        
+        // Add a service to update
+        did_registry::add_service(
+            &mut did,
+            b"api_service",
+            b"OldAPI",
+            b"https://old.example.com",
+            ts::ctx(&mut scenario)
+        );
+        
+        // Update the service
+        did_registry::update_service(
+            &mut did,
+            b"api_service",
+            b"NewAPI",
+            b"https://new.example.com",
+            ts::ctx(&mut scenario)
+        );
+        
+        // Verify service was updated by checking it still exists
+        assert!(did_registry::has_service(&did, b"api_service"), 0);
+        
+        ts::return_to_sender(&scenario, did);
+        ts::end(scenario);
+    }
+
+    #[test]
+    fun test_service_lifecycle_management() {
+        let mut scenario = ts::begin(ALICE);
+        let ctx = ts::ctx(&mut scenario);
+        
+        did_registry::test_init(ctx);
+        ts::next_tx(&mut scenario, ALICE);
+        
+        let mut registry = ts::take_shared<DIDRegistry>(&scenario);
+        
+        // Register a DID
+        did_registry::register_did(
+            &mut registry,
+            b"alice_did",
+            dummy_pubkey(),
+            b"authentication",
+            ts::ctx(&mut scenario)
+        );
+        
+        ts::return_shared(registry);
+        ts::next_tx(&mut scenario, ALICE);
+        
+        let mut did = ts::take_from_sender<DIDInfo>(&scenario);
+        
+        // Test complete service lifecycle: add -> update -> remove
+        
+        // 1. Add service
+        did_registry::add_service(
+            &mut did,
+            b"lifecycle_service",
+            b"InitialAPI",
+            b"https://initial.example.com",
+            ts::ctx(&mut scenario)
+        );
+        
+        assert!(did_registry::has_service(&did, b"lifecycle_service"), 0);
+        
+        // 2. Update service
+        did_registry::update_service(
+            &mut did,
+            b"lifecycle_service",
+            b"UpdatedAPI",
+            b"https://updated.example.com",
+            ts::ctx(&mut scenario)
+        );
+        
+        assert!(did_registry::has_service(&did, b"lifecycle_service"), 1);
+        
+        // 3. Remove service
+        did_registry::remove_service(
+            &mut did,
+            b"lifecycle_service",
+            ts::ctx(&mut scenario)
+        );
+        
+        assert!(!did_registry::has_service(&did, b"lifecycle_service"), 2);
+        
+        ts::return_to_sender(&scenario, did);
+        ts::end(scenario);
+    }
 } 

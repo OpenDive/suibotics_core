@@ -3,6 +3,7 @@ module suibotics_did::did_registry {
     use sui::dynamic_field;
     use sui::tx_context::{TxContext, sender};
     use sui::transfer::share_object;
+    use sui::transfer::public_transfer;
     use sui::event;
     use std::option;
     use suibotics_did::identity_types::{
@@ -19,7 +20,8 @@ module suibotics_did::did_registry {
         new_did_document_data, new_verification_method_data, new_service_data,
         add_verification_method, add_authentication_key, add_service_to_doc,
         key_info_pubkey, key_info_purpose, key_info_revoked,
-        service_info_id, service_info_type, service_info_endpoint, did_info_created_at
+        service_info_id, service_info_type, service_info_endpoint, did_info_created_at,
+        emit_service_removed, emit_service_updated
     };
 
     /// Global registry for name-to-DID mappings
@@ -171,6 +173,82 @@ module suibotics_did::did_registry {
 
         // Emit event
         emit_service_added(sui::object::uid_to_address(did_info_id_mut(did)), svc_id, svc_type, endpoint, ts);
+    }
+
+    /// Remove a service endpoint from the DID Document
+    public entry fun remove_service(
+        did: &mut DIDInfo,
+        svc_id: vector<u8>,
+        ctx: &mut TxContext
+    ) {
+        let sender_addr = sender(ctx);
+        let ts = sui::tx_context::epoch_timestamp_ms(ctx);
+        
+        // Validate inputs
+        validate_key_id(&svc_id);
+        
+        // Verify sender is the DID controller
+        assert!(sender_addr == did_info_controller(did), e_invalid_controller());
+
+        // Create type-safe service field key
+        let service_field_key = new_service_field_key(svc_id);
+
+        // Check if service exists before trying to remove it
+        assert!(dynamic_field::exists_(did_info_id_mut(did), service_field_key), e_key_not_found());
+
+        // Remove the service from dynamic fields
+        let removed_service: ServiceInfo = dynamic_field::remove(did_info_id_mut(did), service_field_key);
+        
+        // Emit event
+        emit_service_removed(sui::object::uid_to_address(did_info_id_mut(did)), svc_id, ts);
+    }
+
+    /// Update a service endpoint in the DID Document
+    public entry fun update_service(
+        did: &mut DIDInfo,
+        svc_id: vector<u8>,
+        new_svc_type: vector<u8>,
+        new_endpoint: vector<u8>,
+        ctx: &mut TxContext
+    ) {
+        let sender_addr = sender(ctx);
+        let ts = sui::tx_context::epoch_timestamp_ms(ctx);
+        
+        // Validate inputs
+        validate_key_id(&svc_id);
+        validate_purpose(&new_svc_type);
+        validate_endpoint(&new_endpoint);
+        
+        // Verify sender is the DID controller
+        assert!(sender_addr == did_info_controller(did), e_invalid_controller());
+
+        // Create type-safe service field key
+        let service_field_key = new_service_field_key(svc_id);
+
+        // Check if service exists before trying to update it
+        assert!(dynamic_field::exists_(did_info_id_mut(did), service_field_key), e_key_not_found());
+
+        // Get the current service to capture old values for event
+        let current_service: &ServiceInfo = dynamic_field::borrow(did_info_id_mut(did), service_field_key);
+        let old_type = *service_info_type(current_service);
+        let old_endpoint = *service_info_endpoint(current_service);
+
+        // Remove old service and add new one (Move doesn't support in-place mutation of dynamic fields)
+        let old_service: ServiceInfo = dynamic_field::remove(did_info_id_mut(did), service_field_key);
+        
+        let updated_service = new_service_info(svc_id, new_svc_type, new_endpoint);
+        dynamic_field::add(did_info_id_mut(did), service_field_key, updated_service);
+
+        // Emit event
+        emit_service_updated(
+            sui::object::uid_to_address(did_info_id_mut(did)), 
+            svc_id, 
+            old_type, 
+            new_svc_type, 
+            old_endpoint, 
+            new_endpoint, 
+            ts
+        );
     }
 
     /// Get the controller address for a given DID name

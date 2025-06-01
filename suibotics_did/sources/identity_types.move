@@ -90,6 +90,22 @@ module suibotics_did::identity_types {
         timestamp: u64,
     }
 
+    public struct ServiceRemoved has copy, drop {
+        did_id: address,
+        service_id: vector<u8>,
+        timestamp: u64,
+    }
+
+    public struct ServiceUpdated has copy, drop {
+        did_id: address,
+        service_id: vector<u8>,
+        old_type: vector<u8>,
+        new_type: vector<u8>,
+        old_endpoint: vector<u8>,
+        new_endpoint: vector<u8>,
+        timestamp: u64,
+    }
+
     public struct CredentialIssued has copy, drop {
         credential_id: address,
         subject: address,
@@ -119,7 +135,7 @@ module suibotics_did::identity_types {
     }
 
     /// A service endpoint entry in a DID Document.
-    public struct ServiceInfo has store {
+    public struct ServiceInfo has store, drop {
         id: vector<u8>,         // fragment, e.g. b"mqtt1"
         type_: vector<u8>,      // e.g. b"MQTTBroker"
         endpoint: vector<u8>,   // e.g. b"wss://host:port"
@@ -407,6 +423,38 @@ module suibotics_did::identity_types {
             service_id,
             service_type,
             endpoint,
+            timestamp,
+        });
+    }
+
+    public fun emit_service_removed(
+        did_id: address,
+        service_id: vector<u8>,
+        timestamp: u64
+    ) {
+        event::emit(ServiceRemoved {
+            did_id,
+            service_id,
+            timestamp,
+        });
+    }
+
+    public fun emit_service_updated(
+        did_id: address,
+        service_id: vector<u8>,
+        old_type: vector<u8>,
+        new_type: vector<u8>,
+        old_endpoint: vector<u8>,
+        new_endpoint: vector<u8>,
+        timestamp: u64
+    ) {
+        event::emit(ServiceUpdated {
+            did_id,
+            service_id,
+            old_type,
+            new_type,
+            old_endpoint,
+            new_endpoint,
             timestamp,
         });
     }
