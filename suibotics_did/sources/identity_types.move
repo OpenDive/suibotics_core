@@ -26,17 +26,23 @@ module suibotics_did::identity_types {
     const E_CREDENTIAL_ALREADY_REVOKED: u64 = 21;
     const E_UNAUTHORIZED_REVOCATION: u64 = 22;
     const E_INVALID_SCHEMA: u64 = 23;
+    #[allow(unused_const)]
     const E_CREDENTIAL_EXPIRED: u64 = 24;
 
     // Service management errors (30-39)
     const E_SERVICE_NOT_FOUND: u64 = 30;
     const E_SERVICE_ALREADY_EXISTS: u64 = 31;
+    #[allow(unused_const)]
     const E_INVALID_SERVICE_TYPE: u64 = 32;
+    #[allow(unused_const)]
     const E_INVALID_ENDPOINT: u64 = 33;
 
     // Registry errors (40-49)
+    #[allow(unused_const)]
     const E_REGISTRY_NOT_FOUND: u64 = 40;
+    #[allow(unused_const)]
     const E_REGISTRY_FULL: u64 = 41;
+    #[allow(unused_const)]
     const E_INDEX_CORRUPTED: u64 = 42;
 
     // Future expansion (50+)

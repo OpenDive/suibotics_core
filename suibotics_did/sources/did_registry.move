@@ -1,3 +1,4 @@
+#[allow(unused_use)]
 module suibotics_did::did_registry {
     use sui::object::{new};
     use sui::dynamic_field;
