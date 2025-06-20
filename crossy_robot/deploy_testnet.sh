@@ -132,7 +132,7 @@ check_wallet() {
 
 # Function to build and test the package
 build_and_test() {
-    print_status "Building and testing the Crossy Robot game contract..."
+    print_status "Building and testing the Crossy Robot game contracts..."
     
     # Clean previous build
     if [[ -d "build" ]]; then
@@ -161,7 +161,7 @@ build_and_test() {
 
 # Function to deploy the package
 deploy_package() {
-    print_status "Deploying Crossy Robot game contract to testnet..."
+    print_status "Deploying Crossy Robot game contracts to testnet..."
     
     # Create deployment command
     local deploy_cmd="sui client publish --gas-budget $GAS_BUDGET --json"
@@ -179,13 +179,15 @@ deploy_package() {
         local tx_digest=$(echo "$deployment_output" | jq -r '.digest' 2>/dev/null || echo "")
         
         if [[ -n "$package_id" ]]; then
-            print_success "Crossy Robot game contract deployed successfully!"
+            print_success "Crossy Robot game contracts deployed successfully!"
             echo ""
             echo "=== DEPLOYMENT RESULTS ==="
             echo "Package ID: $package_id"
             echo "Transaction Digest: $tx_digest"
             echo "Network: testnet"
-            echo "Game Cost: 0.05 SUI (50,000,000 MIST)"
+            echo "Deployed Contracts:"
+            echo "  • crossy_robot - Pay-to-play (0.05 SUI per game)"
+            echo "  • crowd_robot - Free crowd-controlled (2-minute games)"
             echo "Timestamp: $(date)"
             echo ""
             
@@ -198,17 +200,37 @@ deploy_package() {
   "timestamp": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
   "package_name": "$PACKAGE_NAME",
   "gas_budget": $GAS_BUDGET,
-  "game_cost_sui": "0.05",
-  "game_cost_mist": 50000000,
-  "contract_functions": {
-    "create_game": "Create new game with 0.05 SUI payment",
-    "connect_robot": "Robot connects to game and receives payment",
-    "move_robot": "Issue movement command (0-7 directions)"
-  },
-  "events": {
-    "GameCreated": "New game available for robots",
-    "RobotConnected": "Robot accepted the game",
-    "RobotMoved": "Movement command issued"
+  "contracts": {
+    "crossy_robot": {
+      "description": "Pay-to-play robot control game",
+      "game_cost_sui": "0.05",
+      "game_cost_mist": 50000000,
+      "functions": {
+        "create_game": "Create new game with 0.05 SUI payment",
+        "connect_robot": "Robot connects to game and receives payment",
+        "move_robot": "Issue movement command (0-7 directions)"
+      },
+      "events": {
+        "GameCreated": "New game available for robots",
+        "RobotConnected": "Robot accepted the game",
+        "RobotMoved": "Movement command issued"
+      }
+    },
+    "crowd_robot": {
+      "description": "Free crowd-controlled robot game",
+      "game_duration_minutes": 2,
+      "game_cost": "free",
+      "functions": {
+        "create_game": "Create new free game (2-minute duration)",
+        "move_robot": "Anyone can submit movement commands",
+        "end_game": "Manually end expired games"
+      },
+      "events": {
+        "GameCreated": "New free game available",
+        "RobotMoved": "Movement command from any player",
+        "GameEnded": "Game completed with statistics"
+      }
+    }
   }
 }
 EOF
@@ -226,12 +248,17 @@ EOF
             echo "=== INTEGRATION EXAMPLES ==="
             echo "Frontend (TypeScript):"
             echo "  const PACKAGE_ID = '$package_id';"
-            echo "  // Create game: call create_game(payment, clock)"
-            echo "  // Move robot: call move_robot(game, direction, clock)"
+            echo "  // Original contract (pay-to-play):"
+            echo "  //   create_game(payment, clock)"
+            echo "  //   move_robot(game, direction, clock)"
+            echo "  // New contract (crowd-controlled):"
+            echo "  //   crowd_robot::create_game(clock)"
+            echo "  //   crowd_robot::move_robot(game, direction, clock)"
             echo ""
             echo "Robot (Python):"
-            echo "  # Listen for GameCreated events to connect"
+            echo "  # Listen for GameCreated events from both contracts"
             echo "  # Listen for RobotMoved events to execute movements"
+            echo "  # crowd_robot games end automatically after 2 minutes"
             
         else
             print_error "Deployment completed but could not extract package ID from output"
@@ -254,7 +281,7 @@ verify_deployment() {
         
         # Check if package exists on chain
         if sui client object "$package_id" >/dev/null 2>&1; then
-            print_success "Package verification successful - Crossy Robot contract exists on testnet"
+            print_success "Package verification successful - Crossy Robot contracts exist on testnet"
         else
             print_warning "Package verification failed - package not found on chain"
         fi
@@ -286,7 +313,7 @@ main() {
     
     echo ""
     print_success "Crossy Robot deployment process completed successfully!"
-    print_status "Your robot control game is now live on Sui testnet! 🤖🎮"
+    print_status "Your robot control games are now live on Sui testnet! 🤖🎮"
     print_status "Check $DEPLOYMENT_LOG for detailed logs"
     echo ""
 }
