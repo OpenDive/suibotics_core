@@ -1,223 +1,270 @@
-# Crossy Robot E2E Testing
+# E2E Testing Guide
 
-This directory contains an event-driven end-to-end test that simulates the complete Crossy Robot game flow using real blockchain interactions.
+This document explains how to run End-to-End (E2E) tests for the Crossy Robot contracts on the Sui blockchain.
 
-## What This Test Does
+## Overview
 
-The test simulates the real-world interaction between users and robots:
+We provide comprehensive E2E testing for both contract variants:
 
-1. **User** creates a game by paying 0.05 SUI
-2. **Robot** listens for `GameCreated` event and automatically connects
-3. **User** sends movement commands (UP, RIGHT, DOWN, LEFT)
-4. **Robot** listens for `RobotMoved` events and simulates physical movement
-5. **Verification** ensures all events are captured and processed correctly
+### Original Crossy Robot Contract Tests
+- **Pay-to-play robot control game**
+- **Robot connection transactions**
+- **Direct payment transfers**
 
-## Quick Start
+### Crowd Robot Contract Tests *(NEW)*
+- **Free crowd-controlled games**
+- **Multi-player participation**
+- **Network stress testing**
+- **Player tracking validation**
 
-### 1. Install Dependencies
+## Test Files
+
+### Original Contract Tests
+- `simple-e2e-test.ts` - Basic functionality validation
+- `e2e-test.ts` - Comprehensive event-driven testing
+
+### Crowd Robot Contract Tests *(NEW)*
+- `simple-crowd-e2e-test.ts` - Basic crowd control validation
+- `crowd-e2e-test.ts` - Comprehensive stress testing with multi-player scenarios
+
+## Prerequisites
+
+1. **Node.js and npm** installed
+2. **Sui CLI** installed and configured
+3. **Testnet SUI tokens** in your wallets
+4. **Contract deployed** on testnet
+
+### Dependencies Installation
+
 ```bash
 npm install
 ```
 
-### 2. Set Up Wallets
-Create a `.env` file with your wallet private keys:
+### Required Environment Variables
+
+Create a `.env` file in the `crossy_robot` directory:
+
 ```bash
-cp env.example .env
-# Edit .env with your actual private keys
+# Required for all tests
+USER_PRIVATE_KEY=your_primary_wallet_private_key
+
+# Required for crowd robot tests (multi-player)
+PLAYER2_PRIVATE_KEY=your_second_wallet_private_key
+PLAYER3_PRIVATE_KEY=your_third_wallet_private_key
+
+# Optional for enhanced stress testing
+PLAYER4_PRIVATE_KEY=your_fourth_wallet_private_key
 ```
 
-### 3. Fund Wallets
-Make sure both wallets have testnet SUI:
-- **User wallet**: Needs ~0.1 SUI (0.05 for game + gas)
-- **Robot wallet**: Needs ~0.05 SUI for gas
+**Note:** Use either Sui CLI format (`suiprivkey1...`) or base64 encoded private keys.
 
-Get testnet tokens from: https://faucet.sui.io/
+### Wallet Balance Requirements
 
-### 4. Run the Test
+- **Original tests**: 0.1 SUI minimum (for game payments)
+- **Crowd robot tests**: 0.05 SUI minimum per wallet (for gas only)
+
+## Running Tests
+
+### Original Contract Tests
+
+**Basic Test:**
 ```bash
-npm test
+./simple-e2e-test.ts
+# or
+npx ts-node simple-e2e-test.ts
 ```
 
-## Prerequisites
-
-### Required Files
-- `deployment_info.json` - Contains the deployed contract package ID
-- `.env` - Contains wallet private keys (create from `env.example`)
-
-### Wallet Setup
-You need two separate wallets:
-1. **User Wallet** - Creates games and sends movement commands
-2. **Robot Wallet** - Connects to games and receives payments
-
-#### Getting Private Keys
-From Sui CLI:
+**Comprehensive Test:**
 ```bash
-# Export private key for existing wallet
-sui keytool export <address> --key-scheme ed25519
-
-# Or create new wallets
-sui client new-address ed25519
+./e2e-test.ts
+# or
+npx ts-node e2e-test.ts
 ```
 
-From Sui Wallet Browser Extension:
-1. Go to Settings → Export Private Key
-2. Copy the base64 encoded private key
+### Crowd Robot Contract Tests *(NEW)*
 
-## Configuration
-
-### Environment Variables
+**Basic Crowd Control Test:**
 ```bash
-# Required
-USER_PRIVATE_KEY=your_user_wallet_private_key_here
-ROBOT_PRIVATE_KEY=your_robot_wallet_private_key_here
-
-# Optional
-SUI_NETWORK=testnet
-SUI_RPC_URL=https://fullnode.testnet.sui.io:443
-GAS_BUDGET=10000000
-TEST_TIMEOUT_MS=30000
-MOVEMENT_DELAY_MS=2000
+./simple-crowd-e2e-test.ts
+# or
+npx ts-node simple-crowd-e2e-test.ts
 ```
 
-### Test Parameters
-- **Game Cost**: 0.05 SUI (50,000,000 MIST)
-- **Gas Budget**: 10 SUI (configurable)
-- **Test Timeout**: 30 seconds (configurable)
-- **Movement Delay**: 2 seconds between commands (configurable)
-
-## Expected Output
-
+**Comprehensive Stress Test:**
+```bash
+./crowd-e2e-test.ts
+# or
+npx ts-node crowd-e2e-test.ts
 ```
-🤖 Crossy Robot E2E Test Initialized
-📦 Package ID: 0x026e404cc7799d16f55c8e44e1a13868bbe58d48a38aebc6739e04c62d857d94
-👤 User Address: 0x1234...
-🤖 Robot Address: 0x5678...
 
-💰 Checking wallet balances...
-👤 User balance: 0.150 SUI
-🤖 Robot balance: 0.100 SUI
-✅ Wallet balances sufficient
+## Test Features
 
-👂 Starting event listener...
-✅ Event listener started
+### Original Contract Tests
 
-🎮 User: Creating new game...
-✅ Game created successfully!
-   Game ID: 0xabc123...
-   Transaction: DEF456...
+1. **Game Creation** - Pay 0.05 SUI to create game
+2. **Robot Connection** - Robot connects and receives payment
+3. **Movement Commands** - User controls robot direction
+4. **Event Processing** - Real-time blockchain events
+5. **Error Handling** - Invalid moves and insufficient funds
 
-📡 Event received: GameCreated
-🎮 GameCreated event detected!
-   Game ID: 0xabc123...
-   User: 0x1234...
-   Payment: 0.05 SUI
-🤖 Robot: Detected new game, connecting...
-✅ Robot connected to game!
-   Transaction: GHI789...
+### Crowd Robot Contract Tests *(NEW)*
 
-📡 Event received: RobotConnected
-🔗 RobotConnected event detected!
-   Game ID: 0xabc123...
-   Robot: 0x5678...
-   Timestamp: 1234567890
-✅ Robot successfully connected and received payment!
+1. **Free Game Creation** - No payment required
+2. **Multi-Player Participation** - 3-4 players control same robot
+3. **Player Tracking** - Unique participant counting
+4. **Stress Testing** - Rapid command submission (15 commands/player)
+5. **Time-Based Expiration** - 2-minute game duration
+6. **Network Performance** - Measures response times and throughput
 
-👤 User: Sending movement command: UP...
-✅ Movement command sent: UP
-   Transaction: JKL012...
+## Test Scenarios
 
-📡 Event received: RobotMoved
-🎯 RobotMoved event detected!
-   Game ID: 0xabc123...
-   Direction: 0 (UP)
-   Timestamp: 1234567891
-🤖 Robot: Executing physical movement: UP
+### Simple Tests
+- Basic contract functionality
+- Single transaction flows
+- Error condition handling
+- ~30 seconds duration
 
-[... more movements ...]
+### Comprehensive Tests
+- Multi-step workflows
+- Event-driven testing
+- Real-time monitoring
+- Stress testing scenarios
+- ~2-3 minutes duration
 
-🎉 E2E Test Complete!
+## Expected Outputs
 
-📊 Test Results:
-   ✅ Game created: YES
-   ✅ Robot connected: YES
-   ✅ Movements executed: 4
-   ✅ Events received: 6
+### Original Contract Test Results
+```
+🎮 Crossy Robot E2E Test Results:
+✅ Game created with 0.05 SUI payment
+✅ Robot connected and received payment
+✅ Movement commands executed
+✅ Events processed correctly
+✅ All transactions successful
+```
 
-🎊 ALL TESTS PASSED! 🎊
-🤖 Crossy Robot contract is working perfectly!
+### Crowd Robot Test Results *(NEW)*
+```
+🎮 Crowd Robot E2E Test Results:
+✅ Free game created (no payment required)
+✅ Multi-player crowd control: PASSED (3-4 players)
+✅ Player tracking: PASSED (unique players recorded)
+✅ Movement commands: PASSED (45-60 total moves)
+✅ Performance metrics: PASSED (avg response time)
+✅ Stress testing: PASSED (high transaction volume)
 ```
 
 ## Troubleshooting
 
 ### Common Issues
 
-#### "Private key not found"
-- Make sure `.env` file exists with correct private keys
-- Private keys should be base64 encoded
-- Copy `env.example` to `.env` and fill in your keys
+**1. Insufficient Balance**
+```
+❌ Wallet has insufficient balance
+```
+*Solution: Add more SUI to your testnet wallets*
 
-#### "Insufficient balance"
-- User wallet needs at least 0.06 SUI (0.05 for game + gas)
-- Robot wallet needs at least 0.05 SUI for gas
-- Get testnet tokens from https://faucet.sui.io/
+**2. Missing Private Keys**
+```
+❌ USER_PRIVATE_KEY not found in environment variables
+```
+*Solution: Create `.env` file with all required private keys*
 
-#### "Could not load deployment info"
-- Make sure `deployment_info.json` exists
-- Run deployment script first: `./deploy_testnet.sh`
-- Check that package_id is valid
+**3. Contract Not Deployed**
+```
+❌ Could not load deployment info
+```
+*Solution: Run deployment script first*
 
-#### "Event listener failed"
-- Check network connectivity
-- Verify RPC URL is correct
-- Try restarting the test
+**4. Network Issues**
+```
+❌ Transaction failed: RPC error
+```
+*Solution: Wait and retry, or check testnet status*
 
-#### "Transaction failed"
-- Check wallet balances
-- Verify contract is deployed correctly
-- Check gas budget settings
+### Crowd Robot Specific Issues
 
-### Debug Mode
-For more detailed logging, you can modify the script to add debug output or check transaction details on the Sui explorer.
+**1. Insufficient Players**
+```
+❌ PLAYER2_PRIVATE_KEY not found
+```
+*Solution: Add at least 3 player wallets for crowd testing*
 
-## What This Tests
+**2. Stress Test Failures**
+```
+❌ High transaction volume causing failures
+```
+*Solution: This is expected during stress testing - check success rate*
 
-### Core Functionality
-- ✅ Game creation with correct payment
-- ✅ Robot connection and payment receipt
-- ✅ Movement command execution
-- ✅ Event emission and capture
+## Performance Metrics
 
-### Event System
-- ✅ `GameCreated` events are emitted and parseable
-- ✅ `RobotConnected` events are emitted and parseable
-- ✅ `RobotMoved` events are emitted and parseable
-- ✅ Event timing and ordering
+### Original Contract Performance
+- **Game Creation**: ~1-2 seconds
+- **Robot Connection**: ~1-2 seconds  
+- **Movement Commands**: ~0.5-1 second each
+- **Event Processing**: Real-time
 
-### Economic Flow
-- ✅ 0.05 SUI payment from user to robot
-- ✅ Gas cost estimation and execution
-- ✅ Balance tracking throughout game lifecycle
+### Crowd Robot Performance *(NEW)*
+- **Free Game Creation**: ~1-2 seconds
+- **Movement Commands**: ~0.5-1 second each
+- **Stress Test Throughput**: 4-8 commands/second
+- **Multi-Player Coordination**: Parallel execution
+- **Network Capacity**: 45-60 total transactions
 
-### Integration
-- ✅ Sui TypeScript SDK integration
-- ✅ Real blockchain interaction
-- ✅ WebSocket event subscription
-- ✅ Transaction building and signing
+## Integration Examples
 
-## Next Steps
+### Basic Integration
+```typescript
+// Create game
+const tx = new Transaction();
+tx.moveCall({
+  target: `${packageId}::crowd_robot::create_game`,
+  arguments: [tx.object('0x6')], // Clock only
+});
 
-After successful testing, you can:
+// Send movement (any player)
+tx.moveCall({
+  target: `${packageId}::crowd_robot::move_robot`,
+  arguments: [
+    tx.object(gameId),
+    tx.pure.u8(direction),
+    tx.object('0x6')
+  ],
+});
+```
 
-1. **Build Frontend** - Create a web interface using similar patterns
-2. **Implement Physical Robots** - Use the event listening pattern for real robots
-3. **Add More Features** - Extend the contract and test new functionality
-4. **Deploy to Mainnet** - Use the same testing approach on mainnet
+### Event Listening
+```typescript
+// Listen for crowd robot events
+const subscription = await client.subscribeEvent({
+  filter: { Package: packageId },
+  onMessage: (event) => {
+    if (event.type.includes('RobotMoved')) {
+      const { player, direction, is_new_player } = event.parsedJson;
+      console.log(`Player ${player} moved robot ${direction}`);
+      if (is_new_player) {
+        console.log('New player joined!');
+      }
+    }
+  }
+});
+```
 
-## Notes
+## Best Practices
 
-- This test uses real testnet transactions and consumes real SUI
-- Each test run creates new game objects on the blockchain
-- Events are captured in real-time using WebSocket connections
-- The test validates the complete user journey from game creation to robot movement
+1. **Start with simple tests** before running comprehensive ones
+2. **Check wallet balances** before starting
+3. **Monitor network conditions** during stress testing
+4. **Use multiple wallets** for realistic crowd testing
+5. **Expect some failures** during high-volume stress tests
+6. **Run tests in sequence** to avoid conflicts
 
-This E2E test proves that the Crossy Robot contract works correctly in a real blockchain environment!
+## Support
+
+For issues or questions:
+1. Check the troubleshooting section
+2. Verify your environment setup
+3. Review the test output logs
+4. Check deployment status
+
+**Note:** Crowd robot tests are designed for network stress testing and may produce some transaction failures at high volumes - this is expected behavior when testing network limits.
