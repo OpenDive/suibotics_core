@@ -10,11 +10,8 @@
 /// - Real-time performance testing (no rate limiting)
 /// - Precise timestamping for network analysis
 module crossy_robot::crowd_robot {
-    use sui::object::{UID, ID};
-    use sui::tx_context::TxContext;
     use sui::event;
     use sui::clock::{Self, Clock};
-    use std::vector;
 
     // ===== Error Codes =====
     const E_GAME_ALREADY_ENDED: u64 = 1;
