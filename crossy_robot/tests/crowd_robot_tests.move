@@ -243,7 +243,7 @@ module crossy_robot::crowd_robot_tests {
     }
 
     #[test]
-    #[expected_failure(abort_code = 1)]
+    #[expected_failure(abort_code = 1, location = crowd_robot)]
     fun test_move_after_game_ended() {
         let mut scenario = ts::begin(CREATOR);
         
@@ -267,7 +267,7 @@ module crossy_robot::crowd_robot_tests {
     }
 
     #[test]
-    #[expected_failure(abort_code = 2)]
+    #[expected_failure(abort_code = 2, location = crowd_robot)]
     fun test_invalid_direction() {
         let mut scenario = ts::begin(CREATOR);
         
@@ -288,7 +288,7 @@ module crossy_robot::crowd_robot_tests {
     }
 
     #[test]
-    #[expected_failure(abort_code = 3)]
+    #[expected_failure(abort_code = 3, location = crowd_robot)]
     fun test_end_game_before_expiration() {
         let mut scenario = ts::begin(CREATOR);
         
