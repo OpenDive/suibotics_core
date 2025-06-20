@@ -1,17 +1,27 @@
 # Crossy Robot
 
-A simple blockchain-based robot control game where users pay to control physical robots in real-time.
+A blockchain-based robot control platform with two distinct game modes for controlling physical robots in real-time.
 
-## **Game Concept**
+## **Game Concepts**
 
-Crossy Robot is a pay-to-play game where:
+The platform includes two distinct robot control contracts:
+
+### **Original Contract (`crossy_robot`)** - Pay-to-Play
 1. **Users** create games by paying 0.05 SUI
 2. **Physical robots** listen for game events and connect to earn the payment
 3. **Users** control the connected robot through blockchain transactions
 4. **Robots** execute movements in the physical world based on blockchain events
 
+### **Crowd-Controlled Contract (`crowd_robot`)** - Free & Collaborative
+1. **Anyone** can create games for free (no payment required)
+2. **Physical robots** automatically monitor for new games
+3. **Anyone** can submit movement commands to control the robot
+4. **Games** automatically end after exactly 2 minutes
+5. **Player tracking** records all participants for analytics
+
 ## **Architecture**
 
+### **Original Contract Flow (Pay-to-Play)**
 ```
 ┌─────────────┐    0.05 SUI     ┌─────────────────┐
 │   Frontend  │ ──────────────► │  Smart Contract │
@@ -26,10 +36,27 @@ Crossy Robot is a pay-to-play game where:
                                 └─────────────────┘
 ```
 
+### **Crowd-Controlled Flow (Free)**
+```
+┌─────────────┐    Free Game    ┌─────────────────┐
+│   Anyone    │ ──────────────► │  Smart Contract │
+│ (Frontend)  │                 │   (Sui Blockchain)│
+└─────────────┘                 └─────────────────┘
+       │                                 │
+       │ Commands                   Events │ 2-min Timer
+       ▼                                 ▼
+┌─────────────┐                ┌─────────────────┐
+│   Crowd     │ ──────────────► │ Physical Robot  │
+│ (Multiple   │   Real-time     │   (Listener)    │
+│  Players)   │   Control       │                 │
+└─────────────┘                 └─────────────────┘
+```
+
 **Key Architecture Features:**
-- **Shared Game Objects**: Games are created as shared objects, allowing both users and robots to interact
+- **Shared Game Objects**: Games are created as shared objects, allowing multi-party interaction
 - **Event-Driven Communication**: Real-time blockchain events trigger robot actions
-- **Direct Payment Transfer**: 0.05 SUI flows directly from user to robot upon connection
+- **Dual Payment Models**: Pay-to-play OR free crowd-controlled games
+- **Time-Bounded Games**: Crowd games automatically end after 2 minutes
 - **Decentralized Control**: No central server required for game coordination
 
 ## **Game Flow**
@@ -146,13 +173,12 @@ sui client publish --gas-budget 100000000
 ```
 
 ### **Test Results**
-✅ **8/8 tests passing** - 100% test success rate
+✅ **19/19 tests passing** - 100% test success rate
 
 **Test Coverage:**
-- Game creation with valid/invalid payment
-- Robot connection success/failure scenarios
-- Movement validation for all directions
-- Error handling for invalid states
+- **Original Contract**: Game creation with payment, robot connection, movement validation
+- **Crowd Contract**: Free game creation, crowd control, time-based ending, player tracking
+- **Both Contracts**: All 8 movement directions, error handling, edge cases
 
 ### **Post-Deployment**
 After successful deployment, you'll receive:
@@ -167,8 +193,8 @@ The deployment information is automatically saved to `deployment_info.json` for 
 
 ### **For Frontend Developers**
 ```typescript
-// Create game (creates shared object)
-const createGame = async () => {
+// Original Contract - Pay-to-play game
+const createPaidGame = async () => {
   const tx = new Transaction();
   const [coin] = tx.splitCoins(tx.gas, [tx.pure.u64(50_000_000)]); // 0.05 SUI
   
@@ -180,11 +206,22 @@ const createGame = async () => {
   return await signAndExecute(tx);
 };
 
-// Move robot (requires active game)
-const moveRobot = async (gameId: string, direction: number) => {
+// Crowd-Controlled Contract - Free game
+const createFreeGame = async () => {
   const tx = new Transaction();
   tx.moveCall({
-    target: `${PACKAGE_ID}::crossy_robot::move_robot`,
+    target: `${PACKAGE_ID}::crowd_robot::create_game`,
+    arguments: [tx.object('0x6')], // Clock object only
+  });
+  
+  return await signAndExecute(tx);
+};
+
+// Move robot (works for both contracts)
+const moveRobot = async (gameId: string, direction: number, contractType: 'crossy_robot' | 'crowd_robot') => {
+  const tx = new Transaction();
+  tx.moveCall({
+    target: `${PACKAGE_ID}::${contractType}::move_robot`,
     arguments: [
       tx.object(gameId), 
       tx.pure.u8(direction), // 0-7 directions
@@ -197,37 +234,64 @@ const moveRobot = async (gameId: string, direction: number) => {
 
 ### **For Robot Developers**
 ```python
-# Listen for game events and auto-connect
+# Listen for game events from both contracts
 def listen_for_games():
-    # Subscribe to GameCreated events from package
-    # Parse event: game_id, user, payment_amount, timestamp
-    # Call connect_robot() to accept game and receive payment
+    # Subscribe to GameCreated events from both contracts
     
+    # Original contract (crossy_robot):
+    # - Parse event: game_id, user, payment_amount, timestamp
+    # - Call connect_robot() to accept game and receive payment
+    
+    # Crowd contract (crowd_robot):
+    # - Parse event: game_id, creator, created_at, end_time  
+    # - No connection needed, just start monitoring
+    
+    # Example for original contract:
     tx = Transaction()
     [received_coin] = tx.move_call(
         target=f"{PACKAGE_ID}::crossy_robot::connect_robot",
         arguments=[game_id, clock_object]
     )
-    # Transfer received payment to robot wallet
     tx.transfer_objects([received_coin], robot_address)
 
 # Listen for movement events and execute  
 def listen_for_movements():
-    # Subscribe to RobotMoved events from active games
-    # Parse event: game_id, direction (0-7), timestamp
+    # Subscribe to RobotMoved events from both contracts
+    # Parse event: game_id, direction (0-7), timestamp, player
     # Execute physical movement based on direction
     # Directions: 0=up, 1=down, 2=left, 3=right, 4-7=diagonals
+    
+    # crowd_robot games automatically end after 2 minutes
+    # crossy_robot games continue until manually ended
+
+# Listen for crowd game endings
+def listen_for_game_ends():
+    # Subscribe to GameEnded events from crowd_robot
+    # Parse event: game_id, duration, total_moves, unique_players
+    # Reset robot state for next game
 ```
 
 ##  **Current MVP Features**
 
 ### **Implemented**
+
+#### **Original Contract (`crossy_robot`)**
 - Pay-to-play game creation (0.05 SUI)
-- Shared game objects for multi-party access
 - Robot connection and automatic payment transfer
+- Individual user control
+
+#### **Crowd-Controlled Contract (`crowd_robot`)**
+- Free game creation (no payment required)
+- 2-minute time-bounded games
+- Crowd-controlled gameplay (anyone can move)
+- Player tracking and participation analytics
+- Automatic game ending with statistics
+
+#### **Shared Features**
+- Shared game objects for multi-party access
 - 8-directional movement commands (0-7)
 - Event-driven architecture with real-time blockchain events
-- Comprehensive test suite (8/8 tests passing)
+- Comprehensive test suite (19/19 tests passing)
 - End-to-end testing with TypeScript SDK
 - Automated deployment scripts with validation
 
@@ -264,11 +328,10 @@ def listen_for_movements():
 ## **Testing & Validation**
 
 ### **Smart Contract Tests**
-- ✅ 8/8 Move tests passing (100% success rate)
-- ✅ Game creation with valid/invalid payments
-- ✅ Robot connection scenarios
-- ✅ Movement validation for all 8 directions
-- ✅ Error handling and edge cases
+- ✅ 19/19 Move tests passing (100% success rate)
+- ✅ **Original Contract**: Game creation with payment, robot connection scenarios
+- ✅ **Crowd Contract**: Free game creation, time-based ending, player tracking
+- ✅ **Both Contracts**: Movement validation for all 8 directions, error handling
 
 ### **End-to-End Testing**
 - ✅ TypeScript E2E test suite with real blockchain interaction

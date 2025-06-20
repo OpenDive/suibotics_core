@@ -1,6 +1,9 @@
 # Crossy Robot Deployment Guide
 
-This guide covers deploying the Crossy Robot game contract to Sui testnet.
+This guide covers deploying the Crossy Robot game contracts to Sui testnet. The package includes two distinct robot control contracts:
+
+- **`crossy_robot`** - Pay-to-play (0.05 SUI per game, robot earns payment)
+- **`crowd_robot`** - Free crowd-controlled (2-minute games, anyone can control)
 
 ## Prerequisites
 
@@ -89,21 +92,37 @@ After successful deployment, you'll receive:
 - **Package ID**: `0xcf21b35cca41042a29b030ec7f8d7c54d80235b9fcac438cab72fd89616c82ab`
 - **Transaction**: `HC3jBPFjwEdFiyHcS3oSy1ydUR36DsVjfschWPTs8Wi1`
 - **Network**: `testnet`
-- **Game Cost**: `0.05 SUI` per game
+- **Contracts Deployed**:
+  - `crossy_robot` - Pay-to-play (0.05 SUI per game)
+  - `crowd_robot` - Free crowd-controlled (2-minute duration)
 
 ### Explorer Links
 - **Package**: https://suiscan.xyz/testnet/object/0xcf21b35cca41042a29b030ec7f8d7c54d80235b9fcac438cab72fd89616c82ab
 - **Transaction**: https://suiscan.xyz/testnet/tx/HC3jBPFjwEdFiyHcS3oSy1ydUR36DsVjfschWPTs8Wi1
 
 ### Contract Functions
+
+#### Original Contract (`crossy_robot`)
 - `create_game(payment, clock, ctx)` - Create new game with 0.05 SUI payment
 - `connect_robot(game, clock, ctx)` - Robot connects to game and receives payment
 - `move_robot(game, direction, clock, ctx)` - Issue movement command (0-7 directions)
 
+#### Crowd-Controlled Contract (`crowd_robot`)
+- `create_game(clock, ctx)` - Create new free game (2-minute duration)
+- `move_robot(game, direction, clock, ctx)` - Anyone can submit movement commands
+- `end_game(game, clock, ctx)` - Manually end expired games
+
 ### Events
+
+#### Original Contract Events
 - `GameCreated` - New game available for robots
 - `RobotConnected` - Robot accepted the game
 - `RobotMoved` - Movement command issued
+
+#### Crowd-Controlled Contract Events
+- `GameCreated` - New free game available
+- `RobotMoved` - Movement command from any player
+- `GameEnded` - Game completed with statistics
 
 ## 🔧 Integration Examples
 
@@ -111,8 +130,8 @@ After successful deployment, you'll receive:
 ```typescript
 const PACKAGE_ID = '0xcf21b35cca41042a29b030ec7f8d7c54d80235b9fcac438cab72fd89616c82ab';
 
-// Create game
-const createGame = async () => {
+// Original Contract (Pay-to-play)
+const createPaidGame = async () => {
   const payment = /* 0.05 SUI coin */;
   const tx = new TransactionBlock();
   tx.moveCall({
@@ -122,11 +141,21 @@ const createGame = async () => {
   return await signAndExecute(tx);
 };
 
-// Move robot
-const moveRobot = async (gameId: string, direction: number) => {
+// Crowd-Controlled Contract (Free)
+const createFreeGame = async () => {
   const tx = new TransactionBlock();
   tx.moveCall({
-    target: `${PACKAGE_ID}::crossy_robot::move_robot`,
+    target: `${PACKAGE_ID}::crowd_robot::create_game`,
+    arguments: [clock],
+  });
+  return await signAndExecute(tx);
+};
+
+// Move robot (works for both contracts)
+const moveRobot = async (gameId: string, direction: number, contractType: 'crossy_robot' | 'crowd_robot') => {
+  const tx = new TransactionBlock();
+  tx.moveCall({
+    target: `${PACKAGE_ID}::${contractType}::move_robot`,
     arguments: [gameId, direction, clock],
   });
   return await signAndExecute(tx);
@@ -140,18 +169,31 @@ from sui_sdk import SuiClient
 
 PACKAGE_ID = "0xcf21b35cca41042a29b030ec7f8d7c54d80235b9fcac438cab72fd89616c82ab"
 
-# Listen for game events
+# Listen for game events (both contract types)
 async def listen_for_games():
-    # Subscribe to GameCreated events
-    # Parse event data to get game_id
-    # Call connect_robot() to accept game
+    # Subscribe to GameCreated events from both contracts
+    # crossy_robot events: include payment info
+    # crowd_robot events: include game duration/end_time
+    
+    # For crossy_robot: Call connect_robot() to accept game and earn payment
+    # For crowd_robot: Just start monitoring (no connection needed)
     pass
 
 # Listen for movement events  
 async def listen_for_movements():
-    # Subscribe to RobotMoved events
-    # Parse direction from event
+    # Subscribe to RobotMoved events from both contracts
+    # Parse direction from event (0-7 for both)
     # Execute physical movement
+    
+    # crowd_robot games automatically end after 2 minutes
+    # crossy_robot games continue indefinitely
+    pass
+
+# Listen for game end events (crowd_robot only)
+async def listen_for_game_ends():
+    # Subscribe to GameEnded events from crowd_robot
+    # Parse game statistics (duration, moves, players)
+    # Reset robot state for next game
     pass
 ```
 
