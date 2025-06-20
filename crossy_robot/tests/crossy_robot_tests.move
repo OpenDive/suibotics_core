@@ -65,7 +65,7 @@ module crossy_robot::crossy_robot_tests {
     }
 
     #[test]
-    #[expected_failure(abort_code = 3)]
+    #[expected_failure(abort_code = 3, location = crossy_robot)]
     fun test_create_game_invalid_payment() {
         let mut scenario = ts::begin(USER);
         
@@ -114,7 +114,7 @@ module crossy_robot::crossy_robot_tests {
     }
 
     #[test]
-    #[expected_failure(abort_code = 1)]
+    #[expected_failure(abort_code = 1, location = crossy_robot)]
     fun test_robot_connect_already_active() {
         let mut scenario = ts::begin(USER);
         
@@ -176,7 +176,7 @@ module crossy_robot::crossy_robot_tests {
     }
 
     #[test]
-    #[expected_failure(abort_code = 5)]
+    #[expected_failure(abort_code = 5, location = crossy_robot)]
     fun test_move_robot_game_not_active() {
         let mut scenario = ts::begin(USER);
         
@@ -195,7 +195,7 @@ module crossy_robot::crossy_robot_tests {
     }
 
     #[test]
-    #[expected_failure(abort_code = 4)]
+    #[expected_failure(abort_code = 4, location = crossy_robot)]
     fun test_move_robot_invalid_direction() {
         let mut scenario = ts::begin(USER);
         
